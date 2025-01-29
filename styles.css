@@ -1,0 +1,150 @@
+/* Import Fonts */
+@font-face {
+  font-family: "AvenirBook";
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2045%20Book.otf")
+    format("opentype");
+}
+@font-face {
+  font-family: "AvenirMedium";
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2065%20Medium.otf")
+    format("opentype");
+}
+@font-face {
+  font-family: "SeasonsBold";
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Fontspring-DEMO-theseasons-bd.otf")
+    format("opentype");
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4 {
+  all: unset;
+}
+
+h1 {
+  font-family: "SeasonsBold", sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 38px;
+}
+
+h2 {
+  font-family: "AvenirMedium", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+h3 {
+  font-family: "AvenirMedium", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+h4 {
+  font-family: "AvenirMedium", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+/* Paragraphs */
+.p1 {
+  font-family: "AvenirBook", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.p2 {
+  font-family: "AvenirBook", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.p3 {
+  font-family: "AvenirBook", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+/* One Liner */
+.o1 {
+  font-family: "AvenirBook", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.o2 {
+  font-family: "AvenirBook", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+.o3 {
+  font-family: "AvenirBook", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 12px;
+}
+
+/* Responsive Design for Mobile Screens */
+@media (max-width: 500px) {
+  h1 {
+    font-size: 20px;
+    line-height: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  h3,
+  h4 {
+    font-size: 14px;
+    line-height: 24px;
+  }
+
+  .p1,
+  .p2 {
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .p3 {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .o1 {
+    font-size: 14px;
+    line-height: 14px;
+  }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.filter-button.active {
+  --sl-button-background-color: var(--sl-color-primary-500);
+  --sl-button-color: white;
+}
+
+.filter-button:hover {
+  --sl-button-background-color: var(--sl-color-primary-600);
+}

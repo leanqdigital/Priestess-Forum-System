@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priestess Forum System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/themes/light.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Post Modal -->
+    <sl-dialog id="post-modal" label="Post Details">
+        <div id="post-modal-content" class="space-y-4"></div>
+    </sl-dialog>
+
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <!-- Controls Section -->
+        <section class="mb-8 text-center">
+            <div class="mb-6">
+                <sl-button variant="default" class="refresh-button">
+                    <sl-icon name="arrow-clockwise" slot="prefix"></sl-icon>
+                    Refresh
+                </sl-button>
+            </div>
+
+            <div class="flex flex-wrap gap-4 justify-center">
+                <sl-button variant="default" class="filter-button" data-filter="recent">Recent Posts</sl-button>
+                <sl-button variant="default" class="filter-button" data-filter="featured">Featured Posts</sl-button>
+                <sl-button variant="default" class="filter-button" data-filter="my">My Posts</sl-button>
+                <sl-button variant="default" class="filter-button" data-filter="saved">Saved Posts</sl-button>
+            </div>
+        </section>
+
+        <!-- Posts Container -->
+        <main id="posts-container" class="space-y-6"></main>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center hidden py-4">
+            <sl-spinner class="loading-spinner text-2xl"></sl-spinner>
+        </div>
+
+        <!-- Error Display -->
+        <div id="error-display" class="hidden p-4 bg-red-100 text-red-700 rounded-lg"></div>
+
+        <!-- Load More Button -->
+        <div class="text-center mt-6">
+            <sl-button variant="primary" id="load-more-button" class="hidden">
+                Load More
+            </sl-button>
+        </div>
+    </div>
+
+    <!-- Templates -->
+    <script type="text/html" id="post-template">
+        <article class="post bg-white rounded-lg shadow-sm p-6" data-post-id="{{:id}}">
+            <header class="flex items-center gap-4 mb-4">
+                <img class="w-10 h-10 rounded-full object-cover" 
+                     src="{{:author.profileImage}}" 
+                     alt="{{:author.name}}"
+                     onerror="this.src='{{:defaultAuthorImage}}'">
+                <div>
+                    <h2 class="font-semibold text-gray-800">{{:author.name}}</h2>
+                    <time class="text-sm text-gray-500">{{:date}}</time>
+                </div>
+            </header>
+            
+            <div class="post-content mb-4">
+                {{if title}}<h3 class="text-xl font-medium mb-2">{{:title}}</h3>{{/if}}
+                <div class="text-gray-700 whitespace-pre-wrap">{{:content}}</div>
+            </div>
+
+            <footer class="comments-section">
+                <div class="mt-4 text-center">
+                    <sl-button variant="default" size="small" 
+                              class="load-comments-btn"
+                              data-post-id="{{:id}}">
+                        Show Comments
+                    </sl-button>
+                </div>
+            </footer>
+        </article>
+    </script>
+
+    <script type="text/html" id="comment-template">
+        <div class="comment bg-gray-50 rounded p-4 mt-4">
+            <div class="flex items-center gap-3 mb-2">
+                <img class="w-8 h-8 rounded-full object-cover"
+                     src="{{:author.profileImage}}"
+                     alt="{{:author.name}}"
+                     onerror="this.src='{{:defaultAuthorImage}}'">
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700">{{:author.name}}</h4>
+                    <time class="text-xs text-gray-500">{{:date}}</time>
+                </div>
+            </div>
+            <p class="text-gray-600 text-sm">{{:content}}</p>
+        </div>
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/1.0.5/jsrender.min.js"></script>
+    <script type="module"
+        src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/shoelace.js"></script>
+
+
+    <script src="script/config.js"></script>
+    <script src="script/api_service.js"></script>
+    <script src="script/formatter.js"></script>
+    <script src="script/ui_manager.js"></script>
+    <script src="script/app.js"></script>
+</body>
+
+</html>
