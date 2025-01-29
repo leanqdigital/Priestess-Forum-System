@@ -1,4 +1,4 @@
-Content Hierarchy
+Content Hierarchy Updated
 1. Post - > Comment - > Replies
 
 Components
