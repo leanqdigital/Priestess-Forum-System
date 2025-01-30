@@ -323,6 +323,7 @@ class ForumManager {
           isBookmarked,
           id: post.ID,
           author_id: post.Author_ID,
+          featured_post: post.Featured_Post,
           defaultAuthorImage: CONFIG.api.defaultAuthorImage,
           author: Formatter.formatAuthor({
             firstName: post.Author_First_Name,
@@ -387,6 +388,7 @@ class ForumManager {
           Date_Added: field(arg: ["created_at"])
           Post_Title: field(arg: ["post_title"])
           Post_Copy: field(arg: ["post_copy"])
+          Featured_Post: field(arg: ["featured_post"])
         }
       }
     `;
