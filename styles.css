@@ -1,17 +1,20 @@
 /* Import Fonts */
 @font-face {
   font-family: "AvenirBook";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2045%20Book.otf") format("opentype");
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2045%20Book.otf")
+    format("opentype");
 }
 
 @font-face {
   font-family: "AvenirMedium";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2065%20Medium.otf") format("opentype");
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2065%20Medium.otf")
+    format("opentype");
 }
 
 @font-face {
   font-family: "SeasonsBold";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Fontspring-DEMO-theseasons-bd.otf") format("opentype");
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Fontspring-DEMO-theseasons-bd.otf")
+    format("opentype");
 }
 
 :root {
@@ -24,28 +27,28 @@
   /* Secondary Colors */
   --primary: #044047;
   --primary-100: #022327;
-  --primary-200: #358D97;
-  --primary-300: #D9EAEC;
+  --primary-200: #358d97;
+  --primary-300: #d9eaec;
 
   /* Grey Colors */
   --grey: #fef5f1;
   --grey-100: #737373;
   --grey-200: #d9d9d9;
   --grey-300: #f4f1f1;
-/* Danger Shades */
-  --danger-100: #AB0707;
-  --danger-200: #DC0A0A;
-  --danger-300: #FDD0D1;
+  /* Danger Shades */
+  --danger-100: #ab0707;
+  --danger-200: #dc0a0a;
+  --danger-300: #fdd0d1;
 
   /* Success Shades */
   --success-100: #035933;
-  --success-200: #059E5A;
-  --success-300: #A6FCD6;
+  --success-200: #059e5a;
+  --success-300: #a6fcd6;
 
   /* Warning Shades */
   --warning-100: #594203;
-  --warning-200: #BB8B06;
-  --warning-300: #FCE5A6;
+  --warning-200: #bb8b06;
+  --warning-300: #fce5a6;
   /* Other Colors */
   --black: #0e0e0e;
   --white: #fef5f1;
@@ -92,7 +95,8 @@ sl-dialog::part(base) {
   }
 }
 
-.dialog__overlay, .dialog--open{
+.dialog__overlay,
+.dialog--open {
   background-color: red !important;
 }
 
@@ -282,8 +286,45 @@ h4 {
   --sl-button-background-color: var(--sl-color-primary-600);
 }
 
-.dialog__overlay{
+.dialog__overlay {
   background-color: green !important;
 }
 
-
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--secondary-300);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  opacity: 1;
+  transition: opacity 1s ease;
+  z-index: 999999999999 !important;
+}
+.spinner {
+  border: 4px solid var(--primary-200);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.loader.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
