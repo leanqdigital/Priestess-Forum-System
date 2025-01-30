@@ -53,7 +53,37 @@
   --black: #0e0e0e;
   --white: #fef5f1;
 }
-
+/* Hide Scrollbar */
+* {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+}
+/* Hide scrollbar in Chrome, Safari, and Edge */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+/* Hide scrollbar inside the Shoelace modal */
+sl-dialog::part(panel) {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer and Edge */
+}
+sl-dialog::part(body) {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer and Edge */
+}
+/* Hide scrollbar in WebKit browsers (Chrome, Safari, Edge) */
+sl-dialog::part(panel)::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
 /* Tab Buttons */
 .tab-Button {
   padding: 12px 24px;
