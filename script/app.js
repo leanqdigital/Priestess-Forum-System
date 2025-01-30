@@ -304,9 +304,13 @@ class ForumManager {
 
         if (isInitialLoad) {
           document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
-                    <div class="text-center text-gray-600 p-4">
-                        <p>⚠️ No posts found.</p>
-                    </div>
+                  <div class="flex flex-col gap-6  items-center justify-center ">
+          <div class="size-[200px]">
+            <img src="./assets/emptyPost.svg" alt="Empty Post" class="size-full object-contain">
+          </div>
+          <div class="p2 text-black">No post available.</div>
+        </div>
+                   
                 `;
         }
         return;
