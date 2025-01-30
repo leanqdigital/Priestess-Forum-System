@@ -34,16 +34,18 @@ class ForumManager {
         this.handleFilterChange(filterType);
         this.classList.add("active");
       }
-      if (e.target.closest(".load-comments-btn")) {
-        const postId = e.target.dataset.postId;
-        const postElement = document.querySelector(
-          `[data-post-id="${postId}"]`
-        );
-
-        if (!postElement) {
+      const button = e.target.closest(".load-comments-btn");
+      if (button) {
+        const postId = button.dataset.postId;
+        if (!postId) {
+          console.error("Error: Post ID not found.");
           return;
         }
-
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        if (!postElement) {
+          console.error("Error: Post element not found.");
+          return;
+        }
         const post = {
           id: postId,
           author: {
@@ -54,6 +56,8 @@ class ForumManager {
           title: postElement.querySelector("h3")?.textContent || "",
           content: postElement.querySelector(".post-content div").textContent,
         };
+
+        console.log(`Opening modal for post ID: ${postId}`);
         await PostModalManager.open(post);
       }
       if (e.target.closest('.delete-post-btn')) {

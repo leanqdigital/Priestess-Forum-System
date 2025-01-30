@@ -10,6 +10,7 @@
         href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/themes/light.css">
     <link href="https://unpkg.com/devextreme@19.1-next/dist/css/dx.common.css" rel="stylesheet">
     <link href="https://unpkg.com/devextreme@19.1-next/dist/css/dx.light.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
 <body class="bg-gray-50">
@@ -78,54 +79,95 @@
 
     <!-- Templates -->
     <script type="text/html" id="post-template">
-        <article class="post bg-white rounded-lg shadow-sm p-6" data-post-id="{{:id}}">
-          <header class="flex items-center gap-4 mb-4">
-            <img class="w-10 h-10 rounded-full object-cover" 
-                 src="{{:author.profileImage}}" 
-                 alt="{{:author.name}}"
-                 onerror="this.src='{{:defaultAuthorImage}}'">
-            <div class = "flex items-center justify-between w-full">
-                <div>
-                    <h2 class="font-semibold text-gray-800">{{:author.name}}</h2>
-                    <time class="text-sm text-gray-500">{{:date}}</time>
-                </div>
-                {{if author_id == "171031"}}
-                <div class="flex items-center gap-4">
-                  <button type="button" 
-                          class="delete-post-btn text-red-600 hover:text-red-800"
-                          data-post-id="{{:id}}">
-                    Delete
-                  </button>
-                  <button type="button" 
-                          class="edit-post-btn text-blue-600 hover:text-blue-800"
-                          data-post-id="{{:id}}">
-                    Edit
-                  </button>
-                </div>
-                {{/if}}
-            </div>
-          </header>
-          
-          <div class="post-content mb-4">
-            <div class="text-gray-700 whitespace-pre-wrap">{{:content}}</div>
-          </div>
-      
-          <footer class="comments-section">
-            <div class="mt-4 text-center">
-              <sl-button variant="default" size="small" 
-                        class="load-comments-btn"
-                        data-post-id="{{:id}}">
-                Show Comments
-              </sl-button>
-              <sl-button variant="default" size="small" 
-                        class="save-post-btn"
-                        data-post-id="{{:id}}">
-                Save This Post
-              </sl-button>
-            </div>
-          </footer>
-        </article>
-      </script>
+                    <div class="p-4 flex flex-col items-start gap-3 bg-white rounded" data-post-id="{{:id}}">
+                        <!-- Avatar Section -->
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-2">
+                                <div class="size-8">
+                                    <img alt="{{:author.name}}" onerror="this.src='{{:defaultAuthorImage}}'"
+                                        src="{{:author.profileImage}}"
+                                        class="rounded-full size-full object-cover">
+                                </div>
+                                <h2 class="text-black h2">{{:author.name}}</h2>
+                                <div class="h-[15.13px] w-[2px] border border-[var(--secondary)]"></div>
+                                <time class="o3 text-[#737373]">{{:date}}</time>
+                                <!-- Featured Post Icon -->
+                                <div class="size-[20px]">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path  d="M16.6026 2.94868H14.6795V2.30765C14.6795 2.13764 14.612 1.97459 14.4917 1.85438C14.3715 1.73416 14.2085 1.66663 14.0385 1.66663C13.8685 1.66663 13.7054 1.73416 13.5852 1.85438C13.465 1.97459 13.3974 2.13764 13.3974 2.30765V2.94868H6.98718V2.30765C6.98718 2.13764 6.91964 1.97459 6.79943 1.85438C6.67921 1.73416 6.51616 1.66663 6.34615 1.66663C6.17614 1.66663 6.0131 1.73416 5.89288 1.85438C5.77266 1.97459 5.70513 2.13764 5.70513 2.30765V2.94868H3.78205C3.44203 2.94868 3.11594 3.08375 2.8755 3.32418C2.63507 3.56461 2.5 3.89071 2.5 4.23073V17.0512C2.5 17.3913 2.63507 17.7174 2.8755 17.9578C3.11594 18.1982 3.44203 18.3333 3.78205 18.3333H16.6026C16.9426 18.3333 17.2687 18.1982 17.5091 17.9578C17.7495 17.7174 17.8846 17.3913 17.8846 17.0512V4.23073C17.8846 3.89071 17.7495 3.56461 17.5091 3.32418C17.2687 3.08375 16.9426 2.94868 16.6026 2.94868ZM5.70513 5.51278V4.87175C5.70513 4.70174 5.77266 4.5387 5.89288 4.41848C6.0131 4.29827 6.17614 4.23073 6.34615 4.23073C6.51616 4.23073 6.67921 4.29827 6.79943 4.41848C6.91964 4.5387 6.98718 4.70174 6.98718 4.87175V5.51278C6.98718 5.68279 6.91964 5.84584 6.79943 5.96605C6.67921 6.08627 6.51616 6.15381 6.34615 6.15381C6.17614 6.15381 6.0131 6.08627 5.89288 5.96605C5.77266 5.84584 5.70513 5.68279 5.70513 5.51278ZM14.2428 10.3766L12.2829 11.9944L12.8806 14.407C12.8958 14.4683 12.8926 14.5327 12.8714 14.5921C12.8501 14.6515 12.8118 14.7034 12.7612 14.7411C12.7057 14.7821 12.6386 14.8042 12.5697 14.8044C12.5133 14.8041 12.4581 14.7889 12.4095 14.7604L10.1923 13.4599L7.97756 14.7636C7.92292 14.796 7.85989 14.8114 7.79647 14.8079C7.73305 14.8044 7.6721 14.7821 7.62136 14.7439C7.57062 14.7057 7.53238 14.6533 7.51148 14.5933C7.49059 14.5333 7.48799 14.4685 7.50401 14.407L8.10176 11.9911L6.14183 10.3766C6.09235 10.3359 6.05618 10.2814 6.03797 10.22C6.01976 10.1587 6.02035 10.0932 6.03966 10.0322C6.05897 9.97115 6.09612 9.91729 6.14632 9.87756C6.19652 9.83782 6.25747 9.81403 6.32131 9.80925L8.90465 9.60974L9.89824 7.30925C9.9231 7.25191 9.96418 7.20309 10.0164 7.16879C10.0687 7.13449 10.1298 7.11622 10.1923 7.11622C10.2548 7.11622 10.3159 7.13449 10.3682 7.16879C10.4204 7.20309 10.4615 7.25191 10.4864 7.30925L11.48 9.60974L14.0633 9.80925C14.1271 9.81403 14.1881 9.83782 14.2383 9.87756C14.2885 9.91729 14.3256 9.97115 14.345 10.0322C14.3643 10.0932 14.3649 10.1587 14.3466 10.22C14.3284 10.2814 14.2923 10.3359 14.2428 10.3766ZM14.6795 5.51278C14.6795 5.68279 14.612 5.84584 14.4917 5.96605C14.3715 6.08627 14.2085 6.15381 14.0385 6.15381C13.8685 6.15381 13.7054 6.08627 13.5852 5.96605C13.465 5.84584 13.3974 5.68279 13.3974 5.51278V4.87175C13.3974 4.70174 13.465 4.5387 13.5852 4.41848C13.7054 4.29827 13.8685 4.23073 14.0385 4.23073C14.2085 4.23073 14.3715 4.29827 14.4917 4.41848C14.612 4.5387 14.6795 4.70174 14.6795 4.87175V5.51278Z" fill="#C29D68" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <!-- Three Dots -->
+                                    {{if author_id == "171031"}}
+                            <div x-data="{ editDeletePost: false, openedWithKeyboard: false }" class="relative w-fit"
+                                x-on:keydown.esc.window="editDeletePost = false, openedWithKeyboard = false">
+                                <div class="size-4 cursor-pointer" x-on:click="editDeletePost = ! editDeletePost" aria-haspopup="true"
+                                    x-on:keydown.space.prevent="openedWithKeyboard = true"
+                                    x-on:keydown.enter.prevent="openedWithKeyboard = true"
+                                    x-on:keydown.down.prevent="openedWithKeyboard = true"
+                                    x-bind:class="editDeletePost || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
+                                    x-bind:aria-expanded="editDeletePost || openedWithKeyboard">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M8.6665 7.99992C8.6665 8.1977 8.60785 8.39104 8.49797 8.55549C8.38809 8.71994 8.23191 8.84811 8.04919 8.9238C7.86646 8.99948 7.66539 9.01929 7.47141 8.9807C7.27743 8.94212 7.09925 8.84688 6.9594 8.70702C6.81954 8.56717 6.7243 8.38899 6.68572 8.19501C6.64713 8.00103 6.66694 7.79996 6.74262 7.61723C6.81831 7.43451 6.94649 7.27833 7.11093 7.16845C7.27538 7.05857 7.46872 6.99992 7.6665 6.99992C7.93172 6.99992 8.18607 7.10528 8.37361 7.29281C8.56115 7.48035 8.6665 7.7347 8.6665 7.99992ZM7.6665 3.33325C7.86429 3.33325 8.05762 3.2746 8.22207 3.16472C8.38652 3.05484 8.5147 2.89866 8.59038 2.71594C8.66607 2.53321 8.68587 2.33214 8.64729 2.13816C8.6087 1.94418 8.51346 1.766 8.37361 1.62615C8.23376 1.48629 8.05558 1.39105 7.86159 1.35247C7.66761 1.31388 7.46655 1.33369 7.28382 1.40937C7.10109 1.48506 6.94492 1.61323 6.83503 1.77768C6.72515 1.94213 6.6665 2.13547 6.6665 2.33325C6.6665 2.59847 6.77186 2.85282 6.9594 3.04036C7.14693 3.2279 7.40129 3.33325 7.6665 3.33325ZM7.6665 12.6666C7.46872 12.6666 7.27538 12.7252 7.11093 12.8351C6.94649 12.945 6.81831 13.1012 6.74262 13.2839C6.66694 13.4666 6.64713 13.6677 6.68572 13.8617C6.7243 14.0557 6.81954 14.2338 6.9594 14.3737C7.09925 14.5135 7.27743 14.6088 7.47141 14.6474C7.66539 14.686 7.86646 14.6662 8.04919 14.5905C8.23191 14.5148 8.38809 14.3866 8.49797 14.2222C8.60785 14.0577 8.6665 13.8644 8.6665 13.6666C8.6665 13.4014 8.56115 13.147 8.37361 12.9595C8.18607 12.7719 7.93172 12.6666 7.6665 12.6666Z"
+                                            fill="#0E0E0E" />
+                                    </svg>
+                    
+                                </div>
+                                <div x-cloak x-show="editDeletePost || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
+                                    x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
+                                    x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
+                                    class="absolute top-5 right-0 flex p-1 bg-white rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
+                                    <button type="button" data-post-id="{{:id}}"
+                                        class="edit-post-btn p-[10px] hover:bg-[#F2F4F8] rounded cursor-pointer o3 text-[var(--primary)] text-left">Edit</button>
+                                    <button type="button" data-post-id="{{:id}}"
+                                        class="delete-post-btn p-[10px] hover:bg-[#F2F4F8] rounded cursor-pointer o3 text-[var(--primary)] text-left">Delete</button>
+                                </div>
+                            </div>
+                            {{/if}}
+                            <!-- Three Dots Ends -->
+                        </div>
+                        <div class="post-content">
+                        <div class="p2 text-black !font-[350]">{{:content}}</div>
+                        </div>
+                        <!-- Post Cmt Like Bookmark -->
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center gap-6 max-[500px]:gap-3">
+                                <div class="flex items-center gap-2 cursor-pointer">
+                                    <button type="button" class="size-6 cursor-pointer">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M20.5087 4.49572C19.5548 3.54375 18.2626 3.0085 16.915 3.00713C15.5673 3.00577 14.274 3.53841 13.3182 4.48844L12.0022 5.71353L10.6863 4.48844C9.73116 3.53456 8.43626 2.99915 7.08641 3C5.73656 3.00085 4.44233 3.5379 3.48844 4.49299C2.53456 5.44808 1.99915 6.74298 2 8.09283C2.00085 9.44269 2.5379 10.7369 3.49299 11.6908L11.6142 19.9301C11.6649 19.9815 11.7253 20.0223 11.7919 20.0501C11.8585 20.078 11.93 20.0923 12.0022 20.0923C12.0744 20.0923 12.1459 20.078 12.2125 20.0501C12.2791 20.0223 12.3396 19.9815 12.3903 19.9301L20.5087 11.6944C20.9815 11.2218 21.3565 10.6607 21.6124 10.0431C21.8683 9.42552 22 8.76357 22 8.09507C22 7.42658 21.8683 6.76463 21.6124 6.14704C21.3565 5.52946 20.9815 4.96833 20.5087 4.49572ZM19.7344 10.9256L12.0022 18.7705L4.2673 10.9229C3.52175 10.1721 3.10413 9.15642 3.10594 8.09835C3.10774 7.04028 3.52881 6.02606 4.27692 5.27783C5.02503 4.5296 6.03919 4.10837 7.09726 4.10639C8.15532 4.10442 9.17105 4.52187 9.92194 5.2673C9.92632 5.27204 9.9312 5.27631 9.93648 5.28002L11.6305 6.85772C11.7314 6.95176 11.8643 7.00405 12.0022 7.00405C12.1402 7.00405 12.273 6.95176 12.3739 6.85772L14.068 5.27911C14.0732 5.2754 14.0781 5.27114 14.0825 5.26639C14.4536 4.89313 14.8946 4.59679 15.3805 4.39436C15.8663 4.19194 16.3873 4.08741 16.9136 4.08678C17.4399 4.08615 17.9612 4.18942 18.4475 4.39068C18.9338 4.59194 19.3756 4.88722 19.7476 5.25959C20.1195 5.63196 20.4143 6.07409 20.615 6.56063C20.8157 7.04717 20.9184 7.56855 20.9172 8.09486C20.916 8.62118 20.8109 9.14207 20.6079 9.62767C20.4049 10.1133 20.1081 10.554 19.7344 10.9247V10.9256Z"
+                                                fill="#044047" />
+                                        </svg>
+                                    </button>
+                                    <div class="o1 text-black">88</div>
+                                </div>
+                                <button class="!flex items-center gap-2 load-comments-btn cursor-pointer" data-post-id="{{:id}}">
+                                    <div  class="size-6 cursor-pointer">
+                                        <svg class = "-z-1" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M12.375 2.25C9.88943 2.25273 7.50645 3.24133 5.74889 4.99889C3.99133 6.75645 3.00273 9.13943 3 11.625V19.5C3 19.8978 3.15804 20.2794 3.43934 20.5607C3.72064 20.842 4.10218 21 4.5 21H12.375C14.8614 21 17.246 20.0123 19.0041 18.2541C20.7623 16.496 21.75 14.1114 21.75 11.625C21.75 9.1386 20.7623 6.75403 19.0041 4.99587C17.246 3.23772 14.8614 2.25 12.375 2.25ZM15.375 14.25H9C8.80109 14.25 8.61032 14.171 8.46967 14.0303C8.32902 13.8897 8.25 13.6989 8.25 13.5C8.25 13.3011 8.32902 13.1103 8.46967 12.9697C8.61032 12.829 8.80109 12.75 9 12.75H15.375C15.5739 12.75 15.7647 12.829 15.9053 12.9697C16.046 13.1103 16.125 13.3011 16.125 13.5C16.125 13.6989 16.046 13.8897 15.9053 14.0303C15.7647 14.171 15.5739 14.25 15.375 14.25ZM15.375 11.25H9C8.80109 11.25 8.61032 11.171 8.46967 11.0303C8.32902 10.8897 8.25 10.6989 8.25 10.5C8.25 10.3011 8.32902 10.1103 8.46967 9.96967C8.61032 9.82902 8.80109 9.75 9 9.75H15.375C15.5739 9.75 15.7647 9.82902 15.9053 9.96967C16.046 10.1103 16.125 10.3011 16.125 10.5C16.125 10.6989 16.046 10.8897 15.9053 11.0303C15.7647 11.171 15.5739 11.25 15.375 11.25Z"
+                                                fill="#044047" />
+                                        </svg>
+                    
+                                    </div>
+                                    <div class="o1 text-black">55</div>
+                                </button>
+                            </div>
+                            <!-- Bookmark -->
+                            <button type="button" class="size-6 cursor-pointer">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"
+                                        fill="#044047" />
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Post Cmt Like Bookmark End -->
+                    </div>
+        </script>
 
 
     <script type="text/html" id="comment-template">

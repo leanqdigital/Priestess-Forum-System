@@ -1,28 +1,95 @@
 /* Import Fonts */
 @font-face {
   font-family: "AvenirBook";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2045%20Book.otf")
-    format("opentype");
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2045%20Book.otf") format("opentype");
 }
+
 @font-face {
   font-family: "AvenirMedium";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2065%20Medium.otf")
-    format("opentype");
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2065%20Medium.otf") format("opentype");
 }
+
 @font-face {
   font-family: "SeasonsBold";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Fontspring-DEMO-theseasons-bd.otf")
-    format("opentype");
+  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Fontspring-DEMO-theseasons-bd.otf") format("opentype");
+}
+
+:root {
+  /* Primary Colors */
+  --secondary: #c29d68;
+  --secondary-100: #9c8661;
+  --secondary-200: #d0b48b;
+  --secondary-300: #e9e2da;
+
+  /* Secondary Colors */
+  --primary: #044047;
+  --primary-100: #0a98a9;
+  --primary-200: #0cc4d9;
+  --primary-300: #26def3;
+  --primary-400: #86edf8;
+
+  /* Grey Colors */
+  --grey: #fef5f1;
+  --grey-100: #737373;
+  --grey-200: #d9d9d9;
+  --grey-300: #f4f1f1;
+
+  /* Other Colors */
+  --black: #0e0e0e;
+  --white: #fef5f1;
+}
+
+/* Tab Buttons */
+.tab-Button {
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.tab-Active {
+  background: var(--primary);
+  border-radius: 4px;
+  color: var(--white);
+
+  svg {
+    path {
+      fill: var(--white);
+    }
+  }
+}
+
+.tab-Inactive {
+  background: transparent;
+  border-radius: 0px;
+
+  svg {
+    path {
+      fill: var(--primary);
+    }
+  }
+}
+
+/* Mention Text */
+.mention-button {
+  padding: 4px 6px;
+  background: var(--secondary-300);
+  color: var(--primary);
+  font-family: "AvenirBook", sans-serif;
+  font-size: 16px;
+  font-weight: 350;
+  line-height: 16px;
+  border-radius: 4px;
+}
+
+.button {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
 }
 
 /* Headings */
-h1,
-h2,
-h3,
-h4 {
-  all: unset;
-}
-
 h1 {
   font-family: "SeasonsBold", sans-serif;
   font-size: 32px;
@@ -77,21 +144,21 @@ h4 {
 .o1 {
   font-family: "AvenirBook", sans-serif;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 350;
   line-height: 16px;
 }
 
 .o2 {
   font-family: "AvenirBook", sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 350;
   line-height: 14px;
 }
 
 .o3 {
   font-family: "AvenirBook", sans-serif;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 350;
   line-height: 12px;
 }
 
@@ -124,9 +191,37 @@ h4 {
     line-height: 16px;
   }
 
-  .o1 {
+  .o1,
+  .mention-button {
     font-size: 14px;
     line-height: 14px;
+  }
+
+  .button {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 760px) {
+  .tab-Button {
+    padding: 8px 12px;
+  }
+
+  .tab-Active {
+    background: var(--primary);
+
+    div {
+      display: flex;
+    }
+  }
+
+  .tab-Inactive {
+    background: white;
+    border-radius: 4px;
+
+    div {
+      display: none;
+    }
   }
 }
 
@@ -147,29 +242,4 @@ h4 {
 
 .filter-button:hover {
   --sl-button-background-color: var(--sl-color-primary-600);
-}
-
-.dx-htmleditor-content {
-  /* white-space: unset !important; */
-  text-align: left !important;
-}
-
-/* Add custom transitions */
-.post {
-  transition: opacity 0.3s ease;
-}
-
-/* Add pulse animation */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
