@@ -125,10 +125,18 @@ class ForumManager {
       if (e.target.closest("#load-more-button")) {
         this.loadMorePosts();
       }
-      if (e.target.closest(".filter-button")) {
-        const filterType = e.target.dataset.filter;
-        this.handleFilterChange(filterType);
-        this.classList.add("active");
+      const filterButton = e.target.closest(".filter-button"); // Always get the correct button
+
+      if (filterButton) {
+        const filterType = filterButton.dataset.filter; // Get the correct dataset filter
+
+        if (!filterType) {
+          console.error("Error: Filter type not found.");
+          return;
+        }
+
+        this.handleFilterChange(filterType); // Execute filter function
+        filterButton.classList.add("active"); // Add the active class to the correct button
       }
       const button = e.target.closest(".load-comments-btn");
       if (button) {
