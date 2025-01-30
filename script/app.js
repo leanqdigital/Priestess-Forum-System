@@ -308,7 +308,7 @@ class ForumManager {
           <div class="size-[200px]">
             <img src="./assets/emptyPost.svg" alt="Empty Post" class="size-full object-contain">
           </div>
-          <div class="p2 text-black">No post available.</div>
+          <div class="p2 text-black">No posts available.</div>
         </div>
                    
                 `;
