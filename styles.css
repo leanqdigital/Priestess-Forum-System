@@ -33,7 +33,20 @@
   --grey-100: #737373;
   --grey-200: #d9d9d9;
   --grey-300: #f4f1f1;
+/* Danger Shades */
+  --danger-100: #AB0707;
+  --danger-200: #DC0A0A;
+  --danger-300: #FDD0D1;
 
+  /* Success Shades */
+  --success-100: #035933;
+  --success-200: #059E5A;
+  --success-300: #A6FCD6;
+
+  /* Warning Shades */
+  --warning-100: #594203;
+  --warning-200: #BB8B06;
+  --warning-300: #FCE5A6;
   /* Other Colors */
   --black: #0e0e0e;
   --white: #fef5f1;
