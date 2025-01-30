@@ -17,6 +17,9 @@ class ForumManager {
       this.postsOffset = 0;
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = "";
       this.hasMorePosts = true;
+
+      // Load saved posts first
+      await this.fetchSavedPosts();
       await this.fetchAndRenderPosts(true);
     } catch (error) {
       UIManager.showError("Failed to load posts. Please try again.");
@@ -27,14 +30,19 @@ class ForumManager {
     try {
       const query = `
         query {
-          calcOContactSavedPosts(query: [{ where: { contact_id: "${LOGGED_IN_USER_ID}" } }]) {
+          calcOContactSavedPosts(query: [{ 
+            where: { 
+              contact_id: "${LOGGED_IN_USER_ID}" 
+            } 
+          }]) {
             ID: field(arg: ["id"])
             Saved_Post_ID: field(arg: ["saved_post_id"])
           }
         }
       `;
+
       const data = await ApiService.query(query);
-      
+
       if (data?.calcOContactSavedPosts) {
         this.savedPostIds.clear();
         data.calcOContactSavedPosts.forEach(({ ID, Saved_Post_ID }) => {
@@ -42,42 +50,60 @@ class ForumManager {
         });
       }
     } catch (error) {
-      console.error('Error fetching saved posts:', error);
+      console.error("Error fetching saved posts:", error);
     }
   }
 
   async toggleBookmark(postId) {
-    const button = document.querySelector(`.bookmark-button[data-post-id="${postId}"]`);
+    const buttons = document.querySelectorAll(
+      `.bookmark-button[data-post-id="${postId}"]`
+    );
     const isBookmarked = this.savedPostIds.has(postId);
-    
+
     try {
-      button.disabled = true;
+      buttons.forEach((button) => (button.disabled = true));
       // Optimistic UI update
-      button.innerHTML = this.getBookmarkSVG(!isBookmarked);
+      buttons.forEach((button) => {
+        button.innerHTML = this.getBookmarkSVG(!isBookmarked);
+      });
 
       if (isBookmarked) {
         const savedRecordId = this.savedPostIds.get(postId);
         await this.deleteBookmark(savedRecordId);
         this.savedPostIds.delete(postId);
       } else {
-        const savedRecordId = await this.createBookmark(postId);
-        this.savedPostIds.set(postId, savedRecordId);
+        // Prevent duplicate saves
+        if (!this.savedPostIds.has(postId)) {
+          const savedRecordId = await this.createBookmark(postId);
+          this.savedPostIds.set(postId, savedRecordId);
+        }
       }
 
-      UIManager.showSuccess(`Post ${isBookmarked ? 'removed from' : 'added to'} bookmarks`);
+      // Refresh posts if in saved view
+      if (this.currentFilter === "saved") {
+        await this.refreshPosts();
+      }
+
+      UIManager.showSuccess(
+        `Post ${isBookmarked ? "removed from" : "added to"} bookmarks`
+      );
     } catch (error) {
       // Revert UI state
-      button.innerHTML = this.getBookmarkSVG(isBookmarked);
-      UIManager.showError(`Failed to ${isBookmarked ? 'remove' : 'save'} bookmark`);
+      buttons.forEach((button) => {
+        button.innerHTML = this.getBookmarkSVG(isBookmarked);
+      });
+      UIManager.showError(
+        `Failed to ${isBookmarked ? "remove" : "save"} bookmark`
+      );
     } finally {
-      button.disabled = false;
+      buttons.forEach((button) => (button.disabled = false));
     }
   }
 
   getBookmarkSVG(isBookmarked) {
     return `
       <svg width="24" height="24" viewBox="0 0 24 24" 
-           fill="${isBookmarked ? '#044047' : 'none'}" 
+           fill="${isBookmarked ? "#044047" : "none"}" 
            stroke="#044047">
         <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
       </svg>
@@ -96,10 +122,10 @@ class ForumManager {
     const variables = {
       payload: {
         contact_id: LOGGED_IN_USER_ID,
-        saved_post_id: postId
-      }
+        saved_post_id: postId,
+      },
     };
-    
+
     const response = await ApiService.query(query, variables);
     return response.createOContactSavedPost.id;
   }
@@ -116,7 +142,6 @@ class ForumManager {
     await ApiService.query(query, variables);
   }
 
-
   initEventListeners() {
     document.addEventListener("click", async (e) => {
       if (e.target.closest(".refresh-button")) {
@@ -125,53 +150,43 @@ class ForumManager {
       if (e.target.closest("#load-more-button")) {
         this.loadMorePosts();
       }
-      const filterButton = e.target.closest(".filter-button"); // Always get the correct button
+      const filterButton = e.target.closest(".filter-button");
 
       if (filterButton) {
-        const filterType = filterButton.dataset.filter; // Get the correct dataset filter
-
-        if (!filterType) {
-          console.error("Error: Filter type not found.");
-          return;
-        }
-
-        this.handleFilterChange(filterType); // Execute filter function
-        filterButton.classList.add("active"); // Add the active class to the correct button
+        const filterType = filterButton.dataset.filter;
+        this.handleFilterChange(filterType);
       }
+
       const button = e.target.closest(".load-comments-btn");
       if (button) {
         const postId = button.dataset.postId;
-        if (!postId) {
-          console.error("Error: Post ID not found.");
-          return;
+        const postElement = document.querySelector(
+          `[data-post-id="${postId}"]`
+        );
+        if (postElement) {
+          const post = {
+            id: postId,
+            author: {
+              name: postElement.querySelector("h2").textContent,
+              profileImage: postElement.querySelector("img").src,
+            },
+            date: postElement.querySelector("time").textContent,
+            title: postElement.querySelector("h3")?.textContent || "",
+            content: postElement.querySelector(".post-content div").textContent,
+          };
+          await PostModalManager.open(post);
         }
-        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-        if (!postElement) {
-          console.error("Error: Post element not found.");
-          return;
-        }
-        const post = {
-          id: postId,
-          author: {
-            name: postElement.querySelector("h2").textContent,
-            profileImage: postElement.querySelector("img").src,
-          },
-          date: postElement.querySelector("time").textContent,
-          title: postElement.querySelector("h3")?.textContent || "",
-          content: postElement.querySelector(".post-content div").textContent,
-        };
-
-        console.log(`Opening modal for post ID: ${postId}`);
-        await PostModalManager.open(post);
       }
-      if (e.target.closest('.delete-post-btn')) {
-        const postId = e.target.closest('.delete-post-btn').dataset.postId;
+
+      if (e.target.closest(".delete-post-btn")) {
+        const postId = e.target.closest(".delete-post-btn").dataset.postId;
         this.deletePost(postId);
       }
-          if (e.target.closest('.bookmark-button')) {
-      const postId = e.target.closest('.bookmark-button').dataset.postId;
-      this.toggleBookmark(postId);
-    }
+
+      if (e.target.closest(".bookmark-button")) {
+        const postId = e.target.closest(".bookmark-button").dataset.postId;
+        this.toggleBookmark(postId);
+      }
     });
   }
 
@@ -193,9 +208,7 @@ class ForumManager {
 
   async fetchAndRenderPosts(isInitialLoad = false) {
     try {
-      if (!this.hasMorePosts) {
-        return;
-      }
+      if (!this.hasMorePosts) return;
 
       const { query, variables } = this.buildQuery();
       const data = await ApiService.query(query, variables);
@@ -218,6 +231,7 @@ class ForumManager {
         isBookmarked: this.savedPostIds.has(post.ID),
         id: post.ID,
         author_id: post.Author_ID,
+        defaultAuthorImage: CONFIG.api.defaultAuthorImage,
         author: Formatter.formatAuthor({
           firstName: post.Author_First_Name,
           lastName: post.Author_Last_Name,
@@ -290,29 +304,27 @@ class ForumManager {
       variables.id = LOGGED_IN_USER_ID;
     }
 
-    return {
-      query,
-      variables,
-    };
+    return { query, variables };
   }
+
 
   buildFilterCondition() {
     switch (this.currentFilter) {
+      case "saved":
+        return `query: [{ where: { Contacts: [{ where: { id: $id } }] } }]`;
       case "featured":
         return `query: [{ where: { featured_post: true } }]`;
       case "my":
         return `query: [{ where: { Author: [{ where: { id: $id } }] } }]`;
-      case "saved":
-        return `query: [{ where: { Contacts: [{ where: { id: $id } }] } }]`;
       default:
         return "";
     }
   }
-
+  
   needsUserId() {
     return this.currentFilter === "my" || this.currentFilter === "saved";
   }
-
+  
   static async fetchComments(postId) {
     try {
       const query = `
@@ -351,22 +363,22 @@ class ForumManager {
   async deletePost(postId) {
     const postElement = document.querySelector(`[data-post-id="${postId}"]`);
     if (!postElement) return;
-  
+
     try {
       // Show visual effects
-      postElement.classList.add('opacity-50', 'pointer-events-none');
-  
+      postElement.classList.add("opacity-50", "pointer-events-none");
+
       const confirmed = await UIManager.showDeleteConfirmation();
-      
+
       if (!confirmed) {
         // Reset styles if not confirmed
-        postElement.classList.remove('opacity-50', 'pointer-events-none');
+        postElement.classList.remove("opacity-50", "pointer-events-none");
         return;
       }
-  
+
       // Show processing state
-      postElement.classList.add('animate-pulse');
-  
+      postElement.classList.add("animate-pulse");
+
       const query = `
         mutation deleteForumPost($id: PriestessForumPostID) {
           deleteForumPost(query: [{ where: { id: $id } }]) {
@@ -376,21 +388,25 @@ class ForumManager {
       `;
       const variables = { id: postId };
       const response = await ApiService.query(query, variables);
-  
+
       if (response?.deleteForumPost?.id) {
         // Add removal animation
-        postElement.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        postElement.classList.add(
+          "opacity-0",
+          "transition-opacity",
+          "duration-300"
+        );
         setTimeout(() => postElement.remove(), 300);
-        UIManager.showSuccess('Post deleted successfully');
+        UIManager.showSuccess("Post deleted successfully");
       }
     } catch (error) {
-      UIManager.showError('Failed to delete post. Please try again.');
+      UIManager.showError("Failed to delete post. Please try again.");
     } finally {
       // Ensure styles are reset even if error occurs after confirmation
       postElement?.classList.remove(
-        'animate-pulse',
-        'opacity-50', 
-        'pointer-events-none'
+        "animate-pulse",
+        "opacity-50",
+        "pointer-events-none"
       );
     }
   }

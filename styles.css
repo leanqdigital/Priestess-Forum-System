@@ -243,3 +243,9 @@ h4 {
 .filter-button:hover {
   --sl-button-background-color: var(--sl-color-primary-600);
 }
+
+.dialog__overlay{
+  background-color: green !important;
+}
+
+
