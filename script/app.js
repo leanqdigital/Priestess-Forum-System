@@ -41,7 +41,6 @@ class ForumManager {
         );
 
         if (!postElement) {
-          console.error("Error: Post element not found.");
           return;
         }
 
@@ -55,21 +54,21 @@ class ForumManager {
           title: postElement.querySelector("h3")?.textContent || "",
           content: postElement.querySelector(".post-content div").textContent,
         };
-
-        console.log(`Opening modal for post ID: ${postId}`);
         await PostModalManager.open(post);
+      }
+      if (e.target.closest('.delete-post-btn')) {
+        const postId = e.target.closest('.delete-post-btn').dataset.postId;
+        this.deletePost(postId);
       }
     });
   }
 
   handleFilterChange(filterType) {
-    console.log(`Filtering: ${filterType}`);
     this.currentFilter = filterType;
     this.refreshPosts();
   }
 
   async refreshPosts() {
-    console.log("Refreshing posts...");
     document.querySelector(CONFIG.selectors.postsContainer).innerHTML = "";
     this.postsOffset = 0;
     this.hasMorePosts = true;
@@ -77,14 +76,12 @@ class ForumManager {
   }
 
   async loadMorePosts() {
-    console.log("Loading more posts...");
     await this.fetchAndRenderPosts(false);
   }
 
   async fetchAndRenderPosts(isInitialLoad = false) {
     try {
       if (!this.hasMorePosts) {
-        console.log("No more posts to load.");
         return;
       }
 
@@ -107,6 +104,7 @@ class ForumManager {
 
       const posts = data.calcForumPosts.map((post) => ({
         id: post.ID,
+        author_id: post.Author_ID,
         author: Formatter.formatAuthor({
           firstName: post.Author_First_Name,
           lastName: post.Author_Last_Name,
@@ -140,7 +138,6 @@ class ForumManager {
         document.querySelector("#load-more-button").classList.remove("hidden");
       }
     } catch (error) {
-      console.error("Error fetching posts:", error);
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
         <div class="text-center text-red-600 p-4">
           <p>⚠️ Failed to load posts. Please try again later.</p>
@@ -150,10 +147,9 @@ class ForumManager {
   }
 
   buildQuery() {
-    let query = `
-      query calcForumPosts($limit: IntScalar, $offset: IntScalar${
-        this.needsUserId() ? ", $id: PriestessContactID" : ""
-      }) {
+    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
+      this.needsUserId() ? ", $id: PriestessContactID" : ""
+    }) {
         calcForumPosts(
           ${this.buildFilterCondition()}
           limit: $limit
@@ -181,7 +177,10 @@ class ForumManager {
       variables.id = LOGGED_IN_USER_ID;
     }
 
-    return { query, variables };
+    return {
+      query,
+      variables,
+    };
   }
 
   buildFilterCondition() {
@@ -203,8 +202,6 @@ class ForumManager {
 
   static async fetchComments(postId) {
     try {
-      console.log(`Fetching comments for post ID: ${postId}`);
-
       const query = `
         query {
           calcForumComments(query: [{ where: { Forum_Post: [{ where: { id: "${postId}" } }] } }]) {
@@ -224,8 +221,6 @@ class ForumManager {
         throw new Error("No comments found or invalid API response.");
       }
 
-      console.log("API Response for Comments:", data);
-
       return data.calcForumComments.map((comment) => ({
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
@@ -236,8 +231,54 @@ class ForumManager {
         }),
       }));
     } catch (error) {
-      console.error("Error fetching comments:", error);
       return [];
+    }
+  }
+
+  async deletePost(postId) {
+    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+    if (!postElement) return;
+  
+    try {
+      // Show visual effects
+      postElement.classList.add('opacity-50', 'pointer-events-none');
+  
+      const confirmed = await UIManager.showDeleteConfirmation();
+      
+      if (!confirmed) {
+        // Reset styles if not confirmed
+        postElement.classList.remove('opacity-50', 'pointer-events-none');
+        return;
+      }
+  
+      // Show processing state
+      postElement.classList.add('animate-pulse');
+  
+      const query = `
+        mutation deleteForumPost($id: PriestessForumPostID) {
+          deleteForumPost(query: [{ where: { id: $id } }]) {
+            id
+          }
+        }
+      `;
+      const variables = { id: postId };
+      const response = await ApiService.query(query, variables);
+  
+      if (response?.deleteForumPost?.id) {
+        // Add removal animation
+        postElement.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => postElement.remove(), 300);
+        UIManager.showSuccess('Post deleted successfully');
+      }
+    } catch (error) {
+      UIManager.showError('Failed to delete post. Please try again.');
+    } finally {
+      // Ensure styles are reset even if error occurs after confirmation
+      postElement?.classList.remove(
+        'animate-pulse',
+        'opacity-50', 
+        'pointer-events-none'
+      );
     }
   }
 }
@@ -283,14 +324,10 @@ class PostModalManager {
 
   static async loadComments(postId) {
     try {
-      console.log(`Fetching comments for post ID: ${postId}`);
-
       const comments = await ForumManager.fetchComments(postId);
       const commentsContainer = document.querySelector(
         "#modal-comments-container"
       );
-
-      console.log("Fetched comments:", comments); // Debugging log
 
       if (comments.length > 0) {
         const template = $.templates("#comment-template");
@@ -301,7 +338,6 @@ class PostModalManager {
         commentsContainer.innerHTML = `<p class="text-gray-500">No comments yet.</p>`;
       }
     } catch (error) {
-      console.error("Error loading comments:", error);
       UIManager.showError("Failed to load comments.");
     }
   }
@@ -329,7 +365,6 @@ class ContactService {
         profileImage: contact.Profile_Image || CONFIG.api.defaultAuthorImage,
       }));
     } catch (error) {
-      console.error("Error fetching contacts:", error);
       return [];
     }
   }
@@ -337,9 +372,6 @@ class ContactService {
 
 async function initializeEditor() {
   if (!window.DevExpress || !$.fn.dxHtmlEditor || !window.Quill) {
-    console.warn(
-      "⏳ DevExtreme or Quill.js not fully loaded. Retrying in 500ms..."
-    );
     setTimeout(initializeEditor, 500);
     return;
   }
@@ -379,8 +411,6 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     return;
   }
 
-  console.log("🚀 Submitting post:", postCopy);
-
   const tempPostId = `temp-${Date.now()}`;
   const tempPost = {
     id: tempPostId,
@@ -403,7 +433,6 @@ document.getElementById("submit-post").addEventListener("click", async () => {
   const postElement = tempPostElement.children[0];
 
   if (!postElement) {
-    console.error("🚨 ERROR: Post rendering failed! No elements were created.");
     return;
   }
 
@@ -432,12 +461,9 @@ document.getElementById("submit-post").addEventListener("click", async () => {
 
     if (response && response.createForumPost && response.createForumPost.id) {
       const actualPostId = response.createForumPost.id;
-
-      // ✅ Update the `data-post-id` attribute with the actual post ID
       postElement.setAttribute("data-post-id", actualPostId);
     }
 
-    // ✅ Remove loading styles after successful API call
     postElement.classList.remove("opacity-50", "pointer-events-none");
   } catch (error) {
     UIManager.showError("Failed to post. Please try again.");
@@ -453,7 +479,5 @@ function extractMentions(content) {
   while ((match = mentionRegex.exec(content)) !== null) {
     matches.push(match[1].trim());
   }
-
-  console.log("Extracted Mentions:", matches);
   return matches;
 }

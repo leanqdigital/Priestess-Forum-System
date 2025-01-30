@@ -148,3 +148,28 @@ h4 {
 .filter-button:hover {
   --sl-button-background-color: var(--sl-color-primary-600);
 }
+
+.dx-htmleditor-content {
+  /* white-space: unset !important; */
+  text-align: left !important;
+}
+
+/* Add custom transitions */
+.post {
+  transition: opacity 0.3s ease;
+}
+
+/* Add pulse animation */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
