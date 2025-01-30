@@ -50,7 +50,18 @@
   --black: #0e0e0e;
   --white: #fef5f1;
 }
-
+/* Hide Scrollbar */
+* {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+}
+/* Hide scrollbar in Chrome, Safari, and Edge */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
 /* Tab Buttons */
 .tab-Button {
   padding: 12px 24px;
