@@ -2,6 +2,7 @@ const LOGGED_IN_USER_ID = "171031";
 
 class ForumManager {
   constructor() {
+    this.LOGGED_IN_USER_ID = LOGGED_IN_USER_ID;
     this.postsOffset = 0;
     this.postsLimit = CONFIG.pagination.postsPerPage;
     this.hasMorePosts = true;
@@ -640,6 +641,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
   const tempPostId = `temp-${Date.now()}`;
   const tempPost = {
     id: tempPostId,
+    author_id: LOGGED_IN_USER_ID, // Add this line
     author: {
       name: "Dipesh Adhikari",
       profileImage: CONFIG.api.defaultAuthorImage,
