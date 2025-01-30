@@ -23,10 +23,9 @@
 
   /* Secondary Colors */
   --primary: #044047;
-  --primary-100: #0a98a9;
-  --primary-200: #0cc4d9;
-  --primary-300: #26def3;
-  --primary-400: #86edf8;
+  --primary-100: #022327;
+  --primary-200: #358D97;
+  --primary-300: #D9EAEC;
 
   /* Grey Colors */
   --grey: #fef5f1;
@@ -113,6 +112,19 @@ sl-dialog::part(base) {
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 4px;
+}
+.submit-button {
+  background-color: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 12px 16px;
+  border-radius: 4px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-200);
 }
 
 /* Headings */
