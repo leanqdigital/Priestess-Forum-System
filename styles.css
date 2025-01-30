@@ -59,6 +59,15 @@
     }
   }
 }
+/* Modal Styling */
+sl-dialog::part(overlay) {
+  background-color: #04404780;
+}
+sl-dialog::part(base) {
+  top: 50px;
+  align-items: start;
+  transform: none;
+}
 
 .tab-Inactive {
   background: transparent;
@@ -69,6 +78,10 @@
       fill: var(--primary);
     }
   }
+}
+
+.dialog__overlay, .dialog--open{
+  background-color: red !important;
 }
 
 /* Mention Text */
