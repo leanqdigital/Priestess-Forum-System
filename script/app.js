@@ -8,6 +8,8 @@ class ForumManager {
     this.currentFilter = "recent";
     this.initEventListeners();
     this.loadInitialPosts();
+    this.savedPostIds = new Map();
+    this.fetchSavedPosts();
   }
 
   async loadInitialPosts() {
@@ -20,6 +22,100 @@ class ForumManager {
       UIManager.showError("Failed to load posts. Please try again.");
     }
   }
+
+  async fetchSavedPosts() {
+    try {
+      const query = `
+        query {
+          calcOContactSavedPosts(query: [{ where: { contact_id: "${LOGGED_IN_USER_ID}" } }]) {
+            ID: field(arg: ["id"])
+            Saved_Post_ID: field(arg: ["saved_post_id"])
+          }
+        }
+      `;
+      const data = await ApiService.query(query);
+      
+      if (data?.calcOContactSavedPosts) {
+        this.savedPostIds.clear();
+        data.calcOContactSavedPosts.forEach(({ ID, Saved_Post_ID }) => {
+          this.savedPostIds.set(Saved_Post_ID, ID);
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching saved posts:', error);
+    }
+  }
+
+  async toggleBookmark(postId) {
+    const button = document.querySelector(`.bookmark-button[data-post-id="${postId}"]`);
+    const isBookmarked = this.savedPostIds.has(postId);
+    
+    try {
+      button.disabled = true;
+      // Optimistic UI update
+      button.innerHTML = this.getBookmarkSVG(!isBookmarked);
+
+      if (isBookmarked) {
+        const savedRecordId = this.savedPostIds.get(postId);
+        await this.deleteBookmark(savedRecordId);
+        this.savedPostIds.delete(postId);
+      } else {
+        const savedRecordId = await this.createBookmark(postId);
+        this.savedPostIds.set(postId, savedRecordId);
+      }
+
+      UIManager.showSuccess(`Post ${isBookmarked ? 'removed from' : 'added to'} bookmarks`);
+    } catch (error) {
+      // Revert UI state
+      button.innerHTML = this.getBookmarkSVG(isBookmarked);
+      UIManager.showError(`Failed to ${isBookmarked ? 'remove' : 'save'} bookmark`);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  getBookmarkSVG(isBookmarked) {
+    return `
+      <svg width="24" height="24" viewBox="0 0 24 24" 
+           fill="${isBookmarked ? '#044047' : 'none'}" 
+           stroke="#044047">
+        <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
+      </svg>
+    `;
+  }
+
+  async createBookmark(postId) {
+    const query = `
+      mutation createOContactSavedPost($payload: OContactSavedPostCreateInput) {
+        createOContactSavedPost(payload: $payload) {
+          id
+          saved_post_id
+        }
+      }
+    `;
+    const variables = {
+      payload: {
+        contact_id: LOGGED_IN_USER_ID,
+        saved_post_id: postId
+      }
+    };
+    
+    const response = await ApiService.query(query, variables);
+    return response.createOContactSavedPost.id;
+  }
+
+  async deleteBookmark(savedRecordId) {
+    const query = `
+      mutation deleteOContactSavedPost($id: PriestessOContactSavedPostID) {
+        deleteOContactSavedPost(query: [{ where: { id: $id } }]) {
+          id
+        }
+      }
+    `;
+    const variables = { id: savedRecordId };
+    await ApiService.query(query, variables);
+  }
+
 
   initEventListeners() {
     document.addEventListener("click", async (e) => {
@@ -64,6 +160,10 @@ class ForumManager {
         const postId = e.target.closest('.delete-post-btn').dataset.postId;
         this.deletePost(postId);
       }
+          if (e.target.closest('.bookmark-button')) {
+      const postId = e.target.closest('.bookmark-button').dataset.postId;
+      this.toggleBookmark(postId);
+    }
     });
   }
 
@@ -107,6 +207,7 @@ class ForumManager {
       }
 
       const posts = data.calcForumPosts.map((post) => ({
+        isBookmarked: this.savedPostIds.has(post.ID),
         id: post.ID,
         author_id: post.Author_ID,
         author: Formatter.formatAuthor({
