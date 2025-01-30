@@ -1,4 +1,4 @@
-Content Hierarchy Updated Again on 1/30/2025 to update to vercel
+Content Hierarchy
 1. Post - > Comment - > Replies
 
 Components
