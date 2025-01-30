@@ -6,10 +6,25 @@ class ForumManager {
     this.postsLimit = CONFIG.pagination.postsPerPage;
     this.hasMorePosts = true;
     this.currentFilter = "recent";
-    this.initEventListeners();
-    this.loadInitialPosts();
     this.savedPostIds = new Map();
-    this.fetchSavedPosts();
+    this.init();
+  }
+
+  async init() {
+    try {
+      console.log("🔄 Initializing Forum Manager...");
+
+      // ✅ Wait for saved posts to load first
+      await this.fetchSavedPosts();
+      console.log("✅ Saved Posts Loaded. Now Fetching Posts...");
+
+      // ✅ Now load the posts
+      this.initEventListeners();
+      await this.loadInitialPosts();
+    } catch (error) {
+      console.error("Initialization error:", error);
+      UIManager.showError("Failed to initialize forum.");
+    }
   }
 
   async loadInitialPosts() {
@@ -18,39 +33,14 @@ class ForumManager {
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = "";
       this.hasMorePosts = true;
 
-      // Load saved posts first
-      await this.fetchSavedPosts();
+      // ❌ Don't call fetchSavedPosts() here again!
+      console.log("✅ Saved Bookmarks Already Fetched:", [
+        ...this.savedPostIds.keys(),
+      ]);
+
       await this.fetchAndRenderPosts(true);
     } catch (error) {
       UIManager.showError("Failed to load posts. Please try again.");
-    }
-  }
-
-  async fetchSavedPosts() {
-    try {
-      const query = `
-        query {
-          calcOContactSavedPosts(query: [{ 
-            where: { 
-              contact_id: "${LOGGED_IN_USER_ID}" 
-            } 
-          }]) {
-            ID: field(arg: ["id"])
-            Saved_Post_ID: field(arg: ["saved_post_id"])
-          }
-        }
-      `;
-
-      const data = await ApiService.query(query);
-
-      if (data?.calcOContactSavedPosts) {
-        this.savedPostIds.clear();
-        data.calcOContactSavedPosts.forEach(({ ID, Saved_Post_ID }) => {
-          this.savedPostIds.set(Saved_Post_ID, ID);
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching saved posts:", error);
     }
   }
 
@@ -58,40 +48,40 @@ class ForumManager {
     const buttons = document.querySelectorAll(
       `.bookmark-button[data-post-id="${postId}"]`
     );
-    const isBookmarked = this.savedPostIds.has(postId);
+    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+
+    // ✅ Fetch latest bookmarks for this post
+    const existingBookmarkIds = await this.fetchAllBookmarkIdsForPost(postId);
+    const isBookmarked = existingBookmarkIds.length > 0;
 
     try {
       buttons.forEach((button) => (button.disabled = true));
-      // Optimistic UI update
-      buttons.forEach((button) => {
-        button.innerHTML = this.getBookmarkSVG(!isBookmarked);
-      });
 
       if (isBookmarked) {
-        const savedRecordId = this.savedPostIds.get(postId);
-        await this.deleteBookmark(savedRecordId);
-        this.savedPostIds.delete(postId);
-      } else {
-        // Prevent duplicate saves
-        if (!this.savedPostIds.has(postId)) {
-          const savedRecordId = await this.createBookmark(postId);
-          this.savedPostIds.set(postId, savedRecordId);
+        await this.deleteMultipleBookmarks(existingBookmarkIds);
+        this.savedPostIds.delete(postId); // ✅ Update local state immediately
+
+        // ✅ If in "Saved" tab, remove the post from UI
+        if (this.currentFilter === "saved" && postElement) {
+          postElement.classList.add(
+            "opacity-0",
+            "transition-opacity",
+            "duration-300"
+          );
+          setTimeout(() => postElement.remove(), 300);
         }
+      } else {
+        const newBookmarkId = await this.createBookmark(postId);
+        this.savedPostIds.set(postId, newBookmarkId); // ✅ Update local state immediately
       }
 
-      // Refresh posts if in saved view
-      if (this.currentFilter === "saved") {
-        await this.refreshPosts();
-      }
+      // ✅ Update icons without re-fetching everything
+      this.updateBookmarkIcons();
 
       UIManager.showSuccess(
         `Post ${isBookmarked ? "removed from" : "added to"} bookmarks`
       );
     } catch (error) {
-      // Revert UI state
-      buttons.forEach((button) => {
-        button.innerHTML = this.getBookmarkSVG(isBookmarked);
-      });
       UIManager.showError(
         `Failed to ${isBookmarked ? "remove" : "save"} bookmark`
       );
@@ -100,17 +90,107 @@ class ForumManager {
     }
   }
 
+  async fetchAllBookmarkIdsForPost(postId) {
+    const query = `
+      query {
+        calcOContactSavedPosts(query: [{
+          where: {
+            contact_id: "${LOGGED_IN_USER_ID}",
+            saved_post_id: "${postId}"
+          }
+        }]) {
+          ID: field(arg: ["id"])
+        }
+      }
+    `;
+
+    const data = await ApiService.query(query);
+    return data?.calcOContactSavedPosts?.map((bookmark) => bookmark.ID) || [];
+  }
+
+  async deleteMultipleBookmarks(bookmarkIds) {
+    await Promise.all(
+      bookmarkIds.map((id) =>
+        this.deleteBookmark(id).catch((error) =>
+          console.error("Failed to delete bookmark:", id, error)
+        )
+      )
+    );
+
+    // Update local state
+    bookmarkIds.forEach((id) => {
+      const postId = [...this.savedPostIds.entries()].find(
+        ([_, bookmarkId]) => bookmarkId === id
+      )?.[0];
+      if (postId) this.savedPostIds.delete(postId);
+    });
+  }
+
+  updateBookmarkIcons() {
+    console.trace("🔎 updateBookmarkIcons() CALLED");
+    console.log("🔄 Updating Bookmark Icons...", [...this.savedPostIds.keys()]);
+
+    document.querySelectorAll(".bookmark-button").forEach((button) => {
+      const postId = button.dataset.postId;
+      const isBookmarked = this.savedPostIds.has(postId);
+      console.log(`🔎 Post ID: ${postId}, Bookmarked: ${isBookmarked}`);
+
+      button.innerHTML = this.getBookmarkSVG(isBookmarked);
+    });
+
+    console.log("✅ Bookmark Icons Updated.");
+  }
+
+  async fetchSavedPosts() {
+    try {
+      const query = `
+            query {
+                calcOContactSavedPosts(
+                    query: [{ where: { contact_id: "${LOGGED_IN_USER_ID}" } }]
+                    orderBy: [{ path: ["created_at"], type: desc }]
+                ) {
+                    ID: field(arg: ["id"])
+                    Saved_Post_ID: field(arg: ["saved_post_id"])
+                }
+            }
+        `;
+
+      const data = await ApiService.query(query);
+
+      // ✅ Don't clear `savedPostIds` before verifying data
+      if (!data || !data.calcOContactSavedPosts) {
+        console.warn("⚠️ No saved bookmarks found.");
+        return;
+      }
+
+      // ✅ Only update savedPostIds if data exists
+      this.savedPostIds.clear();
+      data.calcOContactSavedPosts.forEach(({ ID, Saved_Post_ID }) => {
+        this.savedPostIds.set(String(Saved_Post_ID), ID); // Convert to string
+      });
+
+      console.log("✅ Saved Bookmarks Fetched:", [...this.savedPostIds.keys()]);
+    } catch (error) {
+      console.error("Error fetching saved posts:", error);
+    }
+  }
+
   getBookmarkSVG(isBookmarked) {
     return `
-      <svg width="24" height="24" viewBox="0 0 24 24" 
-           fill="${isBookmarked ? "#044047" : "none"}" 
-           stroke="#044047">
-        <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
-      </svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" 
+             fill="${isBookmarked ? "#044047" : "none"}" 
+             stroke="#044047">
+            <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
+        </svg>
     `;
   }
 
   async createBookmark(postId) {
+    // Prevent duplicate bookmarks
+    if (this.savedPostIds.has(postId)) {
+      throw new Error("Post is already bookmarked.");
+    }
+
     const query = `
       mutation createOContactSavedPost($payload: OContactSavedPostCreateInput) {
         createOContactSavedPost(payload: $payload) {
@@ -192,7 +272,11 @@ class ForumManager {
 
   handleFilterChange(filterType) {
     this.currentFilter = filterType;
-    this.refreshPosts();
+    this.refreshPosts().then(() => {
+      if (filterType === "saved") {
+        this.updateBookmarkIcons(); // ✅ Update icons when switching to Saved Posts
+      }
+    });
   }
 
   async refreshPosts() {
@@ -219,28 +303,38 @@ class ForumManager {
 
         if (isInitialLoad) {
           document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
-            <div class="text-center text-gray-600 p-4">
-              <p>⚠️ No posts found.</p>
-            </div>
-          `;
+                    <div class="text-center text-gray-600 p-4">
+                        <p>⚠️ No posts found.</p>
+                    </div>
+                `;
         }
         return;
       }
 
-      const posts = data.calcForumPosts.map((post) => ({
-        isBookmarked: this.savedPostIds.has(post.ID),
-        id: post.ID,
-        author_id: post.Author_ID,
-        defaultAuthorImage: CONFIG.api.defaultAuthorImage,
-        author: Formatter.formatAuthor({
-          firstName: post.Author_First_Name,
-          lastName: post.Author_Last_Name,
-          profileImage: post.Author_Profile_Image,
-        }),
-        date: Formatter.formatTimestamp(post.Date_Added),
-        title: post.Post_Title,
-        content: post.Post_Copy,
-      }));
+      console.log("✅ Rendering Posts. Current Saved Post IDs:", [
+        ...this.savedPostIds.keys(),
+      ]);
+
+      const posts = data.calcForumPosts.map((post) => {
+        const postIdString = String(post.ID); // Convert post.ID to string
+        const isBookmarked = this.savedPostIds.has(postIdString);
+
+        return {
+          isBookmarked,
+          id: post.ID,
+          author_id: post.Author_ID,
+          featured_post: post.Featured_Post,
+          defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+          author: Formatter.formatAuthor({
+            firstName: post.Author_First_Name,
+            lastName: post.Author_Last_Name,
+            profileImage: post.Author_Profile_Image,
+          }),
+          date: Formatter.formatTimestamp(post.Date_Added),
+          title: post.Post_Title,
+          content: post.Post_Copy,
+        };
+      });
 
       const template = $.templates("#post-template");
       const postContainer = document.querySelector(
@@ -264,12 +358,15 @@ class ForumManager {
       } else {
         document.querySelector("#load-more-button").classList.remove("hidden");
       }
+
+      // ✅ Call updateBookmarkIcons *after* posts are rendered
+      this.updateBookmarkIcons();
     } catch (error) {
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
-        <div class="text-center text-red-600 p-4">
-          <p>⚠️ Failed to load posts. Please try again later.</p>
-        </div>
-      `;
+            <div class="text-center text-red-600 p-4">
+                <p>⚠️ Failed to load posts. Please try again later.</p>
+            </div>
+        `;
     }
   }
 
@@ -291,6 +388,7 @@ class ForumManager {
           Date_Added: field(arg: ["created_at"])
           Post_Title: field(arg: ["post_title"])
           Post_Copy: field(arg: ["post_copy"])
+          Featured_Post: field(arg: ["featured_post"])
         }
       }
     `;
@@ -307,7 +405,6 @@ class ForumManager {
     return { query, variables };
   }
 
-
   buildFilterCondition() {
     switch (this.currentFilter) {
       case "saved":
@@ -320,11 +417,11 @@ class ForumManager {
         return "";
     }
   }
-  
+
   needsUserId() {
     return this.currentFilter === "my" || this.currentFilter === "saved";
   }
-  
+
   static async fetchComments(postId) {
     try {
       const query = `
@@ -591,6 +688,11 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     if (response && response.createForumPost && response.createForumPost.id) {
       const actualPostId = response.createForumPost.id;
       postElement.setAttribute("data-post-id", actualPostId);
+      // Update all elements with data-post-id within the post
+      const elementsWithPostId = postElement.querySelectorAll("[data-post-id]");
+      elementsWithPostId.forEach((element) => {
+        element.dataset.postId = actualPostId;
+      });
     }
 
     postElement.classList.remove("opacity-50", "pointer-events-none");
