@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Priestess Forum System</title>
     <link rel="stylesheet" href="styles.css">
+
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/themes/light.css">
     <link href="https://unpkg.com/devextreme@19.1-next/dist/css/dx.common.css" rel="stylesheet">
@@ -13,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
-<body class="bg-gray-50">
+<body class="ml-[87px] mr-[310px] my-[80px] bg-[var(--secondary-300)] max-[500px]:m-[40px_24px] max-[1100px]:m-[40px]">
 
     <!-- Post Modal -->
     <sl-dialog id="post-modal" label="Post Details">
@@ -31,7 +32,7 @@
         </div>
     </sl-dialog>
 
-    <div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="container flex gap-[110px] max-[1100px]:flex-col max-[1100px]:gap-4  items-start w-full">
         <!-- Controls Section -->
         <section class="mb-8 text-center flex flex-col gap-4">
             <div class="mb-6">
@@ -40,14 +41,52 @@
                     Refresh
                 </sl-button>
             </div>
-
-            <div class="flex flex-wrap gap-4 justify-center">
-                <sl-button variant="default" class="filter-button" data-filter="recent">Recent Posts</sl-button>
-                <sl-button variant="default" class="filter-button" data-filter="featured">Featured Posts</sl-button>
-                <sl-button variant="default" class="filter-button" data-filter="my">My Posts</sl-button>
-                <sl-button variant="default" class="filter-button" data-filter="saved">Saved Posts</sl-button>
+            <!-- Tab Section -->
+            <div class="max-[500px]:w-full max-[500px]:flex max-[500px]:items-center max-[500px]:justify-center">
+                <div
+                    class="flex flex-col max-[1100px]:flex-row items-center max-[500px]:justify-center min-[500px]:w-fit gap-1 max-[500px]:gap-2">
+                    <button class="filter-button tab-Button tab-Active w-full text-nowrap" data-filter="recent"
+                        id="recent-posts">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M15.7692 7.17947V16.1538C15.7692 16.4938 15.6342 16.8199 15.3937 17.0604C15.1533 17.3008 14.8272 17.4359 14.4872 17.4359H2.94872C2.60869 17.4359 2.2826 17.3008 2.04217 17.0604C1.80174 16.8199 1.66666 16.4938 1.66666 16.1538V7.17947C1.66666 6.83945 1.80174 6.51335 2.04217 6.27292C2.2826 6.03249 2.60869 5.89742 2.94872 5.89742H14.4872C14.8272 5.89742 15.1533 6.03249 15.3937 6.27292C15.6342 6.51335 15.7692 6.83945 15.7692 7.17947ZM17.0513 3.33331H4.87179C4.70178 3.33331 4.53873 3.40085 4.41852 3.52107C4.2983 3.64128 4.23077 3.80433 4.23077 3.97434C4.23077 4.14435 4.2983 4.3074 4.41852 4.42761C4.53873 4.54783 4.70178 4.61536 4.87179 4.61536H17.0513V14.2307C17.0513 14.4008 17.1188 14.5638 17.239 14.684C17.3592 14.8042 17.5223 14.8718 17.6923 14.8718C17.8623 14.8718 18.0254 14.8042 18.1456 14.684C18.2658 14.5638 18.3333 14.4008 18.3333 14.2307V4.61536C18.3333 4.27534 18.1983 3.94925 17.9578 3.70882C17.7174 3.46839 17.3913 3.33331 17.0513 3.33331Z"
+                                fill="#044047" />
+                        </svg>
+                        <div class="o1">Recent Posts</div>
+                    </button>
+                    <button class="filter-button tab-Button tab-Inactive w-full text-nowrap" data-filter="featured"
+                        id="featured-posts">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16.6026 2.94874H14.6795V2.30771C14.6795 2.1377 14.612 1.97465 14.4917 1.85444C14.3715 1.73422 14.2085 1.66669 14.0385 1.66669C13.8685 1.66669 13.7054 1.73422 13.5852 1.85444C13.465 1.97465 13.3974 2.1377 13.3974 2.30771V2.94874H6.98718V2.30771C6.98718 2.1377 6.91964 1.97465 6.79943 1.85444C6.67921 1.73422 6.51616 1.66669 6.34615 1.66669C6.17614 1.66669 6.0131 1.73422 5.89288 1.85444C5.77266 1.97465 5.70513 2.1377 5.70513 2.30771V2.94874H3.78205C3.44203 2.94874 3.11594 3.08381 2.8755 3.32424C2.63507 3.56467 2.5 3.89077 2.5 4.23079V17.0513C2.5 17.3913 2.63507 17.7174 2.8755 17.9578C3.11594 18.1983 3.44203 18.3334 3.78205 18.3334H16.6026C16.9426 18.3334 17.2687 18.1983 17.5091 17.9578C17.7495 17.7174 17.8846 17.3913 17.8846 17.0513V4.23079C17.8846 3.89077 17.7495 3.56467 17.5091 3.32424C17.2687 3.08381 16.9426 2.94874 16.6026 2.94874ZM5.70513 5.51284V4.87182C5.70513 4.7018 5.77266 4.53876 5.89288 4.41854C6.0131 4.29833 6.17614 4.23079 6.34615 4.23079C6.51616 4.23079 6.67921 4.29833 6.79943 4.41854C6.91964 4.53876 6.98718 4.7018 6.98718 4.87182V5.51284C6.98718 5.68285 6.91964 5.8459 6.79943 5.96611C6.67921 6.08633 6.51616 6.15387 6.34615 6.15387C6.17614 6.15387 6.0131 6.08633 5.89288 5.96611C5.77266 5.8459 5.70513 5.68285 5.70513 5.51284ZM14.2428 10.3766L12.2829 11.9944L12.8806 14.4071C12.8958 14.4683 12.8926 14.5327 12.8714 14.5922C12.8501 14.6516 12.8118 14.7035 12.7612 14.7412C12.7057 14.7821 12.6386 14.8043 12.5697 14.8045C12.5133 14.8042 12.4581 14.789 12.4095 14.7604L10.1923 13.46L7.97756 14.7636C7.92292 14.796 7.85989 14.8114 7.79647 14.8079C7.73305 14.8044 7.6721 14.7822 7.62136 14.744C7.57062 14.7058 7.53238 14.6533 7.51148 14.5934C7.49059 14.5334 7.48799 14.4685 7.50401 14.4071L8.10176 11.9912L6.14183 10.3766C6.09235 10.336 6.05618 10.2815 6.03797 10.2201C6.01976 10.1587 6.02035 10.0933 6.03966 10.0323C6.05897 9.97121 6.09612 9.91735 6.14632 9.87762C6.19652 9.83789 6.25747 9.8141 6.32131 9.80932L8.90465 9.6098L9.89824 7.30932C9.9231 7.25197 9.96418 7.20315 10.0164 7.16885C10.0687 7.13455 10.1298 7.11628 10.1923 7.11628C10.2548 7.11628 10.3159 7.13455 10.3682 7.16885C10.4204 7.20315 10.4615 7.25197 10.4864 7.30932L11.48 9.6098L14.0633 9.80932C14.1271 9.8141 14.1881 9.83789 14.2383 9.87762C14.2885 9.91735 14.3256 9.97121 14.345 10.0323C14.3643 10.0933 14.3649 10.1587 14.3466 10.2201C14.3284 10.2815 14.2923 10.336 14.2428 10.3766ZM14.6795 5.51284C14.6795 5.68285 14.612 5.8459 14.4917 5.96611C14.3715 6.08633 14.2085 6.15387 14.0385 6.15387C13.8685 6.15387 13.7054 6.08633 13.5852 5.96611C13.465 5.8459 13.3974 5.68285 13.3974 5.51284V4.87182C13.3974 4.7018 13.465 4.53876 13.5852 4.41854C13.7054 4.29833 13.8685 4.23079 14.0385 4.23079C14.2085 4.23079 14.3715 4.29833 14.4917 4.41854C14.612 4.53876 14.6795 4.7018 14.6795 4.87182V5.51284Z"
+                                fill="#044047" />
+                        </svg>
+                        <div class="o1">Featured Posts</div>
+                    </button>
+                    <button class="filter-button tab-Button tab-Inactive w-full text-nowrap" data-filter="my"
+                        id="saved-posts">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M14.8335 1.66669H5.50002C5.1464 1.66669 4.80725 1.80717 4.5572 2.05722C4.30714 2.30727 4.16666 2.64642 4.16666 3.00005V17.667C4.16672 17.786 4.19862 17.9028 4.25905 18.0053C4.31947 18.1078 4.40623 18.1922 4.5103 18.2499C4.61438 18.3075 4.73199 18.3363 4.85093 18.3331C4.96986 18.33 5.08579 18.2951 5.18668 18.232L10.1668 15.1195L15.1477 18.232C15.2486 18.2949 15.3644 18.3296 15.4832 18.3326C15.6021 18.3356 15.7195 18.3069 15.8235 18.2492C15.9274 18.1916 16.0141 18.1072 16.0744 18.0049C16.1348 17.9025 16.1668 17.7859 16.1669 17.667V3.00005C16.1669 2.64642 16.0264 2.30727 15.7764 2.05722C15.5263 1.80717 15.1872 1.66669 14.8335 1.66669Z"
+                                fill="#044047" />
+                        </svg>
+                        <div class="o1">Saved Posts</div>
+                    </button>
+                    <button class="filter-button tab-Button tab-Inactive w-full text-nowrap" data-filter="saved"
+                        id="my-posts">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M18.2479 17.3749C18.1916 17.4723 18.1107 17.5533 18.0132 17.6095C17.9157 17.6658 17.8051 17.6954 17.6926 17.6954H2.3071C2.19462 17.6953 2.08416 17.6656 1.9868 17.6093C1.88944 17.5529 1.8086 17.472 1.75242 17.3746C1.69623 17.2771 1.66667 17.1666 1.66669 17.0542C1.66672 16.9417 1.69634 16.8312 1.75258 16.7338C2.973 14.6239 4.85371 13.111 7.04854 12.3938C5.96288 11.7475 5.11939 10.7627 4.6476 9.59061C4.17581 8.41852 4.10182 7.12397 4.43698 5.90576C4.77213 4.68755 5.49792 3.61304 6.50286 2.84724C7.50781 2.08143 8.73635 1.66669 9.99983 1.66669C11.2633 1.66669 12.4918 2.08143 13.4968 2.84724C14.5017 3.61304 15.2275 4.68755 15.5627 5.90576C15.8978 7.12397 15.8238 8.41852 15.3521 9.59061C14.8803 10.7627 14.0368 11.7475 12.9511 12.3938C15.1459 13.111 17.0267 14.6239 18.2471 16.7338C18.3035 16.8312 18.3332 16.9417 18.3334 17.0542C18.3335 17.1667 18.304 17.2773 18.2479 17.3749Z"
+                                fill="#044047" />
+                        </svg>
+                        <div class="o1">My Posts</div>
+                    </button>
+                </div>
             </div>
+            <!-- Tab Ends -->
+        </section>
 
+        <div class="flex flex-col gap-6  w-full">
             <!-- Post Creation Form -->
             <section class="mb-6 p-4 bg-white shadow-sm rounded-lg">
                 <h2 class="text-lg font-semibold mb-2">Create a Post</h2>
@@ -56,10 +95,88 @@
                 </div>
                 <sl-button id="submit-post" variant="primary" class="mt-4">Post</sl-button>
             </section>
-        </section>
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-between">
+                    <div class="o2 text-black">Recent Post</div>
+                    <div class="flex items-center gap-2">
+                        <div x-data="{ sortData: false, openedWithKeyboard: false }" class="relative w-fit"
+                            x-on:keydown.esc.window="sortData = false, openedWithKeyboard = false">
+                            <button x-on:click="sortData = ! sortData" aria-haspopup="true"
+                                x-on:keydown.space.prevent="openedWithKeyboard = true"
+                                x-on:keydown.enter.prevent="openedWithKeyboard = true"
+                                x-on:keydown.down.prevent="openedWithKeyboard = true"
+                                x-bind:class="sortData || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
+                                x-bind:aria-expanded="sortData || openedWithKeyboard"
+                                class="group button flex items-center gap-2 border border-[var(--primary)] text-nowrap text-[var(--primary)] focus:!bg-[var(--primary)] focus:text-white active:!bg-[var(--primary)] active:!text-white">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path class="group-focus:!fill-white group-active:!fill-white"
+                                        d="M1.1665 7.68079C1.1665 7.55187 1.21772 7.42823 1.30888 7.33707C1.40004 7.24591 1.52368 7.19469 1.6526 7.19469H6.0275C6.15642 7.19469 6.28007 7.24591 6.37123 7.33707C6.46239 7.42823 6.5136 7.55187 6.5136 7.68079C6.5136 7.80972 6.46239 7.93336 6.37123 8.02452C6.28007 8.11568 6.15642 8.16689 6.0275 8.16689H1.6526C1.52368 8.16689 1.40004 8.11568 1.30888 8.02452C1.21772 7.93336 1.1665 7.80972 1.1665 7.68079ZM1.6526 4.27809H5.0553C5.18422 4.27809 5.30787 4.22688 5.39903 4.13572C5.49019 4.04456 5.5414 3.92092 5.5414 3.79199C5.5414 3.66307 5.49019 3.53943 5.39903 3.44827C5.30787 3.35711 5.18422 3.3059 5.0553 3.3059H1.6526C1.52368 3.3059 1.40004 3.35711 1.30888 3.44827C1.21772 3.53943 1.1665 3.66307 1.1665 3.79199C1.1665 3.92092 1.21772 4.04456 1.30888 4.13572C1.40004 4.22688 1.52368 4.27809 1.6526 4.27809ZM9.9163 11.0835H1.6526C1.52368 11.0835 1.40004 11.1347 1.30888 11.2259C1.21772 11.317 1.1665 11.4407 1.1665 11.5696C1.1665 11.6985 1.21772 11.8222 1.30888 11.9133C1.40004 12.0045 1.52368 12.0557 1.6526 12.0557H9.9163C10.0452 12.0557 10.1689 12.0045 10.26 11.9133C10.3512 11.8222 10.4024 11.6985 10.4024 11.5696C10.4024 11.4407 10.3512 11.317 10.26 11.2259C10.1689 11.1347 10.0452 11.0835 9.9163 11.0835ZM12.6907 4.90638L10.2602 2.47588C10.2151 2.43068 10.1615 2.39483 10.1024 2.37037C10.0434 2.3459 9.98018 2.33331 9.9163 2.33331C9.85242 2.33331 9.78916 2.3459 9.73015 2.37037C9.67114 2.39483 9.61753 2.43068 9.57238 2.47588L7.14189 4.90638C7.05067 4.99759 6.99943 5.1213 6.99943 5.25029C6.99943 5.37929 7.05067 5.503 7.14189 5.59421C7.2331 5.68542 7.35681 5.73666 7.4858 5.73666C7.61479 5.73666 7.73851 5.68542 7.82972 5.59421L9.4302 3.99312V8.65299C9.4302 8.78192 9.48141 8.90556 9.57258 8.99672C9.66374 9.08788 9.78738 9.13909 9.9163 9.13909C10.0452 9.13909 10.1689 9.08788 10.26 8.99672C10.3512 8.90556 10.4024 8.78192 10.4024 8.65299V3.99312L12.0029 5.59421C12.048 5.63937 12.1017 5.6752 12.1607 5.69964C12.2197 5.72408 12.2829 5.73666 12.3468 5.73666C12.4107 5.73666 12.4739 5.72408 12.5329 5.69964C12.5919 5.6752 12.6456 5.63937 12.6907 5.59421C12.7359 5.54905 12.7717 5.49543 12.7961 5.43642C12.8206 5.37741 12.8332 5.31417 12.8332 5.25029C12.8332 5.18642 12.8206 5.12318 12.7961 5.06417C12.7717 5.00516 12.7359 4.95154 12.6907 4.90638Z"
+                                        fill="#044047" />
+                                </svg>
+                                <div class="o3">Sort</div>
+                            </button>
+                            <div x-cloak x-show="sortData || openedWithKeyboard" x-transition
+                                x-trap="openedWithKeyboard"
+                                x-on:click.outside="sortData = false, openedWithKeyboard = false"
+                                x-on:keydown.down.prevent="$focus.wrap().next()"
+                                x-on:keydown.up.prevent="$focus.wrap().previous()"
+                                class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-white p-1 shadow-[0px_4px_4px_0px_#0000000F]">
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Latest</button>
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Oldest</button>
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Most
+                                    Popular</button>
+                            </div>
+                        </div>
+                        <div x-data="{ filterData: false, openedWithKeyboard: false }" class="relative w-fit"
+                            x-on:keydown.esc.window="filterData = false, openedWithKeyboard = false">
+                            <button x-on:click="filterData = ! filterData" aria-haspopup="true"
+                                x-on:keydown.space.prevent="openedWithKeyboard = true"
+                                x-on:keydown.enter.prevent="openedWithKeyboard = true"
+                                x-on:keydown.down.prevent="openedWithKeyboard = true"
+                                x-bind:class="filterData || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
+                                x-bind:aria-expanded="filterData || openedWithKeyboard"
+                                class="group button flex items-center gap-2 border border-[var(--primary)] text-nowrap text-[var(--primary)] focus:!bg-[var(--primary)] focus:text-white active:!bg-[var(--primary)] active:!text-white">
+                                <div class="o3">All</div>
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path class="group-focus:!fill-white group-active:!fill-white"
+                                        d="M12.6778 4.98905L7.37501 10.2918C7.32576 10.3411 7.26728 10.3802 7.2029 10.4069C7.13853 10.4336 7.06952 10.4473 6.99984 10.4473C6.93015 10.4473 6.86115 10.4336 6.79677 10.4069C6.7324 10.3802 6.67391 10.3411 6.62467 10.2918L1.3219 4.98905C1.2224 4.88955 1.1665 4.7546 1.1665 4.61388C1.1665 4.47317 1.2224 4.33821 1.3219 4.23871C1.42141 4.13921 1.55636 4.08331 1.69707 4.08331C1.83779 4.08331 1.97274 4.13921 2.07225 4.23871L6.99984 9.16697L11.9274 4.23871C11.9767 4.18945 12.0352 4.15036 12.0996 4.1237C12.1639 4.09704 12.2329 4.08331 12.3026 4.08331C12.3723 4.08331 12.4413 4.09704 12.5056 4.1237C12.57 4.15036 12.6285 4.18945 12.6778 4.23871C12.727 4.28798 12.7661 4.34647 12.7928 4.41084C12.8194 4.47521 12.8332 4.54421 12.8332 4.61388C12.8332 4.68356 12.8194 4.75255 12.7928 4.81692C12.7661 4.8813 12.727 4.93979 12.6778 4.98905Z"
+                                        fill="#044047" />
+                                </svg>
+                            </button>
 
-        <!-- Posts Container -->
-        <main id="posts-container" class="space-y-6"></main>
+                            <div x-cloak x-show="filterData || openedWithKeyboard" x-transition
+                                x-trap="openedWithKeyboard"
+                                x-on:click.outside="filterData = false, openedWithKeyboard = false"
+                                x-on:keydown.down.prevent="$focus.wrap().next()"
+                                x-on:keydown.up.prevent="$focus.wrap().previous()"
+                                class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-white p-1 shadow-[0px_4px_4px_0px_#0000000F] !z-5">
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Video</button>
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Audio</button>
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Image</button>
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-[var(--primary)] hover:bg-[#F2F4F8]">Text</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Posts Container -->
+                <main id="posts-container" class="space-y-6"></main>
+            </div>
+            <div class="text-center mt-6">
+                <sl-button variant="primary" id="load-more-button" class="hidden">
+                    Load More
+                </sl-button>
+            </div>
+        </div>
+
 
         <!-- Loading Indicator -->
         <div id="loading-indicator" class="text-center hidden py-4">
@@ -70,11 +187,7 @@
         <div id="error-display" class="hidden p-4 bg-red-100 text-red-700 rounded-lg"></div>
 
         <!-- Load More Button -->
-        <div class="text-center mt-6">
-            <sl-button variant="primary" id="load-more-button" class="hidden">
-                Load More
-            </sl-button>
-        </div>
+
     </div>
 
     <!-- Templates -->
@@ -201,6 +314,7 @@
     <script src="script/formatter.js"></script>
     <script src="script/ui_manager.js"></script>
     <script src="script/app.js"></script>
+    <script src="script/tab.js"></script>
 </body>
 
 </html>
