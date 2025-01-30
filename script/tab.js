@@ -1,4 +1,3 @@
-
 const tabs = document.querySelectorAll(".tab-Button");
 tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
