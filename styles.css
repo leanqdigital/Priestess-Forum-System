@@ -104,16 +104,6 @@ sl-dialog::part(panel)::-webkit-scrollbar {
     }
   }
 }
-/* Modal Styling */
-sl-dialog::part(overlay) {
-  background-color: #04404780;
-}
-sl-dialog::part(base) {
-  top: 50px;
-  align-items: start;
-  transform: none;
-}
-
 .tab-Inactive {
   background: transparent;
   border-radius: 0px;
@@ -124,12 +114,43 @@ sl-dialog::part(base) {
     }
   }
 }
-
-.dialog__overlay,
-.dialog--open {
-  background-color: red !important;
+/* Modal Styling */
+sl-dialog::part(overlay) {
+  background-color: #04404780;
+}
+#postNewModal::part(panel) {
+width: 656px;
+}
+sl-dialog::part(base) {
+  top: 50px;
+  align-items: start;
+  transform: none;
 }
 
+/* Icon Only Button Styling */
+.icon-button {
+  padding: 12px;
+  border-radius: 4px;
+  transition: all 0.3s;
+  background: var(--grey-300);
+  svg {
+    path {
+      fill: var(--primary);
+      transition: all 0.3s;
+    } 
+  }
+}
+
+.icon-button:focus,
+.icon-button:hover,
+.icon-button:active {
+  background: var(--primary);
+  svg{
+    path {
+      fill: var(--white);
+    }
+  }
+}
 /* Mention Text */
 .mention-button {
   padding: 4px 6px;
@@ -359,19 +380,25 @@ h4 {
   visibility: hidden;
 }
 
-
 .mention {
-  background-color: #E2F4F5;
+  padding: 4px 6px;
+  background: var(--secondary-300);
+  color: var(--primary);
+  font-family: "AvenirBook", sans-serif;
+  font-size: 16px;
+  font-weight: 350;
+  line-height: 16px;
   border-radius: 4px;
-  padding: 2px 4px;
-  color: #044047;
-  font-weight: 500;
 }
 
+
 .tribute-container {
+  background: white;
+  z-index: 999;
+  height: 250px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .tribute-container ul li {
