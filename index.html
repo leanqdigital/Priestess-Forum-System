@@ -81,7 +81,7 @@
     <div class="container  w-full">
         <!-- Controls Section -->
         <section class="mb-8 text-center flex flex-col gap-4 max-[1100px]:w-full">
-            <div class="mb-6 hidden">
+            <div class="mb-6 ">
                 <sl-button variant="default" class="refresh-button">
                     <sl-icon name="arrow-clockwise" slot="prefix"></sl-icon>
                     Refresh
@@ -89,7 +89,7 @@
             </div>
 
         </section>
-        <div class="flex flex-col gap-6 max-[500px]:gap-4 w-full">
+        <div class="flex flex-col gap-4 w-full">
             <!-- Post Creation Form -->
             <div class="bg-white p-4 rounded flex items-center justify-between">
                 <!-- Start a post Btn -->
@@ -270,11 +270,7 @@
                 <!-- Posts Container -->
                 <main id="posts-container" class="space-y-6"></main>
             </div>
-            <div class="text-center mt-6">
-                <sl-button variant="primary" id="load-more-button" class="hidden">
-                    Load More
-                </sl-button>
-            </div>
+
         </div>
         <!-- Loading Indicator -->
         <div id="loading-indicator" class="text-center hidden py-4">
@@ -340,10 +336,10 @@
                             {{/if}}
                             <!-- Three Dots Ends -->
                         </div>
-                        <div class="post-content flex flex-col gap-2">
+                        <div class="post-content flex flex-col gap-2 w-full max-h-[500px] overflow-hidden">
                             {{if post_image}}
                             <div class = "post-image-wrapper">
-                                <img src = "{{:post_image}}">
+                                <img src = "{{:post_image}}" class="size-full object-contain ">
                             </div>
                             {{/if}}
                             <div class="p2 text-black !font-[350]">{{:content}}</div>

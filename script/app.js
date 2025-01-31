@@ -368,6 +368,18 @@ class ForumManager {
   }
 
   initEventListeners() {
+    let isLoading = false;
+    window.addEventListener("scroll", () => {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      if (scrollPosition >= documentHeight - 100 && !isLoading) {
+        isLoading = true; 
+        setTimeout(() => {
+          this.loadMorePosts();
+          isLoading = false; 
+        }, 500);
+      }
+    });
     document.addEventListener("click", async (e) => {
       if (e.target.closest(".vote-button")) {
         const postId = e.target.closest(".vote-button").dataset.postId;
@@ -378,9 +390,6 @@ class ForumManager {
         this.refreshPosts();
       }
 
-      if (e.target.closest("#load-more-button")) {
-        this.loadMorePosts();
-      }
       const filterButton = e.target.closest(".filter-button");
 
       if (filterButton) {
@@ -457,8 +466,6 @@ class ForumManager {
 
       if (!data || !data.calcForumPosts || data.calcForumPosts.length === 0) {
         this.hasMorePosts = false;
-        document.querySelector("#load-more-button").classList.add("hidden");
-
         if (isInitialLoad) {
           document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
                   <div class="flex flex-col gap-6  items-center justify-center ">
@@ -517,11 +524,7 @@ class ForumManager {
 
       if (posts.length < this.postsLimit) {
         this.hasMorePosts = false;
-        document.querySelector("#load-more-button").classList.add("hidden");
-      } else {
-        document.querySelector("#load-more-button").classList.remove("hidden");
-      }
-
+      } 
       // ✅ Call updateBookmarkIcons *after* posts are rendered
       this.updateBookmarkIcons();
     } catch (error) {
