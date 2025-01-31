@@ -84,6 +84,10 @@ sl-dialog::part(panel)::-webkit-scrollbar {
   height: 0px;
   display: none;
 }
+/* Disabling margins or header */
+h1,h2,h3,h4 {
+ all: unset;
+}
 /* Tab Buttons */
 .tab-Button {
   padding: 12px 24px;
@@ -294,7 +298,7 @@ h4 {
   }
 
   .button {
-    padding: 8px;
+    padding: 12px 16px;
   }
 }
 
