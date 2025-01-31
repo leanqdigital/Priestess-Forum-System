@@ -85,3 +85,11 @@ window.addEventListener("load", function () {
     loader.classList.add("fade-out");
   }, 500);
 });
+
+
+// Open New Post Modal
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById('openCreateNewPostModal').addEventListener('click', function () {
+    document.getElementById('postNewModal').show();
+  });
+});
