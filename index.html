@@ -89,7 +89,7 @@
             </div>
 
         </section>
-        <div class="flex flex-col gap-6  w-full">
+        <div class="flex flex-col gap-6 max-[500px]:gap-4 w-full">
             <!-- Post Creation Form -->
             <div class="bg-white p-4 rounded flex items-center justify-between">
                 <!-- Start a post Btn -->
@@ -105,15 +105,14 @@
                 <!-- Start a post Btn End-->
               
                 <!-- Start Post Action Buttons -->
-                <div class="flex items-center gap-6 max-[500px]:gap-3">
+                <div class="flex items-center gap-4 max-[500px]:gap-3">
                     <button
-                        class="group button bg-[var(--secondary-300)] text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
+                        class="group button bg-gray-300 text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path class="group-focus:!fill-white group-active:!fill-white"
                                 d="M13.5 2.5H2.5C2.23478 2.5 1.98043 2.60536 1.79289 2.79289C1.60536 2.98043 1.5 3.23478 1.5 3.5V12.5C1.5 12.7652 1.60536 13.0196 1.79289 13.2071C1.98043 13.3946 2.23478 13.5 2.5 13.5H13.5C13.7652 13.5 14.0196 13.3946 14.2071 13.2071C14.3946 13.0196 14.5 12.7652 14.5 12.5V3.5C14.5 3.23478 14.3946 2.98043 14.2071 2.79289C14.0196 2.60536 13.7652 2.5 13.5 2.5ZM13.5 3.5V9.92188L11.8706 8.29313C11.7778 8.20024 11.6675 8.12656 11.5462 8.07629C11.4248 8.02602 11.2948 8.00015 11.1634 8.00015C11.0321 8.00015 10.902 8.02602 10.7807 8.07629C10.6594 8.12656 10.5491 8.20024 10.4563 8.29313L9.20625 9.54313L6.45625 6.79313C6.26873 6.60573 6.01448 6.50046 5.74937 6.50046C5.48427 6.50046 5.23002 6.60573 5.0425 6.79313L2.5 9.33562V3.5H13.5ZM2.5 10.75L5.75 7.5L10.75 12.5H2.5V10.75ZM13.5 12.5H12.1644L9.91438 10.25L11.1644 9L13.5 11.3363V12.5ZM9 6.25C9 6.10166 9.04399 5.95666 9.1264 5.83332C9.20881 5.70999 9.32594 5.61386 9.46299 5.55709C9.60003 5.50032 9.75083 5.48547 9.89632 5.51441C10.0418 5.54335 10.1754 5.61478 10.2803 5.71967C10.3852 5.82456 10.4566 5.9582 10.4856 6.10368C10.5145 6.24917 10.4997 6.39997 10.4429 6.53701C10.3861 6.67406 10.29 6.79119 10.1667 6.8736C10.0433 6.95601 9.89834 7 9.75 7C9.55109 7 9.36032 6.92098 9.21967 6.78033C9.07902 6.63968 9 6.44891 9 6.25Z"
                                 fill="#044047" />
                         </svg>
-                        <div>Upload Image</div>
                     </button>
                     <div x-data="{ uploadAudio: false, openedWithKeyboard: false }" class="relative w-fit"
                         x-on:keydown.esc.window="uploadAudio = false, openedWithKeyboard = false">
@@ -123,38 +122,34 @@
                             x-on:keydown.down.prevent="openedWithKeyboard = true"
                             x-bind:class="uploadAudio || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                             x-bind:aria-expanded="uploadAudio || openedWithKeyboard"
-                            class="group button bg-[var(--secondary-300)] text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
+                            class="group button bg-gray-300 text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path class="group-focus:!fill-white group-active:!fill-white"
                                     d="M8.24403 9.66665C9.64135 9.66665 10.7738 8.5476 10.7738 7.16665V3.83331C10.7738 2.45236 9.64135 1.33331 8.24403 1.33331C6.84671 1.33331 5.71427 2.45236 5.71427 3.83331V7.16665C5.71427 8.5476 6.84671 9.66665 8.24403 9.66665ZM13.1547 7.13688C13.1547 7.07141 13.1012 7.01784 13.0357 7.01784H12.1428C12.0774 7.01784 12.0238 7.07141 12.0238 7.13688C12.0238 9.22468 10.3318 10.9166 8.24403 10.9166C6.15623 10.9166 4.46427 9.22468 4.46427 7.13688C4.46427 7.07141 4.41069 7.01784 4.34522 7.01784H3.45236C3.38688 7.01784 3.33331 7.07141 3.33331 7.13688C3.33331 9.6473 5.21724 11.7187 7.64879 12.0119V13.5357H5.48659C5.28272 13.5357 5.11903 13.7485 5.11903 14.0119V14.5476C5.11903 14.6131 5.16069 14.6666 5.21129 14.6666H11.2768C11.3274 14.6666 11.369 14.6131 11.369 14.5476V14.0119C11.369 13.7485 11.2053 13.5357 11.0015 13.5357H8.77974V12.0193C11.2396 11.7515 13.1547 9.66813 13.1547 7.13688Z"
                                     fill="#044047" />
                             </svg>
-
-
-                            <div>Add Audio</div>
                         </button>
                         <div x-cloak x-show="uploadAudio || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
                             x-on:click.outside="uploadAudio = false, openedWithKeyboard = false"
                             x-on:keydown.down.prevent="$focus.wrap().next()"
                             x-on:keydown.up.prevent="$focus.wrap().previous()"
-                            class="absolute top-10 right-0 flex p-1 bg-white rounded w-full flex-col shadow-[0px_4px_4px_0px_#0000000F]">
+                            class="absolute top-10 right-0 flex p-1 bg-white rounded w-fit flex-col shadow-[0px_4px_4px_0px_#0000000F]">
                             <button type="button"
-                                class="p-[10px] hover:bg-[#F2F4F8] rounded cursor-pointer o3 text-[var(--primary)] text-left">Record
+                                class="p-[10px] hover:bg-[#F2F4F8]  text-nowrap cursor-pointer o3 text-[var(--primary)] text-left">Record
                                 Audio</button>
                             <button type="button"
-                                class="p-[10px] hover:bg-[#F2F4F8] rounded cursor-pointer o3 text-[var(--primary)] text-left">Upload
+                                class="p-[10px] hover:bg-[#F2F4F8] text-nowrap  rounded cursor-pointer o3 text-[var(--primary)] text-left">Upload
                                 Audio</button>
                         </div>
                     </div>
                     <button
-                        class="group button bg-[var(--secondary-300)] text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
+                        class="group button bg-gray-300 text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path class="group-focus:!fill-white group-active:!fill-white"
                                 d="M11.111 4.88888V11.1111C11.111 11.3468 11.0174 11.5729 10.8507 11.7396C10.684 11.9063 10.4579 12 10.2222 12H2.2222C1.98645 12 1.76036 11.9063 1.59366 11.7396C1.42696 11.5729 1.33331 11.3468 1.33331 11.1111V4.88888C1.33331 4.65314 1.42696 4.42705 1.59366 4.26035C1.76036 4.09365 1.98645 4 2.2222 4H10.2222C10.4579 4 10.684 4.09365 10.8507 4.26035C11.0174 4.42705 11.111 4.65314 11.111 4.88888ZM14.3333 4.90277C14.2705 4.88743 14.2053 4.88554 14.1418 4.89722C14.0783 4.9089 14.0181 4.93389 13.9649 4.97055L12.0988 6.21443C12.0684 6.23474 12.0434 6.26226 12.0262 6.29453C12.0089 6.3268 11.9999 6.36284 11.9999 6.39943V9.60053C11.9999 9.63712 12.0089 9.67316 12.0262 9.70543C12.0434 9.7377 12.0684 9.76522 12.0988 9.78553L13.9755 11.0366C14.0457 11.0835 14.1279 11.1094 14.2123 11.1112C14.2967 11.1131 14.3799 11.0909 14.4521 11.0472C14.519 11.0047 14.5738 10.9458 14.6114 10.876C14.6489 10.8063 14.6679 10.7281 14.6666 10.6489V5.33333C14.6666 5.23476 14.6339 5.13897 14.5736 5.06103C14.5132 4.98309 14.4287 4.92742 14.3333 4.90277Z"
                                 fill="#044047" />
                         </svg>
-                        <div>Add Video</div>
                     </button>
                 </div>
                 <!-- Start Post Action Buttons Ends -->
@@ -212,12 +207,12 @@
                                 x-on:keydown.down.prevent="openedWithKeyboard = true"
                                 x-bind:class="sortData || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                                 x-bind:aria-expanded="sortData || openedWithKeyboard"
-                                class="group button flex items-center gap-2 border border-primary text-nowrap text-primary focus:!bg-primary focus:text-white active:!bg-primary active:!text-white">
+                                class="group button flex items-center gap-2 border border-secondary text-nowrap text-secondary focus:!bg-secondary focus:text-white active:!bg-secondary active:!text-white">
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path class="group-focus:!fill-white group-active:!fill-white"
                                         d="M1.1665 7.68079C1.1665 7.55187 1.21772 7.42823 1.30888 7.33707C1.40004 7.24591 1.52368 7.19469 1.6526 7.19469H6.0275C6.15642 7.19469 6.28007 7.24591 6.37123 7.33707C6.46239 7.42823 6.5136 7.55187 6.5136 7.68079C6.5136 7.80972 6.46239 7.93336 6.37123 8.02452C6.28007 8.11568 6.15642 8.16689 6.0275 8.16689H1.6526C1.52368 8.16689 1.40004 8.11568 1.30888 8.02452C1.21772 7.93336 1.1665 7.80972 1.1665 7.68079ZM1.6526 4.27809H5.0553C5.18422 4.27809 5.30787 4.22688 5.39903 4.13572C5.49019 4.04456 5.5414 3.92092 5.5414 3.79199C5.5414 3.66307 5.49019 3.53943 5.39903 3.44827C5.30787 3.35711 5.18422 3.3059 5.0553 3.3059H1.6526C1.52368 3.3059 1.40004 3.35711 1.30888 3.44827C1.21772 3.53943 1.1665 3.66307 1.1665 3.79199C1.1665 3.92092 1.21772 4.04456 1.30888 4.13572C1.40004 4.22688 1.52368 4.27809 1.6526 4.27809ZM9.9163 11.0835H1.6526C1.52368 11.0835 1.40004 11.1347 1.30888 11.2259C1.21772 11.317 1.1665 11.4407 1.1665 11.5696C1.1665 11.6985 1.21772 11.8222 1.30888 11.9133C1.40004 12.0045 1.52368 12.0557 1.6526 12.0557H9.9163C10.0452 12.0557 10.1689 12.0045 10.26 11.9133C10.3512 11.8222 10.4024 11.6985 10.4024 11.5696C10.4024 11.4407 10.3512 11.317 10.26 11.2259C10.1689 11.1347 10.0452 11.0835 9.9163 11.0835ZM12.6907 4.90638L10.2602 2.47588C10.2151 2.43068 10.1615 2.39483 10.1024 2.37037C10.0434 2.3459 9.98018 2.33331 9.9163 2.33331C9.85242 2.33331 9.78916 2.3459 9.73015 2.37037C9.67114 2.39483 9.61753 2.43068 9.57238 2.47588L7.14189 4.90638C7.05067 4.99759 6.99943 5.1213 6.99943 5.25029C6.99943 5.37929 7.05067 5.503 7.14189 5.59421C7.2331 5.68542 7.35681 5.73666 7.4858 5.73666C7.61479 5.73666 7.73851 5.68542 7.82972 5.59421L9.4302 3.99312V8.65299C9.4302 8.78192 9.48141 8.90556 9.57258 8.99672C9.66374 9.08788 9.78738 9.13909 9.9163 9.13909C10.0452 9.13909 10.1689 9.08788 10.26 8.99672C10.3512 8.90556 10.4024 8.78192 10.4024 8.65299V3.99312L12.0029 5.59421C12.048 5.63937 12.1017 5.6752 12.1607 5.69964C12.2197 5.72408 12.2829 5.73666 12.3468 5.73666C12.4107 5.73666 12.4739 5.72408 12.5329 5.69964C12.5919 5.6752 12.6456 5.63937 12.6907 5.59421C12.7359 5.54905 12.7717 5.49543 12.7961 5.43642C12.8206 5.37741 12.8332 5.31417 12.8332 5.25029C12.8332 5.18642 12.8206 5.12318 12.7961 5.06417C12.7717 5.00516 12.7359 4.95154 12.6907 4.90638Z"
-                                        fill="#044047" />
+                                        fill="var(--secondary)" />
                                 </svg>
                                 <div class="o3">Sort</div>
                             </button>
@@ -228,11 +223,11 @@
                                 x-on:keydown.up.prevent="$focus.wrap().previous()"
                                 class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-white p-1 shadow-[0px_4px_4px_0px_#0000000F]">
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Latest</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Latest</button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Oldest</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Oldest</button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Most
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Most
                                     Popular</button>
                             </div>
                         </div>
@@ -244,13 +239,13 @@
                                 x-on:keydown.down.prevent="openedWithKeyboard = true"
                                 x-bind:class="filterData || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                                 x-bind:aria-expanded="filterData || openedWithKeyboard"
-                                class="group button flex items-center gap-2 border border-primary text-nowrap text-primary focus:!bg-primary focus:text-white active:!bg-primary active:!text-white">
+                                class="group button flex items-center gap-2 border border-secondary text-nowrap text-secondary focus:!bg-secondary focus:text-white active:!bg-secondary active:!text-white">
                                 <div class="o3">All</div>
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <path class="group-focus:!fill-white group-active:!fill-white"
                                         d="M12.6778 4.98905L7.37501 10.2918C7.32576 10.3411 7.26728 10.3802 7.2029 10.4069C7.13853 10.4336 7.06952 10.4473 6.99984 10.4473C6.93015 10.4473 6.86115 10.4336 6.79677 10.4069C6.7324 10.3802 6.67391 10.3411 6.62467 10.2918L1.3219 4.98905C1.2224 4.88955 1.1665 4.7546 1.1665 4.61388C1.1665 4.47317 1.2224 4.33821 1.3219 4.23871C1.42141 4.13921 1.55636 4.08331 1.69707 4.08331C1.83779 4.08331 1.97274 4.13921 2.07225 4.23871L6.99984 9.16697L11.9274 4.23871C11.9767 4.18945 12.0352 4.15036 12.0996 4.1237C12.1639 4.09704 12.2329 4.08331 12.3026 4.08331C12.3723 4.08331 12.4413 4.09704 12.5056 4.1237C12.57 4.15036 12.6285 4.18945 12.6778 4.23871C12.727 4.28798 12.7661 4.34647 12.7928 4.41084C12.8194 4.47521 12.8332 4.54421 12.8332 4.61388C12.8332 4.68356 12.8194 4.75255 12.7928 4.81692C12.7661 4.8813 12.727 4.93979 12.6778 4.98905Z"
-                                        fill="#044047" />
+                                         fill="var(--secondary)" />
                                 </svg>
                             </button>
 
@@ -261,13 +256,13 @@
                                 x-on:keydown.up.prevent="$focus.wrap().previous()"
                                 class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-white p-1 shadow-[0px_4px_4px_0px_#0000000F] !z-[10]">
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Video</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Video</button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Audio</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Audio</button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Image</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Image</button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-primary hover:bg-[#F2F4F8]">Text</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Text</button>
                             </div>
                         </div>
                     </div>
