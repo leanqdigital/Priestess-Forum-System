@@ -119,7 +119,7 @@ sl-dialog::part(overlay) {
   background-color: #04404780;
 }
 #postNewModal::part(panel) {
-width: 656px;
+  width: 656px;
 }
 sl-dialog::part(base) {
   top: 50px;
@@ -137,7 +137,7 @@ sl-dialog::part(base) {
     path {
       fill: var(--primary);
       transition: all 0.3s;
-    } 
+    }
   }
 }
 
@@ -145,7 +145,7 @@ sl-dialog::part(base) {
 .icon-button:hover,
 .icon-button:active {
   background: var(--primary);
-  svg{
+  svg {
     path {
       fill: var(--white);
     }
@@ -385,9 +385,8 @@ h4 {
   border-radius: 4px;
 }
 
-
 .tribute-container {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: auto;
 }
