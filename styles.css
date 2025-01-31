@@ -115,9 +115,11 @@ sl-dialog::part(panel)::-webkit-scrollbar {
     }
   }
 }
+
 /* Modal Styling */
 sl-dialog::part(overlay) {
-  background-color: #04404780;
+  background: #044047B2;
+  backdrop-filter: blur(4px);
 }
 #postNewModal::part(panel) {
   width: 656px;
