@@ -379,24 +379,35 @@ h4 {
   opacity: 0;
   visibility: hidden;
 }
-
 .mention {
-  background-color: #e2f4f5;
+  padding: 4px 6px;
+  background-color: var(--secondary-300);
+  color: var(--primary);
+  font-family: "AvenirBook", sans-serif;
+  font-size: 16px;
+  font-weight: 350;
+  line-height: 16px;
   border-radius: 4px;
 }
 
 
 .tribute-container {
+  background: white;
+  height: 250px;
+  z-index: 999;
+  padding: 4px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border-radius: 8px;
   overflow: auto;
 }
 
 .tribute-container ul li {
-  padding: 8px 12px;
-  border-bottom: 1px solid #eee;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border-bottom: 1px solid white;
 }
 
 .tribute-container ul li.highlight {
-  background: #f2f4f8;
+  background: #F2F4F8;
 }
