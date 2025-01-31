@@ -20,44 +20,44 @@
     </div>
     <!-- Create New Post Modal -->
     <sl-dialog id="postNewModal" label="Start a post">
-        <section class="flex flex-col gap-4">
+        <section class="flex flex-col gap-4 bg-transparent">
             <div class="flex items-center gap-2">
                 <div class="size-8">
                     <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                         alt="Profile" class="size-full object-cover rounded-full">
                 </div>
-                <h3>User Name</h3>
+                <h3 class="text-white">User Name</h3>
             </div>
-
+    
             <div id="post-editor" class="post-editor p-4 min-h-[230px]" contenteditable="true"
                 placeholder="Enter your thoughts ... type @Name to mention members."></div>
-
+    
             <div class="flex items-center gap-3 justify-end">
                 <button class="icon-button" type="button">
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M13.5 3H2.5C2.23478 3 1.98043 3.10536 1.79289 3.29289C1.60536 3.48043 1.5 3.73478 1.5 4V13C1.5 13.2652 1.60536 13.5196 1.79289 13.7071C1.98043 13.8946 2.23478 14 2.5 14H13.5C13.7652 14 14.0196 13.8946 14.2071 13.7071C14.3946 13.5196 14.5 13.2652 14.5 13V4C14.5 3.73478 14.3946 3.48043 14.2071 3.29289C14.0196 3.10536 13.7652 3 13.5 3ZM13.5 4V10.4219L11.8706 8.79313C11.7778 8.70024 11.6675 8.62656 11.5462 8.57629C11.4248 8.52602 11.2948 8.50015 11.1634 8.50015C11.0321 8.50015 10.902 8.52602 10.7807 8.57629C10.6594 8.62656 10.5491 8.70024 10.4563 8.79313L9.20625 10.0431L6.45625 7.29313C6.26873 7.10573 6.01448 7.00046 5.74937 7.00046C5.48427 7.00046 5.23002 7.10573 5.0425 7.29313L2.5 9.83562V4H13.5ZM2.5 11.25L5.75 8L10.75 13H2.5V11.25ZM13.5 13H12.1644L9.91438 10.75L11.1644 9.5L13.5 11.8363V13ZM9 6.75C9 6.60166 9.04399 6.45666 9.1264 6.33332C9.20881 6.20999 9.32594 6.11386 9.46299 6.05709C9.60003 6.00032 9.75083 5.98547 9.89632 6.01441C10.0418 6.04335 10.1754 6.11478 10.2803 6.21967C10.3852 6.32456 10.4566 6.4582 10.4856 6.60368C10.5145 6.74917 10.4997 6.89997 10.4429 7.03701C10.3861 7.17406 10.29 7.29119 10.1667 7.3736C10.0433 7.45601 9.89834 7.5 9.75 7.5C9.55109 7.5 9.36032 7.42098 9.21967 7.28033C9.07902 7.13968 9 6.94891 9 6.75Z"
-                            fill="var(--primary)" />
+                            fill="#C29D68" />
                     </svg>
                 </button>
                 <button class="icon-button" type="button">
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M8.24421 10.1663C9.64153 10.1663 10.774 9.04729 10.774 7.66634V4.33301C10.774 2.95206 9.64153 1.83301 8.24421 1.83301C6.84689 1.83301 5.71445 2.95206 5.71445 4.33301V7.66634C5.71445 9.04729 6.84689 10.1663 8.24421 10.1663ZM13.1549 7.63658C13.1549 7.5711 13.1014 7.51753 13.0359 7.51753H12.143C12.0775 7.51753 12.024 7.5711 12.024 7.63658C12.024 9.72438 10.332 11.4163 8.24421 11.4163C6.15641 11.4163 4.46445 9.72438 4.46445 7.63658C4.46445 7.5711 4.41088 7.51753 4.3454 7.51753H3.45254C3.38707 7.51753 3.3335 7.5711 3.3335 7.63658C3.3335 10.147 5.21742 12.2184 7.64897 12.5116V14.0354H5.48677C5.2829 14.0354 5.11921 14.2482 5.11921 14.5116V15.0473C5.11921 15.1128 5.16088 15.1663 5.21147 15.1663H11.2769C11.3275 15.1663 11.3692 15.1128 11.3692 15.0473V14.5116C11.3692 14.2482 11.2055 14.0354 11.0017 14.0354H8.77992V12.519C11.2397 12.2512 13.1549 10.1678 13.1549 7.63658Z"
-                            fill="#044047" />
+                            fill="#C29D68" />
                     </svg>
                 </button>
                 <button class="icon-button" type="button">
-                    <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            d="M11.1112 5.38888V11.6111C11.1112 11.8468 11.0176 12.0729 10.8509 12.2396C10.6842 12.4063 10.4581 12.5 10.2223 12.5H2.22238C1.98663 12.5 1.76054 12.4063 1.59384 12.2396C1.42715 12.0729 1.3335 11.8468 1.3335 11.6111V5.38888C1.3335 5.15314 1.42715 4.92705 1.59384 4.76035C1.76054 4.59365 1.98663 4.5 2.22238 4.5H10.2223C10.4581 4.5 10.6842 4.59365 10.8509 4.76035C11.0176 4.92705 11.1112 5.15314 11.1112 5.38888ZM14.3334 5.40277C14.2707 5.38743 14.2055 5.38554 14.142 5.39722C14.0785 5.4089 14.0182 5.43389 13.9651 5.47055L12.099 6.71443C12.0686 6.73474 12.0436 6.76226 12.0264 6.79453C12.0091 6.8268 12.0001 6.86284 12.0001 6.89943V10.1005C12.0001 10.1371 12.0091 10.1732 12.0264 10.2054C12.0436 10.2377 12.0686 10.2652 12.099 10.2855L13.9757 11.5366C14.0459 11.5835 14.128 11.6094 14.2125 11.6112C14.2969 11.6131 14.3801 11.5909 14.4523 11.5472C14.5192 11.5047 14.574 11.4458 14.6115 11.376C14.6491 11.3063 14.6681 11.2281 14.6668 11.1489V5.83333C14.6668 5.73476 14.6341 5.63897 14.5738 5.56103C14.5134 5.48309 14.4289 5.42742 14.3334 5.40277Z"
-                            fill="#044047" />
+                            d="M11.1107 4.88888V11.1111C11.1107 11.3468 11.0171 11.5729 10.8504 11.7396C10.6837 11.9063 10.4576 12 10.2219 12H2.22189C1.98615 12 1.76005 11.9063 1.59336 11.7396C1.42666 11.5729 1.33301 11.3468 1.33301 11.1111V4.88888C1.33301 4.65314 1.42666 4.42705 1.59336 4.26035C1.76005 4.09365 1.98615 4 2.22189 4H10.2219C10.4576 4 10.6837 4.09365 10.8504 4.26035C11.0171 4.42705 11.1107 4.65314 11.1107 4.88888ZM14.3329 4.90277C14.2702 4.88743 14.205 4.88554 14.1415 4.89722C14.078 4.9089 14.0177 4.93389 13.9646 4.97055L12.0985 6.21443C12.0681 6.23474 12.0431 6.26226 12.0259 6.29453C12.0086 6.3268 11.9996 6.36284 11.9996 6.39943V9.60053C11.9996 9.63712 12.0086 9.67316 12.0259 9.70543C12.0431 9.7377 12.0681 9.76522 12.0985 9.78553L13.9752 11.0366C14.0454 11.0835 14.1276 11.1094 14.212 11.1112C14.2964 11.1131 14.3796 11.0909 14.4518 11.0472C14.5187 11.0047 14.5735 10.9458 14.611 10.876C14.6486 10.8063 14.6676 10.7281 14.6663 10.6489V5.33333C14.6663 5.23476 14.6336 5.13897 14.5733 5.06103C14.5129 4.98309 14.4284 4.92742 14.3329 4.90277Z"
+                            fill="#C29D68" />
                     </svg>
                 </button>
             </div>
             <div class="h-[1px] w-full bg-grey-200"></div>
             <button id="submit-post" variant="primary" class="w-fit ml-auto submit-button o2">Post</button>
-
+    
         </section>
     </sl-dialog>
     <!-- Post Modal -->
@@ -65,13 +65,14 @@
         <div id="post-modal-content" class="space-y-4"></div>
     </sl-dialog>
 
-    <!-- Add this after the post-modal -->
+    <!-- Delete Comment Moadl-->
     <sl-dialog id="delete-modal" label="Confirm Deletion">
         <div class="space-y-4">
-            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div class="p2 text-white">Are you sure you want to delete this post? This action cannot be undone.</div>
+            <div class="w-full h-[1px] bg-gray-200"></div>
             <div class="flex justify-end gap-4 mt-4 max-[760px]:fixed bottom-8 right-6">
                 <button variant="default"
-                    class="button border border-primary o2 text-primary cancel-delete hover:border-primary-200 transition-all hover:text-primary-200">Cancel</button>
+                    class="button  o2 text-white cancel-delete ">Go Back</button>
                 <button variant="danger"
                     class="confirm-delete text-white o2  button bg-danger-100 hover:bg-danger-200 transition-all">Delete</button>
             </div>
@@ -91,65 +92,62 @@
         </section>
         <div class="flex flex-col gap-4 w-full">
             <!-- Post Creation Form -->
-            <div class="bg-white p-4 rounded flex items-center justify-between">
+            <div class="bg-transparent border border-white p-6 max-[500px]:p-4 rounded flex items-center justify-between">
                 <!-- Start a post Btn -->
-                <button id="openCreateNewPostModal"
-                    class=" flex items-center gap-2 text-[var(--primary)] cursor-pointer">
+                <button id="openCreateNewPostModal" class=" flex items-center gap-2 text-[var(--primary)] cursor-pointer">
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M17.6662 10.3336V17.0001C17.6662 17.3537 17.5257 17.6928 17.2756 17.9428C17.0256 18.1929 16.6865 18.3334 16.3329 18.3334H2.99995C2.64634 18.3334 2.30721 18.1929 2.05717 17.9428C1.80713 17.6928 1.66666 17.3537 1.66666 17.0001V3.66715C1.66666 3.31354 1.80713 2.97441 2.05717 2.72437C2.30721 2.47433 2.64634 2.33386 2.99995 2.33386H9.66641C9.84321 2.33386 10.0128 2.40409 10.1378 2.52911C10.2628 2.65413 10.3331 2.8237 10.3331 3.0005C10.3331 3.17731 10.2628 3.34687 10.1378 3.47189C10.0128 3.59691 9.84321 3.66715 9.66641 3.66715H2.99995V17.0001H16.3329V10.3336C16.3329 10.1568 16.4031 9.98724 16.5281 9.86222C16.6531 9.7372 16.8227 9.66696 16.9995 9.66696C17.1763 9.66696 17.3459 9.7372 17.4709 9.86222C17.5959 9.98724 17.6662 10.1568 17.6662 10.3336ZM18.1378 5.47209L10.1381 13.4718C10.0761 13.5337 10.0026 13.5828 9.92163 13.6163C9.8407 13.6497 9.75398 13.6669 9.66641 13.6668H6.99982C6.82302 13.6668 6.65345 13.5966 6.52843 13.4716C6.40341 13.3466 6.33318 13.177 6.33318 13.0002V10.3336C6.33311 10.246 6.35029 10.1593 6.38375 10.0784C6.41721 9.99745 6.46628 9.92391 6.52817 9.86195L14.5279 1.86221C14.5898 1.80022 14.6634 1.75105 14.7443 1.7175C14.8252 1.68395 14.912 1.66669 14.9996 1.66669C15.0872 1.66669 15.1739 1.68395 15.2549 1.7175C15.3358 1.75105 15.4093 1.80022 15.4712 1.86221L18.1378 4.52879C18.1998 4.5907 18.249 4.66423 18.2825 4.74515C18.3161 4.82608 18.3333 4.91283 18.3333 5.00044C18.3333 5.08805 18.3161 5.1748 18.2825 5.25573C18.249 5.33666 18.1998 5.41018 18.1378 5.47209ZM16.7212 5.00044L14.9996 3.27633L13.9421 4.33379L15.6662 6.05791L16.7212 5.00044Z"
-                            fill="#044047" />
+                            fill="#C29D68" />
                     </svg>
-                    <div class="o2">Start a post</div>
+                    <div class="o2 text-white">Start a post</div>
                 </button>
                 <!-- Start a post Btn End-->
-              
                 <!-- Start Post Action Buttons -->
                 <div class="flex items-center gap-4 max-[500px]:gap-3">
                     <button
-                        class="group button bg-gray-300 text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
+                        class="group button bg-[#042F34] text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--secondary)] hover:!bg-[var(--secondary)] focus:!bg-[var(--secondary)] active:!text-white focus:text-white">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path class="group-focus:!fill-white group-active:!fill-white"
+                            <path class="group-active:fill-black group-focus:fill-black group-hover:fill-black"
                                 d="M13.5 2.5H2.5C2.23478 2.5 1.98043 2.60536 1.79289 2.79289C1.60536 2.98043 1.5 3.23478 1.5 3.5V12.5C1.5 12.7652 1.60536 13.0196 1.79289 13.2071C1.98043 13.3946 2.23478 13.5 2.5 13.5H13.5C13.7652 13.5 14.0196 13.3946 14.2071 13.2071C14.3946 13.0196 14.5 12.7652 14.5 12.5V3.5C14.5 3.23478 14.3946 2.98043 14.2071 2.79289C14.0196 2.60536 13.7652 2.5 13.5 2.5ZM13.5 3.5V9.92188L11.8706 8.29313C11.7778 8.20024 11.6675 8.12656 11.5462 8.07629C11.4248 8.02602 11.2948 8.00015 11.1634 8.00015C11.0321 8.00015 10.902 8.02602 10.7807 8.07629C10.6594 8.12656 10.5491 8.20024 10.4563 8.29313L9.20625 9.54313L6.45625 6.79313C6.26873 6.60573 6.01448 6.50046 5.74937 6.50046C5.48427 6.50046 5.23002 6.60573 5.0425 6.79313L2.5 9.33562V3.5H13.5ZM2.5 10.75L5.75 7.5L10.75 12.5H2.5V10.75ZM13.5 12.5H12.1644L9.91438 10.25L11.1644 9L13.5 11.3363V12.5ZM9 6.25C9 6.10166 9.04399 5.95666 9.1264 5.83332C9.20881 5.70999 9.32594 5.61386 9.46299 5.55709C9.60003 5.50032 9.75083 5.48547 9.89632 5.51441C10.0418 5.54335 10.1754 5.61478 10.2803 5.71967C10.3852 5.82456 10.4566 5.9582 10.4856 6.10368C10.5145 6.24917 10.4997 6.39997 10.4429 6.53701C10.3861 6.67406 10.29 6.79119 10.1667 6.8736C10.0433 6.95601 9.89834 7 9.75 7C9.55109 7 9.36032 6.92098 9.21967 6.78033C9.07902 6.63968 9 6.44891 9 6.25Z"
-                                fill="#044047" />
+                                fill="#C29D68" />
                         </svg>
+                
                     </button>
                     <div x-data="{ uploadAudio: false, openedWithKeyboard: false }" class="relative w-fit"
                         x-on:keydown.esc.window="uploadAudio = false, openedWithKeyboard = false">
                         <button x-on:click="uploadAudio = ! uploadAudio" aria-haspopup="true"
                             x-on:keydown.space.prevent="openedWithKeyboard = true"
-                            x-on:keydown.enter.prevent="openedWithKeyboard = true"
-                            x-on:keydown.down.prevent="openedWithKeyboard = true"
+                            x-on:keydown.enter.prevent="openedWithKeyboard = true" x-on:keydown.down.prevent="openedWithKeyboard = true"
                             x-bind:class="uploadAudio || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                             x-bind:aria-expanded="uploadAudio || openedWithKeyboard"
-                            class="group button bg-gray-300 text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path class="group-focus:!fill-white group-active:!fill-white"
-                                    d="M8.24403 9.66665C9.64135 9.66665 10.7738 8.5476 10.7738 7.16665V3.83331C10.7738 2.45236 9.64135 1.33331 8.24403 1.33331C6.84671 1.33331 5.71427 2.45236 5.71427 3.83331V7.16665C5.71427 8.5476 6.84671 9.66665 8.24403 9.66665ZM13.1547 7.13688C13.1547 7.07141 13.1012 7.01784 13.0357 7.01784H12.1428C12.0774 7.01784 12.0238 7.07141 12.0238 7.13688C12.0238 9.22468 10.3318 10.9166 8.24403 10.9166C6.15623 10.9166 4.46427 9.22468 4.46427 7.13688C4.46427 7.07141 4.41069 7.01784 4.34522 7.01784H3.45236C3.38688 7.01784 3.33331 7.07141 3.33331 7.13688C3.33331 9.6473 5.21724 11.7187 7.64879 12.0119V13.5357H5.48659C5.28272 13.5357 5.11903 13.7485 5.11903 14.0119V14.5476C5.11903 14.6131 5.16069 14.6666 5.21129 14.6666H11.2768C11.3274 14.6666 11.369 14.6131 11.369 14.5476V14.0119C11.369 13.7485 11.2053 13.5357 11.0015 13.5357H8.77974V12.0193C11.2396 11.7515 13.1547 9.66813 13.1547 7.13688Z"
-                                    fill="#044047" />
+                            class="group button bg-[#042F34] text-[var(--secondary)] o3 flex items-center gap-2 active:!bg-[var(--secondary)] hover:!bg-[var(--secondary)] focus:!bg-[var(--secondary)] active:!text-white focus:text-white">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path class="group-active:fill-black group-focus:fill-black group-hover:fill-black"
+                                    d="M8.24404 9.66665C9.64136 9.66665 10.7738 8.5476 10.7738 7.16665V3.83331C10.7738 2.45236 9.64136 1.33331 8.24404 1.33331C6.84672 1.33331 5.71428 2.45236 5.71428 3.83331V7.16665C5.71428 8.5476 6.84672 9.66665 8.24404 9.66665ZM13.1548 7.13688C13.1548 7.07141 13.1012 7.01784 13.0357 7.01784H12.1429C12.0774 7.01784 12.0238 7.07141 12.0238 7.13688C12.0238 9.22468 10.3318 10.9166 8.24404 10.9166C6.15624 10.9166 4.46428 9.22468 4.46428 7.13688C4.46428 7.07141 4.41071 7.01784 4.34523 7.01784H3.45238C3.3869 7.01784 3.33333 7.07141 3.33333 7.13688C3.33333 9.6473 5.21726 11.7187 7.6488 12.0119V13.5357H5.4866C5.28273 13.5357 5.11904 13.7485 5.11904 14.0119V14.5476C5.11904 14.6131 5.16071 14.6666 5.2113 14.6666H11.2768C11.3274 14.6666 11.369 14.6131 11.369 14.5476V14.0119C11.369 13.7485 11.2054 13.5357 11.0015 13.5357H8.77976V12.0193C11.2396 11.7515 13.1548 9.66813 13.1548 7.13688Z"
+                                    fill="#C29D68" />
                             </svg>
                         </button>
                         <div x-cloak x-show="uploadAudio || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
                             x-on:click.outside="uploadAudio = false, openedWithKeyboard = false"
-                            x-on:keydown.down.prevent="$focus.wrap().next()"
-                            x-on:keydown.up.prevent="$focus.wrap().previous()"
-                            class="absolute top-10 right-0 flex p-1 bg-white rounded w-fit flex-col shadow-[0px_4px_4px_0px_#0000000F]">
+                            x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
+                            class="absolute top-10 right-0 flex p-1 bg-[#084D55] rounded w-fit flex-col shadow-[0px_4px_4px_0px_#0000000F]">
                             <button type="button"
-                                class="p-[10px] hover:bg-[#F2F4F8]  text-nowrap cursor-pointer o3 text-[var(--primary)] text-left">Record
+                                class="p-[10px] hover:bg-primary-100 rounded text-nowrap cursor-pointer o3 text-white text-left">Record
                                 Audio</button>
                             <button type="button"
-                                class="p-[10px] hover:bg-[#F2F4F8] text-nowrap  rounded cursor-pointer o3 text-[var(--primary)] text-left">Upload
+                                class="p-[10px] hover:bg-primary-100 text-nowrap  rounded cursor-pointer o3 text-white text-left">Upload
                                 Audio</button>
                         </div>
                     </div>
                     <button
-                        class="group button bg-gray-300 text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--primary)] focus:!bg-[var(--primary)] active:!text-white focus:text-white">
+                        class="group button bg-[#042F34] text-[var(--secondary)] o3 flex items-center gap-2 active:!bg-[var(--secondary)] hover:!bg-[var(--secondary)] focus:!bg-[var(--secondary)] active:!text-white focus:text-white">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path class="group-focus:!fill-white group-active:!fill-white"
-                                d="M11.111 4.88888V11.1111C11.111 11.3468 11.0174 11.5729 10.8507 11.7396C10.684 11.9063 10.4579 12 10.2222 12H2.2222C1.98645 12 1.76036 11.9063 1.59366 11.7396C1.42696 11.5729 1.33331 11.3468 1.33331 11.1111V4.88888C1.33331 4.65314 1.42696 4.42705 1.59366 4.26035C1.76036 4.09365 1.98645 4 2.2222 4H10.2222C10.4579 4 10.684 4.09365 10.8507 4.26035C11.0174 4.42705 11.111 4.65314 11.111 4.88888ZM14.3333 4.90277C14.2705 4.88743 14.2053 4.88554 14.1418 4.89722C14.0783 4.9089 14.0181 4.93389 13.9649 4.97055L12.0988 6.21443C12.0684 6.23474 12.0434 6.26226 12.0262 6.29453C12.0089 6.3268 11.9999 6.36284 11.9999 6.39943V9.60053C11.9999 9.63712 12.0089 9.67316 12.0262 9.70543C12.0434 9.7377 12.0684 9.76522 12.0988 9.78553L13.9755 11.0366C14.0457 11.0835 14.1279 11.1094 14.2123 11.1112C14.2967 11.1131 14.3799 11.0909 14.4521 11.0472C14.519 11.0047 14.5738 10.9458 14.6114 10.876C14.6489 10.8063 14.6679 10.7281 14.6666 10.6489V5.33333C14.6666 5.23476 14.6339 5.13897 14.5736 5.06103C14.5132 4.98309 14.4287 4.92742 14.3333 4.90277Z"
-                                fill="#044047" />
+                            <path class="group-active:fill-black group-focus:fill-black group-hover:fill-black"
+                                d="M11.1111 4.88888V11.1111C11.1111 11.3468 11.0174 11.5729 10.8507 11.7396C10.684 11.9063 10.4579 12 10.2222 12H2.22221C1.98647 12 1.76037 11.9063 1.59368 11.7396C1.42698 11.5729 1.33333 11.3468 1.33333 11.1111V4.88888C1.33333 4.65314 1.42698 4.42705 1.59368 4.26035C1.76037 4.09365 1.98647 4 2.22221 4H10.2222C10.4579 4 10.684 4.09365 10.8507 4.26035C11.0174 4.42705 11.1111 4.65314 11.1111 4.88888ZM14.3333 4.90277C14.2706 4.88743 14.2053 4.88554 14.1418 4.89722C14.0784 4.9089 14.0181 4.93389 13.9649 4.97055L12.0988 6.21443C12.0684 6.23474 12.0434 6.26226 12.0262 6.29453C12.0089 6.3268 11.9999 6.36284 11.9999 6.39943V9.60053C11.9999 9.63712 12.0089 9.67316 12.0262 9.70543C12.0434 9.7377 12.0684 9.76522 12.0988 9.78553L13.9755 11.0366C14.0457 11.0835 14.1279 11.1094 14.2123 11.1112C14.2967 11.1131 14.3799 11.0909 14.4522 11.0472C14.519 11.0047 14.5738 10.9458 14.6114 10.876C14.6489 10.8063 14.6679 10.7281 14.6666 10.6489V5.33333C14.6666 5.23476 14.6339 5.13897 14.5736 5.06103C14.5132 4.98309 14.4287 4.92742 14.3333 4.90277Z"
+                                fill="#C29D68" />
                         </svg>
+                
                     </button>
                 </div>
                 <!-- Start Post Action Buttons Ends -->
@@ -199,70 +197,120 @@
                 <div class="flex items-center justify-between">
                     <div class="o2 text-white post-title-text">Recent Posts</div>
                     <div class="flex items-center gap-2">
-                        <div x-data="{ sortData: false, openedWithKeyboard: false }" class="relative w-fit"
-                            x-on:keydown.esc.window="sortData = false, openedWithKeyboard = false">
-                            <button x-on:click="sortData = ! sortData" aria-haspopup="true"
+                        <div x-data="{ 
+                                                sortData: false, 
+                                                openedWithKeyboard: false, 
+                                                selectedSort: 'Latest' 
+                                            }" class="relative w-fit"
+                            x-on:keydown.esc.window="sortData = false; openedWithKeyboard = false">
+                
+                            <!-- Sort Button -->
+                            <button x-on:click="sortData = !sortData" aria-haspopup="true"
                                 x-on:keydown.space.prevent="openedWithKeyboard = true"
                                 x-on:keydown.enter.prevent="openedWithKeyboard = true"
                                 x-on:keydown.down.prevent="openedWithKeyboard = true"
                                 x-bind:class="sortData || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                                 x-bind:aria-expanded="sortData || openedWithKeyboard"
                                 class="group button flex items-center gap-2 border border-secondary text-nowrap text-secondary focus:!bg-secondary focus:text-white active:!bg-secondary active:!text-white">
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
+                
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path class="group-focus:!fill-white group-active:!fill-white"
                                         d="M1.1665 7.68079C1.1665 7.55187 1.21772 7.42823 1.30888 7.33707C1.40004 7.24591 1.52368 7.19469 1.6526 7.19469H6.0275C6.15642 7.19469 6.28007 7.24591 6.37123 7.33707C6.46239 7.42823 6.5136 7.55187 6.5136 7.68079C6.5136 7.80972 6.46239 7.93336 6.37123 8.02452C6.28007 8.11568 6.15642 8.16689 6.0275 8.16689H1.6526C1.52368 8.16689 1.40004 8.11568 1.30888 8.02452C1.21772 7.93336 1.1665 7.80972 1.1665 7.68079ZM1.6526 4.27809H5.0553C5.18422 4.27809 5.30787 4.22688 5.39903 4.13572C5.49019 4.04456 5.5414 3.92092 5.5414 3.79199C5.5414 3.66307 5.49019 3.53943 5.39903 3.44827C5.30787 3.35711 5.18422 3.3059 5.0553 3.3059H1.6526C1.52368 3.3059 1.40004 3.35711 1.30888 3.44827C1.21772 3.53943 1.1665 3.66307 1.1665 3.79199C1.1665 3.92092 1.21772 4.04456 1.30888 4.13572C1.40004 4.22688 1.52368 4.27809 1.6526 4.27809ZM9.9163 11.0835H1.6526C1.52368 11.0835 1.40004 11.1347 1.30888 11.2259C1.21772 11.317 1.1665 11.4407 1.1665 11.5696C1.1665 11.6985 1.21772 11.8222 1.30888 11.9133C1.40004 12.0045 1.52368 12.0557 1.6526 12.0557H9.9163C10.0452 12.0557 10.1689 12.0045 10.26 11.9133C10.3512 11.8222 10.4024 11.6985 10.4024 11.5696C10.4024 11.4407 10.3512 11.317 10.26 11.2259C10.1689 11.1347 10.0452 11.0835 9.9163 11.0835ZM12.6907 4.90638L10.2602 2.47588C10.2151 2.43068 10.1615 2.39483 10.1024 2.37037C10.0434 2.3459 9.98018 2.33331 9.9163 2.33331C9.85242 2.33331 9.78916 2.3459 9.73015 2.37037C9.67114 2.39483 9.61753 2.43068 9.57238 2.47588L7.14189 4.90638C7.05067 4.99759 6.99943 5.1213 6.99943 5.25029C6.99943 5.37929 7.05067 5.503 7.14189 5.59421C7.2331 5.68542 7.35681 5.73666 7.4858 5.73666C7.61479 5.73666 7.73851 5.68542 7.82972 5.59421L9.4302 3.99312V8.65299C9.4302 8.78192 9.48141 8.90556 9.57258 8.99672C9.66374 9.08788 9.78738 9.13909 9.9163 9.13909C10.0452 9.13909 10.1689 9.08788 10.26 8.99672C10.3512 8.90556 10.4024 8.78192 10.4024 8.65299V3.99312L12.0029 5.59421C12.048 5.63937 12.1017 5.6752 12.1607 5.69964C12.2197 5.72408 12.2829 5.73666 12.3468 5.73666C12.4107 5.73666 12.4739 5.72408 12.5329 5.69964C12.5919 5.6752 12.6456 5.63937 12.6907 5.59421C12.7359 5.54905 12.7717 5.49543 12.7961 5.43642C12.8206 5.37741 12.8332 5.31417 12.8332 5.25029C12.8332 5.18642 12.8206 5.12318 12.7961 5.06417C12.7717 5.00516 12.7359 4.95154 12.6907 4.90638Z"
-                                        fill="var(--secondary)" />
+                                        fill="#C29D68" />
                                 </svg>
-                                <div class="o3">Sort</div>
+                
+                                <div class="o3" x-text="selectedSort"></div>
                             </button>
-                            <div x-cloak x-show="sortData || openedWithKeyboard" x-transition
-                                x-trap="openedWithKeyboard"
-                                x-on:click.outside="sortData = false, openedWithKeyboard = false"
-                                x-on:keydown.down.prevent="$focus.wrap().next()"
-                                x-on:keydown.up.prevent="$focus.wrap().previous()"
-                                class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-white p-1 shadow-[0px_4px_4px_0px_#0000000F]">
+                
+                            <!-- Sort Dropdown -->
+                            <div x-cloak x-show="sortData || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
+                                x-on:click.outside="sortData = false; openedWithKeyboard = false"
+                                x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
+                                class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-[#084D55] p-1 shadow-[0px_4px_4px_0px_#0000000F]">
+                
+                                <!-- Dropdown Items -->
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Latest</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedSort = 'Latest'; sortData = false;"
+                                    x-bind:class="selectedSort === 'Latest' ? 'bg-primary-100' : ''">
+                                    Latest
+                                </button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Oldest</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedSort = 'Oldest'; sortData = false;"
+                                    x-bind:class="selectedSort === 'Oldest' ? 'bg-primary-100' : ''">
+                                    Oldest
+                                </button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Most
-                                    Popular</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedSort = 'Most Popular'; sortData = false;"
+                                    x-bind:class="selectedSort === 'Most Popular' ? 'bg-primary-100' : ''">
+                                    Most Popular
+                                </button>
                             </div>
                         </div>
-                        <div x-data="{ filterData: false, openedWithKeyboard: false }" class="relative w-fit"
-                            x-on:keydown.esc.window="filterData = false, openedWithKeyboard = false">
-                            <button x-on:click="filterData = ! filterData" aria-haspopup="true"
+                        <div x-data="{ 
+                                                                filterData: false, 
+                                                                openedWithKeyboard: false, 
+                                                                selectedFilter: 'All' 
+                                                            }" class="relative w-fit"
+                            x-on:keydown.esc.window="filterData = false; openedWithKeyboard = false">
+                
+                            <!-- Button -->
+                            <button x-on:click="filterData = !filterData" aria-haspopup="true"
                                 x-on:keydown.space.prevent="openedWithKeyboard = true"
                                 x-on:keydown.enter.prevent="openedWithKeyboard = true"
                                 x-on:keydown.down.prevent="openedWithKeyboard = true"
                                 x-bind:class="filterData || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                                 x-bind:aria-expanded="filterData || openedWithKeyboard"
                                 class="group button flex items-center gap-2 border border-secondary text-nowrap text-secondary focus:!bg-secondary focus:text-white active:!bg-secondary active:!text-white">
-                                <div class="o3">All</div>
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
+                
+                                <div class="o3" x-text="selectedFilter"></div>
+                
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path class="group-focus:!fill-white group-active:!fill-white"
                                         d="M12.6778 4.98905L7.37501 10.2918C7.32576 10.3411 7.26728 10.3802 7.2029 10.4069C7.13853 10.4336 7.06952 10.4473 6.99984 10.4473C6.93015 10.4473 6.86115 10.4336 6.79677 10.4069C6.7324 10.3802 6.67391 10.3411 6.62467 10.2918L1.3219 4.98905C1.2224 4.88955 1.1665 4.7546 1.1665 4.61388C1.1665 4.47317 1.2224 4.33821 1.3219 4.23871C1.42141 4.13921 1.55636 4.08331 1.69707 4.08331C1.83779 4.08331 1.97274 4.13921 2.07225 4.23871L6.99984 9.16697L11.9274 4.23871C11.9767 4.18945 12.0352 4.15036 12.0996 4.1237C12.1639 4.09704 12.2329 4.08331 12.3026 4.08331C12.3723 4.08331 12.4413 4.09704 12.5056 4.1237C12.57 4.15036 12.6285 4.18945 12.6778 4.23871C12.727 4.28798 12.7661 4.34647 12.7928 4.41084C12.8194 4.47521 12.8332 4.54421 12.8332 4.61388C12.8332 4.68356 12.8194 4.75255 12.7928 4.81692C12.7661 4.8813 12.727 4.93979 12.6778 4.98905Z"
-                                         fill="var(--secondary)" />
+                                        fill="var(--secondary)" />
                                 </svg>
                             </button>
-
-                            <div x-cloak x-show="filterData || openedWithKeyboard" x-transition
-                                x-trap="openedWithKeyboard"
-                                x-on:click.outside="filterData = false, openedWithKeyboard = false"
-                                x-on:keydown.down.prevent="$focus.wrap().next()"
-                                x-on:keydown.up.prevent="$focus.wrap().previous()"
-                                class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-white p-1 shadow-[0px_4px_4px_0px_#0000000F] !z-[10]">
+                
+                            <!-- Dropdown -->
+                            <div x-cloak x-show="filterData || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
+                                x-on:click.outside="filterData = false; openedWithKeyboard = false"
+                                x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
+                                class="absolute top-10 right-0 flex w-[100px] flex-col rounded bg-[#084D55] p-1 shadow-[0px_4px_4px_0px_#0000000F] !z-[10]">
+                
+                                <!-- Dropdown Items -->
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Video</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedFilter = 'All'; filterData = false;"
+                                    x-bind:class="selectedFilter === 'All' ? 'bg-primary-100' : ''">
+                                    All
+                                </button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Audio</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedFilter = 'Video'; filterData = false;"
+                                    x-bind:class="selectedFilter === 'Video' ? 'bg-primary-100' : ''">
+                                    Video
+                                </button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Image</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedFilter = 'Audio'; filterData = false;"
+                                    x-bind:class="selectedFilter === 'Audio' ? 'bg-primary-100' : ''">
+                                    Audio
+                                </button>
                                 <button type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left text-secondary hover:bg-[#F2F4F8]">Text</button>
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedFilter = 'Image'; filterData = false;"
+                                    x-bind:class="selectedFilter === 'Image' ? 'bg-primary-100' : ''">
+                                    Image
+                                </button>
+                                <button type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
+                                    x-on:click="selectedFilter = 'Text'; filterData = false;"
+                                    x-bind:class="selectedFilter === 'Text' ? 'bg-primary-100' : ''">
+                                    Text
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -285,7 +333,7 @@
 
     <!-- Templates -->
     <script type="text/html" id="post-template">
-                    <div class="p-4 flex flex-col items-start gap-3 bg-white rounded" data-post-id="{{:id}}">
+                    <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded" data-post-id="{{:id}}">
                         <!-- Avatar Section -->
                         <div class="flex items-center justify-between w-full">
                             <div class="flex items-center gap-2">
@@ -294,14 +342,14 @@
                                         src="{{:author.profileImage}}"
                                         class="rounded-full size-full object-cover">
                                 </div>
-                                <h2 class="text-black h2">{{:author.name}}</h2>
+                                <h2 class="text-white h2">{{:author.name}}</h2>
                                 <div class="h-[15.13px] w-[2px] border border-secondary"></div>
-                                <time class="o3 text-[#737373]">{{:date}}</time>
+                                <time class="o3 text-white">{{:date}}</time>
                                 {{if featured_post === true}}
                                 <!-- Featured Post Icon -->
                                 <div class="size-[20px]">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path  d="M16.6026 2.94868H14.6795V2.30765C14.6795 2.13764 14.612 1.97459 14.4917 1.85438C14.3715 1.73416 14.2085 1.66663 14.0385 1.66663C13.8685 1.66663 13.7054 1.73416 13.5852 1.85438C13.465 1.97459 13.3974 2.13764 13.3974 2.30765V2.94868H6.98718V2.30765C6.98718 2.13764 6.91964 1.97459 6.79943 1.85438C6.67921 1.73416 6.51616 1.66663 6.34615 1.66663C6.17614 1.66663 6.0131 1.73416 5.89288 1.85438C5.77266 1.97459 5.70513 2.13764 5.70513 2.30765V2.94868H3.78205C3.44203 2.94868 3.11594 3.08375 2.8755 3.32418C2.63507 3.56461 2.5 3.89071 2.5 4.23073V17.0512C2.5 17.3913 2.63507 17.7174 2.8755 17.9578C3.11594 18.1982 3.44203 18.3333 3.78205 18.3333H16.6026C16.9426 18.3333 17.2687 18.1982 17.5091 17.9578C17.7495 17.7174 17.8846 17.3913 17.8846 17.0512V4.23073C17.8846 3.89071 17.7495 3.56461 17.5091 3.32418C17.2687 3.08375 16.9426 2.94868 16.6026 2.94868ZM5.70513 5.51278V4.87175C5.70513 4.70174 5.77266 4.5387 5.89288 4.41848C6.0131 4.29827 6.17614 4.23073 6.34615 4.23073C6.51616 4.23073 6.67921 4.29827 6.79943 4.41848C6.91964 4.5387 6.98718 4.70174 6.98718 4.87175V5.51278C6.98718 5.68279 6.91964 5.84584 6.79943 5.96605C6.67921 6.08627 6.51616 6.15381 6.34615 6.15381C6.17614 6.15381 6.0131 6.08627 5.89288 5.96605C5.77266 5.84584 5.70513 5.68279 5.70513 5.51278ZM14.2428 10.3766L12.2829 11.9944L12.8806 14.407C12.8958 14.4683 12.8926 14.5327 12.8714 14.5921C12.8501 14.6515 12.8118 14.7034 12.7612 14.7411C12.7057 14.7821 12.6386 14.8042 12.5697 14.8044C12.5133 14.8041 12.4581 14.7889 12.4095 14.7604L10.1923 13.4599L7.97756 14.7636C7.92292 14.796 7.85989 14.8114 7.79647 14.8079C7.73305 14.8044 7.6721 14.7821 7.62136 14.7439C7.57062 14.7057 7.53238 14.6533 7.51148 14.5933C7.49059 14.5333 7.48799 14.4685 7.50401 14.407L8.10176 11.9911L6.14183 10.3766C6.09235 10.3359 6.05618 10.2814 6.03797 10.22C6.01976 10.1587 6.02035 10.0932 6.03966 10.0322C6.05897 9.97115 6.09612 9.91729 6.14632 9.87756C6.19652 9.83782 6.25747 9.81403 6.32131 9.80925L8.90465 9.60974L9.89824 7.30925C9.9231 7.25191 9.96418 7.20309 10.0164 7.16879C10.0687 7.13449 10.1298 7.11622 10.1923 7.11622C10.2548 7.11622 10.3159 7.13449 10.3682 7.16879C10.4204 7.20309 10.4615 7.25191 10.4864 7.30925L11.48 9.60974L14.0633 9.80925C14.1271 9.81403 14.1881 9.83782 14.2383 9.87756C14.2885 9.91729 14.3256 9.97115 14.345 10.0322C14.3643 10.0932 14.3649 10.1587 14.3466 10.22C14.3284 10.2814 14.2923 10.3359 14.2428 10.3766ZM14.6795 5.51278C14.6795 5.68279 14.612 5.84584 14.4917 5.96605C14.3715 6.08627 14.2085 6.15381 14.0385 6.15381C13.8685 6.15381 13.7054 6.08627 13.5852 5.96605C13.465 5.84584 13.3974 5.68279 13.3974 5.51278V4.87175C13.3974 4.70174 13.465 4.5387 13.5852 4.41848C13.7054 4.29827 13.8685 4.23073 14.0385 4.23073C14.2085 4.23073 14.3715 4.29827 14.4917 4.41848C14.612 4.5387 14.6795 4.70174 14.6795 4.87175V5.51278Z" fill="#C29D68" />
+                                        <path  d="M16.6026 2.94868H14.6795V2.30765C14.6795 2.13764 14.612 1.97459 14.4917 1.85438C14.3715 1.73416 14.2085 1.66663 14.0385 1.66663C13.8685 1.66663 13.7054 1.73416 13.5852 1.85438C13.465 1.97459 13.3974 2.13764 13.3974 2.30765V2.94868H6.98718V2.30765C6.98718 2.13764 6.91964 1.97459 6.79943 1.85438C6.67921 1.73416 6.51616 1.66663 6.34615 1.66663C6.17614 1.66663 6.0131 1.73416 5.89288 1.85438C5.77266 1.97459 5.70513 2.13764 5.70513 2.30765V2.94868H3.78205C3.44203 2.94868 3.11594 3.08375 2.8755 3.32418C2.63507 3.56461 2.5 3.89071 2.5 4.23073V17.0512C2.5 17.3913 2.63507 17.7174 2.8755 17.9578C3.11594 18.1982 3.44203 18.3333 3.78205 18.3333H16.6026C16.9426 18.3333 17.2687 18.1982 17.5091 17.9578C17.7495 17.7174 17.8846 17.3913 17.8846 17.0512V4.23073C17.8846 3.89071 17.7495 3.56461 17.5091 3.32418C17.2687 3.08375 16.9426 2.94868 16.6026 2.94868ZM5.70513 5.51278V4.87175C5.70513 4.70174 5.77266 4.5387 5.89288 4.41848C6.0131 4.29827 6.17614 4.23073 6.34615 4.23073C6.51616 4.23073 6.67921 4.29827 6.79943 4.41848C6.91964 4.5387 6.98718 4.70174 6.98718 4.87175V5.51278C6.98718 5.68279 6.91964 5.84584 6.79943 5.96605C6.67921 6.08627 6.51616 6.15381 6.34615 6.15381C6.17614 6.15381 6.0131 6.08627 5.89288 5.96605C5.77266 5.84584 5.70513 5.68279 5.70513 5.51278ZM14.2428 10.3766L12.2829 11.9944L12.8806 14.407C12.8958 14.4683 12.8926 14.5327 12.8714 14.5921C12.8501 14.6515 12.8118 14.7034 12.7612 14.7411C12.7057 14.7821 12.6386 14.8042 12.5697 14.8044C12.5133 14.8041 12.4581 14.7889 12.4095 14.7604L10.1923 13.4599L7.97756 14.7636C7.92292 14.796 7.85989 14.8114 7.79647 14.8079C7.73305 14.8044 7.6721 14.7821 7.62136 14.7439C7.57062 14.7057 7.53238 14.6533 7.51148 14.5933C7.49059 14.5333 7.48799 14.4685 7.50401 14.407L8.10176 11.9911L6.14183 10.3766C6.09235 10.3359 6.05618 10.2814 6.03797 10.22C6.01976 10.1587 6.02035 10.0932 6.03966 10.0322C6.05897 9.97115 6.09612 9.91729 6.14632 9.87756C6.19652 9.83782 6.25747 9.81403 6.32131 9.80925L8.90465 9.60974L9.89824 7.30925C9.9231 7.25191 9.96418 7.20309 10.0164 7.16879C10.0687 7.13449 10.1298 7.11622 10.1923 7.11622C10.2548 7.11622 10.3159 7.13449 10.3682 7.16879C10.4204 7.20309 10.4615 7.25191 10.4864 7.30925L11.48 9.60974L14.0633 9.80925C14.1271 9.81403 14.1881 9.83782 14.2383 9.87756C14.2885 9.91729 14.3256 9.97115 14.345 10.0322C14.3643 10.0932 14.3649 10.1587 14.3466 10.22C14.3284 10.2814 14.2923 10.3359 14.2428 10.3766ZM14.6795 5.51278C14.6795 5.68279 14.612 5.84584 14.4917 5.96605C14.3715 6.08627 14.2085 6.15381 14.0385 6.15381C13.8685 6.15381 13.7054 6.08627 13.5852 5.96605C13.465 5.84584 13.3974 5.68279 13.3974 5.51278V4.87175C13.3974 4.70174 13.465 4.5387 13.5852 4.41848C13.7054 4.29827 13.8685 4.23073 14.0385 4.23073C14.2085 4.23073 14.3715 4.29827 14.4917 4.41848C14.612 4.5387 14.6795 4.70174 14.6795 4.87175V5.51278Z" fill="var(--secondary)" />
                                     </svg>
                                 </div>
                                 {{/if}}
@@ -316,21 +364,20 @@
                                     x-on:keydown.down.prevent="openedWithKeyboard = true"
                                     x-bind:class="editDeletePost || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
                                     x-bind:aria-expanded="editDeletePost || openedWithKeyboard">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M8.6665 7.99992C8.6665 8.1977 8.60785 8.39104 8.49797 8.55549C8.38809 8.71994 8.23191 8.84811 8.04919 8.9238C7.86646 8.99948 7.66539 9.01929 7.47141 8.9807C7.27743 8.94212 7.09925 8.84688 6.9594 8.70702C6.81954 8.56717 6.7243 8.38899 6.68572 8.19501C6.64713 8.00103 6.66694 7.79996 6.74262 7.61723C6.81831 7.43451 6.94649 7.27833 7.11093 7.16845C7.27538 7.05857 7.46872 6.99992 7.6665 6.99992C7.93172 6.99992 8.18607 7.10528 8.37361 7.29281C8.56115 7.48035 8.6665 7.7347 8.6665 7.99992ZM7.6665 3.33325C7.86429 3.33325 8.05762 3.2746 8.22207 3.16472C8.38652 3.05484 8.5147 2.89866 8.59038 2.71594C8.66607 2.53321 8.68587 2.33214 8.64729 2.13816C8.6087 1.94418 8.51346 1.766 8.37361 1.62615C8.23376 1.48629 8.05558 1.39105 7.86159 1.35247C7.66761 1.31388 7.46655 1.33369 7.28382 1.40937C7.10109 1.48506 6.94492 1.61323 6.83503 1.77768C6.72515 1.94213 6.6665 2.13547 6.6665 2.33325C6.6665 2.59847 6.77186 2.85282 6.9594 3.04036C7.14693 3.2279 7.40129 3.33325 7.6665 3.33325ZM7.6665 12.6666C7.46872 12.6666 7.27538 12.7252 7.11093 12.8351C6.94649 12.945 6.81831 13.1012 6.74262 13.2839C6.66694 13.4666 6.64713 13.6677 6.68572 13.8617C6.7243 14.0557 6.81954 14.2338 6.9594 14.3737C7.09925 14.5135 7.27743 14.6088 7.47141 14.6474C7.66539 14.686 7.86646 14.6662 8.04919 14.5905C8.23191 14.5148 8.38809 14.3866 8.49797 14.2222C8.60785 14.0577 8.6665 13.8644 8.6665 13.6666C8.6665 13.4014 8.56115 13.147 8.37361 12.9595C8.18607 12.7719 7.93172 12.6666 7.6665 12.6666Z"
-                                            fill="#0E0E0E" />
-                                    </svg>
-                    
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M8.66666 7.99998C8.66666 8.19776 8.60801 8.3911 8.49813 8.55555C8.38824 8.72 8.23207 8.84817 8.04934 8.92386C7.86661 8.99955 7.66555 9.01935 7.47157 8.98076C7.27759 8.94218 7.0994 8.84694 6.95955 8.70709C6.8197 8.56723 6.72446 8.38905 6.68587 8.19507C6.64729 8.00109 6.66709 7.80002 6.74278 7.6173C6.81847 7.43457 6.94664 7.27839 7.11109 7.16851C7.27554 7.05863 7.46888 6.99998 7.66666 6.99998C7.93187 6.99998 8.18623 7.10534 8.37376 7.29287C8.5613 7.48041 8.66666 7.73476 8.66666 7.99998ZM7.66666 3.33331C7.86444 3.33331 8.05778 3.27466 8.22223 3.16478C8.38668 3.0549 8.51485 2.89872 8.59054 2.716C8.66622 2.53327 8.68603 2.3322 8.64744 2.13822C8.60886 1.94424 8.51362 1.76606 8.37376 1.62621C8.23391 1.48635 8.05573 1.39111 7.86175 1.35253C7.66777 1.31394 7.4667 1.33375 7.28397 1.40943C7.10125 1.48512 6.94507 1.61329 6.83519 1.77774C6.72531 1.94219 6.66666 2.13553 6.66666 2.33331C6.66666 2.59853 6.77201 2.85288 6.95955 3.04042C7.14709 3.22796 7.40144 3.33331 7.66666 3.33331ZM7.66666 12.6666C7.46888 12.6666 7.27554 12.7253 7.11109 12.8352C6.94664 12.9451 6.81847 13.1012 6.74278 13.284C6.66709 13.4667 6.64729 13.6678 6.68587 13.8617C6.72446 14.0557 6.8197 14.2339 6.95955 14.3738C7.0994 14.5136 7.27759 14.6088 7.47157 14.6474C7.66555 14.686 7.86661 14.6662 8.04934 14.5905C8.23207 14.5148 8.38824 14.3867 8.49813 14.2222C8.60801 14.0578 8.66666 13.8644 8.66666 13.6666C8.66666 13.4014 8.5613 13.1471 8.37376 12.9595C8.18623 12.772 7.93187 12.6666 7.66666 12.6666Z"
+                                    fill="white" />
+                            </svg>
                                 </div>
                                 <div x-cloak x-show="editDeletePost || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
                                     x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
                                     x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
-                                    class="absolute top-5 right-0 flex p-1 bg-white rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
+                                    class="absolute top-5 right-0 flex p-1 bg-[#084D55] rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
                                     <button type="button" data-post-id="{{:id}}"
-                                        class="edit-post-btn p-[10px] hover:bg-[#F2F4F8] rounded cursor-pointer o3 text-primary text-left">Edit</button>
+                                        class="edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Edit</button>
                                     <button type="button" data-post-id="{{:id}}"
-                                        class="delete-post-btn p-[10px] hover:bg-[#F2F4F8] rounded cursor-pointer o3 text-primary text-left">Delete</button>
+                                        class="delete-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Delete</button>
                                 </div>
                             </div>
                             {{/if}}
@@ -342,7 +389,7 @@
                                 <img src = "{{:post_image}}" class="size-full object-contain ">
                             </div>
                             {{/if}}
-                            <div class="p2 text-black !font-[350]">{{:content}}</div>
+                            <div class="p2 text-white !font-[350]">{{:content}}</div>
                         </div>
                         <!-- Post Cmt Like Bookmark -->
                         <div class="flex items-center justify-between w-full">
@@ -352,43 +399,50 @@
                                         <button class="vote-button" data-post-id="{{:id}}">
                                           {{if isVoted}}
                                             <!-- Filled heart -->
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#044047">
-                                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                            </svg>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M22 8.18423C22.0015 8.8644 21.8682 9.53811 21.6076 10.1664C21.3471 10.7947 20.9646 11.3651 20.4823 11.8446L12.5097 19.9351C12.4432 20.0025 12.364 20.0561 12.2766 20.0927C12.1893 20.1293 12.0955 20.1481 12.0008 20.1481C11.9061 20.1481 11.8123 20.1293 11.725 20.0927C11.6376 20.0561 11.5584 20.0025 11.4919 19.9351L3.51935 11.8446C2.54736 10.8738 2.00084 9.55668 2 8.18292C1.99916 6.80916 2.54408 5.49134 3.51489 4.51935C4.48569 3.54736 5.80285 3.00084 7.17661 3C8.55037 2.99916 9.8682 3.54409 10.8402 4.51489L12.0008 5.59962L13.1695 4.51132C13.8948 3.78958 14.8177 3.29892 15.8217 3.10128C16.8257 2.90364 17.8657 3.00788 18.8104 3.40085C19.7552 3.79381 20.5624 4.45788 21.1301 5.30922C21.6977 6.16055 22.0004 7.16099 22 8.18423Z"
+                                                fill="#C29D68" />
+                                        </svg>
                                           {{else}}
                                             <!-- Outline heart -->
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#044047">
-                                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="2"/>
-                                            </svg>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M20.5087 4.49572C19.5548 3.54375 18.2625 3.0085 16.9149 3.00713C15.5672 3.00577 14.2739 3.53841 13.3181 4.48844L12.0022 5.71353L10.6862 4.48844C9.7311 3.53456 8.4362 2.99915 7.08635 3C5.7365 3.00085 4.44227 3.5379 3.48838 4.49299C2.5345 5.44808 1.99909 6.74298 1.99994 8.09283C2.00079 9.44269 2.53784 10.7369 3.49293 11.6908L11.6141 19.9301C11.6648 19.9815 11.7252 20.0223 11.7919 20.0501C11.8585 20.078 11.93 20.0923 12.0022 20.0923C12.0744 20.0923 12.1458 20.078 12.2125 20.0501C12.2791 20.0223 12.3395 19.9815 12.3902 19.9301L20.5087 11.6944C20.9814 11.2218 21.3565 10.6607 21.6124 10.0431C21.8682 9.42552 21.9999 8.76357 21.9999 8.09507C21.9999 7.42658 21.8682 6.76463 21.6124 6.14704C21.3565 5.52946 20.9814 4.96833 20.5087 4.49572ZM19.7344 10.9256L12.0022 18.7705L4.26724 10.9229C3.52168 10.1721 3.10407 9.15642 3.10588 8.09835C3.10768 7.04028 3.52875 6.02606 4.27686 5.27783C5.02497 4.5296 6.03913 4.10837 7.0972 4.10639C8.15526 4.10442 9.17099 4.52187 9.92188 5.2673C9.92626 5.27204 9.93114 5.27631 9.93642 5.28002L11.6305 6.85772C11.7314 6.95176 11.8642 7.00405 12.0022 7.00405C12.1401 7.00405 12.2729 6.95176 12.3739 6.85772L14.0679 5.27911C14.0732 5.2754 14.0781 5.27114 14.0824 5.26639C14.4535 4.89313 14.8946 4.59679 15.3804 4.39436C15.8662 4.19194 16.3873 4.08741 16.9136 4.08678C17.4399 4.08615 17.9611 4.18942 18.4475 4.39068C18.9338 4.59194 19.3756 4.88722 19.7475 5.25959C20.1195 5.63196 20.4143 6.07409 20.615 6.56063C20.8157 7.04717 20.9184 7.56855 20.9171 8.09486C20.9159 8.62118 20.8108 9.14207 20.6078 9.62767C20.4049 10.1133 20.108 10.554 19.7344 10.9247V10.9256Z"
+                                                fill="#C29D68" />
+                                        </svg>
                                           {{/if}}
                                         </button>
-                                        <div class="o1 text-black vote-count">{{:voteCount}}</div>
+                                        <div class="o1 text-white vote-count">{{:voteCount}}</div>
                                       </div>
                                 </div>
                                 <button class="!flex items-center gap-2 load-comments-btn cursor-pointer" data-post-id="{{:id}}">
                                     <div  class="size-6 cursor-pointer">
-                                        <svg class = "-z-1" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M12.375 2.25C9.88943 2.25273 7.50645 3.24133 5.74889 4.99889C3.99133 6.75645 3.00273 9.13943 3 11.625V19.5C3 19.8978 3.15804 20.2794 3.43934 20.5607C3.72064 20.842 4.10218 21 4.5 21H12.375C14.8614 21 17.246 20.0123 19.0041 18.2541C20.7623 16.496 21.75 14.1114 21.75 11.625C21.75 9.1386 20.7623 6.75403 19.0041 4.99587C17.246 3.23772 14.8614 2.25 12.375 2.25ZM15.375 14.25H9C8.80109 14.25 8.61032 14.171 8.46967 14.0303C8.32902 13.8897 8.25 13.6989 8.25 13.5C8.25 13.3011 8.32902 13.1103 8.46967 12.9697C8.61032 12.829 8.80109 12.75 9 12.75H15.375C15.5739 12.75 15.7647 12.829 15.9053 12.9697C16.046 13.1103 16.125 13.3011 16.125 13.5C16.125 13.6989 16.046 13.8897 15.9053 14.0303C15.7647 14.171 15.5739 14.25 15.375 14.25ZM15.375 11.25H9C8.80109 11.25 8.61032 11.171 8.46967 11.0303C8.32902 10.8897 8.25 10.6989 8.25 10.5C8.25 10.3011 8.32902 10.1103 8.46967 9.96967C8.61032 9.82902 8.80109 9.75 9 9.75H15.375C15.5739 9.75 15.7647 9.82902 15.9053 9.96967C16.046 10.1103 16.125 10.3011 16.125 10.5C16.125 10.6989 16.046 10.8897 15.9053 11.0303C15.7647 11.171 15.5739 11.25 15.375 11.25Z"
-                                                fill="#044047" />
-                                        </svg>
-                    
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M12.375 2.25C9.88943 2.25273 7.50645 3.24133 5.74889 4.99889C3.99133 6.75645 3.00273 9.13943 3 11.625V19.5C3 19.8978 3.15804 20.2794 3.43934 20.5607C3.72064 20.842 4.10218 21 4.5 21H12.375C14.8614 21 17.246 20.0123 19.0041 18.2541C20.7623 16.496 21.75 14.1114 21.75 11.625C21.75 9.1386 20.7623 6.75403 19.0041 4.99587C17.246 3.23772 14.8614 2.25 12.375 2.25ZM15.375 14.25H9C8.80109 14.25 8.61032 14.171 8.46967 14.0303C8.32902 13.8897 8.25 13.6989 8.25 13.5C8.25 13.3011 8.32902 13.1103 8.46967 12.9697C8.61032 12.829 8.80109 12.75 9 12.75H15.375C15.5739 12.75 15.7647 12.829 15.9053 12.9697C16.046 13.1103 16.125 13.3011 16.125 13.5C16.125 13.6989 16.046 13.8897 15.9053 14.0303C15.7647 14.171 15.5739 14.25 15.375 14.25ZM15.375 11.25H9C8.80109 11.25 8.61032 11.171 8.46967 11.0303C8.32902 10.8897 8.25 10.6989 8.25 10.5C8.25 10.3011 8.32902 10.1103 8.46967 9.96967C8.61032 9.82902 8.80109 9.75 9 9.75H15.375C15.5739 9.75 15.7647 9.82902 15.9053 9.96967C16.046 10.1103 16.125 10.3011 16.125 10.5C16.125 10.6989 16.046 10.8897 15.9053 11.0303C15.7647 11.171 15.5739 11.25 15.375 11.25Z"
+                                            fill="#C29D68" />
+                                    </svg>
                                     </div>
-                                    <div class="o1 text-black">55</div>
+                                    <div class="o1 text-white">55</div>
                                 </button>
                             </div>
                             <!-- Bookmark -->
                             <button class="bookmark-button" data-post-id="{{:id}}">
                                 {{if isBookmarked}}
                                   <!-- Filled bookmark icon -->
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#044047" stroke="#044047">
-                                    <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
-                                  </svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"
+                                fill="#C29D68" />
+                        </svg>
                                 {{else}}
                                   <!-- Outline bookmark icon -->
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#044047">
-                                    <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
-                                  </svg>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M17.857 2H6.42856C6.04968 2 5.68632 2.15051 5.41841 2.41841C5.15051 2.68632 5 3.04968 5 3.42856V21.3876C4.99996 21.4969 5.02919 21.6042 5.08464 21.6984C5.1401 21.7926 5.21976 21.8702 5.31536 21.9232C5.41095 21.9762 5.51899 22.0026 5.62826 21.9998C5.73753 21.9969 5.84403 21.9649 5.93673 21.9069L12.1418 18.0294L18.3488 21.9069C18.4415 21.9649 18.548 21.9969 18.6573 21.9998C18.7666 22.0026 18.8746 21.9762 18.9702 21.9232C19.0658 21.8702 19.1455 21.7926 19.2009 21.6984C19.2564 21.6042 19.2856 21.4969 19.2856 21.3876V3.42856C19.2856 3.04968 19.1351 2.68632 18.8672 2.41841C18.5992 2.15051 18.2359 2 17.857 2ZM18.0611 20.2825L12.4662 16.7866C12.3689 16.7258 12.2565 16.6935 12.1418 16.6935C12.027 16.6935 11.9146 16.7258 11.8173 16.7866L6.22448 20.2825V3.42856C6.22448 3.37443 6.24598 3.32252 6.28425 3.28425C6.32252 3.24598 6.37443 3.22448 6.42856 3.22448H17.857C17.9111 3.22448 17.963 3.24598 18.0013 3.28425C18.0396 3.32252 18.0611 3.37443 18.0611 3.42856V20.2825Z"
+                                    fill="#C29D68" />
+                            </svg>
                                 {{/if}}
                               </button>
                         </div>

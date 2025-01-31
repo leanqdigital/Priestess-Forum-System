@@ -122,16 +122,23 @@ h1,h2,h3,h4 {
 
 /* Modal Styling */
 sl-dialog::part(overlay) {
-  background: #044047B2;
+  background: #286D7580;
   backdrop-filter: blur(4px);
 }
 sl-dialog::part(panel) {
   width: 656px;
+  background: var(--primary-100);
+}
+sl-dialog::part(close-button) {
+  color: white;
 }
 sl-dialog::part(base) {
   top: 50px;
   align-items: start;
   transform: none;
+}
+sl-dialog::part(title) {
+color: white !important;
 }
 
 /* Icon Only Button Styling */
@@ -139,10 +146,10 @@ sl-dialog::part(base) {
   padding: 12px;
   border-radius: 4px;
   transition: all 0.3s;
-  background: var(--grey-300);
+  background: #042F34;
   svg {
     path {
-      fill: var(--primary);
+      fill: var(--secondary);
       transition: all 0.3s;
     }
   }
@@ -151,10 +158,10 @@ sl-dialog::part(base) {
 .icon-button:focus,
 .icon-button:hover,
 .icon-button:active {
-  background: var(--primary);
+  background: var(--secondary);
   svg {
     path {
-      fill: var(--white);
+      fill: black;
     }
   }
 }
@@ -176,8 +183,8 @@ sl-dialog::part(base) {
   border-radius: 4px;
 }
 .submit-button {
-  background-color: var(--primary);
-  color: var(--white);
+  background-color: var(--secondary);
+  color: black;
   border: none;
   padding: 12px 16px;
   border-radius: 4px;
@@ -186,7 +193,7 @@ sl-dialog::part(base) {
 }
 
 .submit-button:hover {
-  background-color: var(--primary-200);
+  background-color: var(--secondary-100);
 }
 
 /* Headings */
@@ -393,8 +400,8 @@ sl-dialog::part(base) {
 }
 .mention {
   padding: 4px 6px;
-  background-color: var(--secondary-300);
-  color: var(--primary);
+  background-color: var(--primary);
+  color: var(--secondary);
   font-family: "AvenirBook", sans-serif;
   font-size: 16px;
   font-weight: 350;
@@ -403,7 +410,7 @@ sl-dialog::part(base) {
 }
 
 .tribute-container {
-  background: white;
+  background: #084D55;
   height: 250px;
   z-index: 999;
   padding: 4px;
@@ -416,9 +423,12 @@ sl-dialog::part(base) {
   padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
-  border-bottom: 1px solid white;
+  color: white;
+}
+.tribute-container ul li .o2{
+  color: white;
 }
 
 .tribute-container ul li.highlight {
-  background: #F2F4F8;
+  background: var(--primary-100);
 }

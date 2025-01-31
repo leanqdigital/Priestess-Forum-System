@@ -57,7 +57,6 @@ class ForumManager {
     // ✅ Fetch latest bookmarks for this post
     const existingBookmarkIds = await this.fetchAllBookmarkIdsForPost(postId);
     const isBookmarked = existingBookmarkIds.length > 0;
-
     try {
       buttons.forEach((button) => (button.disabled = true));
 
@@ -182,8 +181,8 @@ class ForumManager {
   getBookmarkSVG(isBookmarked) {
     return `
         <svg width="24" height="24" viewBox="0 0 24 24" 
-             fill="${isBookmarked ? "#044047" : "none"}" 
-             stroke="#044047">
+             fill="${isBookmarked ? "#C29D68" : "none"}" 
+             stroke="#C29D68">
             <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
         </svg>
     `;
@@ -377,7 +376,7 @@ class ForumManager {
         setTimeout(() => {
           this.loadMorePosts();
           isLoading = false; 
-        }, 500);
+        }, 700);
       }
     });
     document.addEventListener("click", async (e) => {
@@ -456,26 +455,58 @@ class ForumManager {
   async loadMorePosts() {
     await this.fetchAndRenderPosts(false);
   }
+  getSkeletonLoader(count = 1) {
+    let skeletons = "";
+    for (let i = 0; i < count; i++) {
+      skeletons += `
+      <div class="skeleton-loader flex space-x-4 p-4 border border-gray-300 rounded-lg animate-pulse mb-4">
+        <div class="w-16 h-16 bg-gray-300 rounded-full"></div>
+        <div class="flex-1 space-y-4 py-1">
+          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+          <div class="h-6 bg-gray-300 rounded w-full"></div>
+        </div>
+      </div>
+    `;
+    }
+    return skeletons;
+  }
+
 
   async fetchAndRenderPosts(isInitialLoad = false) {
     try {
       if (!this.hasMorePosts) return;
 
+      const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
+
+      // ✅ Show skeleton loader before fetching posts
+      if (isInitialLoad) {
+        postContainer.innerHTML = this.getSkeletonLoader(5);
+      } else {
+        postContainer.insertAdjacentHTML("beforeend", this.getSkeletonLoader());
+      }
+
       const { query, variables } = this.buildQuery();
-      const data = await ApiService.query(query, variables);
+      const dataPromise = ApiService.query(query, variables);
+
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      const data = await dataPromise; // Wait for the data to be available after the delay
+
+      // ✅ Remove skeleton loader before rendering actual posts
+      document.querySelectorAll(".skeleton-loader").forEach(el => el.remove());
 
       if (!data || !data.calcForumPosts || data.calcForumPosts.length === 0) {
         this.hasMorePosts = false;
         if (isInitialLoad) {
-          document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
-                  <div class="flex flex-col gap-6  items-center justify-center ">
-          <div class="size-[200px]">
-            <img src="./assets/emptyPost.svg" alt="Empty Post" class="size-full object-contain">
+          postContainer.innerHTML = `
+          <div class="flex flex-col gap-6 items-center justify-center">
+            <div class="size-[200px]">
+              <img src="./assets/emptyPost.svg" alt="Empty Post" class="size-full object-contain">
+            </div>
+            <div class="p2 text-black">No posts available.</div>
           </div>
-          <div class="p2 text-black">No posts available.</div>
-        </div>
-                   
-                `;
+        `;
         }
         return;
       }
@@ -489,8 +520,8 @@ class ForumManager {
         return {
           id: postId,
           isBookmarked: this.savedPostIds.has(postId),
-          isVoted: this.votedPostIds.has(postId), // ✅ Correctly check if user voted
-          voteCount: this.voteCounts.get(postId) || 0, // ✅ Get vote count
+          isVoted: this.votedPostIds.has(postId),
+          voteCount: this.voteCounts.get(postId) || 0,
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
           post_image: post.Post_Image,
@@ -507,9 +538,6 @@ class ForumManager {
       });
 
       const template = $.templates("#post-template");
-      const postContainer = document.querySelector(
-        CONFIG.selectors.postsContainer
-      );
 
       if (isInitialLoad) {
         postContainer.innerHTML = "";
@@ -524,17 +552,22 @@ class ForumManager {
 
       if (posts.length < this.postsLimit) {
         this.hasMorePosts = false;
-      } 
-      // ✅ Call updateBookmarkIcons *after* posts are rendered
+      }
+
       this.updateBookmarkIcons();
     } catch (error) {
+      // ✅ Remove skeleton loader on error
+      document.querySelectorAll(".skeleton-loader").forEach(el => el.remove());
+
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
-            <div class="text-center text-red-600 p-4">
-                <p>⚠️ Failed to load posts. Please try again later.</p>
-            </div>
-        `;
+      <div class="text-center text-red-600 p-4">
+        <p>⚠️ Failed to load posts. Please try again later.</p>
+      </div>
+    `;
     }
   }
+
+
 
   buildQuery() {
     let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
@@ -686,21 +719,21 @@ class PostModalManager {
 
     // Render modal content
     modalContent.innerHTML = `
-      <article class="post bg-white rounded-lg shadow-sm p-6">
+      <article class="post bg-transparent rounded-lg shadow-sm p-6">
         <header class="flex items-center gap-4 mb-4">
           <img class="w-12 h-12 rounded-full object-cover" 
                src="${post.author.profileImage}" 
                alt="${post.author.name}">
           <div>
-            <h2 class="font-semibold text-gray-800">${post.author.name}</h2>
-            <time class="text-sm text-gray-500">${post.date}</time>
+            <h2 class="font-semibold text-white">${post.author.name}</h2>
+            <time class="text-sm text-white">${post.date}</time>
           </div>
         </header>
         
         <div class="post-content mb-4">
           ${
             post.title
-              ? `<h3 class="text-xl font-medium mb-2">${post.title}</h3>`
+              ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
               : ""
           }
           ${
@@ -711,13 +744,13 @@ class PostModalManager {
                    onerror="console.error('Failed to load image:', this.src)">`
               : ""
           }
-          <div class="text-gray-700 whitespace-pre-wrap">${post.content}</div>
+          <div class="text-white whitespace-pre-wrap">${post.content}</div>
         </div>
 
         <section id="modal-comments-section" class="mt-6">
-          <h3 class="text-lg font-semibold text-gray-800">Comments</h3>
+          <h3 class="text-lg font-semibold text-white">Comments</h3>
           <div id="modal-comments-container" class="space-y-4 mt-4">
-            <p class="text-gray-500">Loading comments...</p>
+            <p class="text-white">Loading comments...</p>
           </div>
         </section>
       </article>
