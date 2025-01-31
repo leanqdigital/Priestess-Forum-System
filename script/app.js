@@ -8,6 +8,8 @@ class ForumManager {
     this.hasMorePosts = true;
     this.currentFilter = "recent";
     this.savedPostIds = new Map();
+    this.votedPostIds = new Map(); // postId: [voteIds]
+    this.voteCounts = new Map(); // postId: count
     this.init();
   }
 
@@ -17,6 +19,7 @@ class ForumManager {
 
       // ✅ Wait for saved posts to load first
       await this.fetchSavedPosts();
+      await this.fetchVotes();
       console.log("✅ Saved Posts Loaded. Now Fetching Posts...");
 
       // ✅ Now load the posts
@@ -223,8 +226,154 @@ class ForumManager {
     await ApiService.query(query, variables);
   }
 
+  async fetchVotes() {
+    try {
+      const query = `
+            query {
+                calcMemberPostUpvotesPostUpvotesMany(
+                    query: [{ where: { member_post_upvote_id: "${LOGGED_IN_USER_ID}" } }]
+                ) {
+                    ID: field(arg: ["id"])
+                    Post_Upvote_ID: field(arg: ["post_upvote_id"])
+                }
+            }
+        `;
+
+      const data = await ApiService.query(query);
+      const votes = data?.calcMemberPostUpvotesPostUpvotesMany || [];
+
+      // ✅ Reset before updating
+      this.votedPostIds.clear();
+      this.voteCounts.clear();
+
+      votes.forEach((vote) => {
+        const postId = String(vote.Post_Upvote_ID);
+
+        // ✅ Store vote IDs in a Set (prevents duplicates)
+        if (!this.votedPostIds.has(postId)) {
+          this.votedPostIds.set(postId, new Set());
+        }
+        this.votedPostIds.get(postId).add(vote.ID);
+
+        // ✅ Initialize vote count (if not already set)
+        this.voteCounts.set(postId, (this.voteCounts.get(postId) || 0) + 1);
+      });
+
+      console.log("✅ Votes fetched: ", this.votedPostIds);
+      console.log("✅ Vote Counts: ", this.voteCounts);
+    } catch (error) {
+      console.error("Error fetching votes:", error);
+    }
+  }
+
+  async toggleVote(postId) {
+    const buttons = document.querySelectorAll(
+      `.vote-button[data-post-id="${postId}"]`
+    );
+    const isVoted = this.votedPostIds.has(postId);
+    let voteCount = this.voteCounts.get(postId) || 0;
+
+    try {
+      buttons.forEach((button) => (button.disabled = true));
+
+      if (isVoted) {
+        // ✅ Remove all existing votes for this post
+        await this.deleteVotes(postId);
+        this.votedPostIds.delete(postId);
+        voteCount = Math.max(0, voteCount - 1); // Prevent negative votes
+      } else {
+        // ✅ Add new vote
+        const voteId = await this.createVote(postId);
+        if (!this.votedPostIds.has(postId)) {
+          this.votedPostIds.set(postId, new Set());
+        }
+        this.votedPostIds.get(postId).add(voteId);
+        voteCount += 1;
+      }
+
+      // ✅ Update local vote count
+      this.voteCounts.set(postId, voteCount);
+
+      // ✅ Update UI
+      this.updateVoteUI(postId);
+      UIManager.showSuccess(`Post ${isVoted ? "unvoted" : "voted"}`);
+    } catch (error) {
+      UIManager.showError(`Failed to ${isVoted ? "unvote" : "vote"}`);
+    } finally {
+      buttons.forEach((button) => (button.disabled = false));
+    }
+  }
+
+  async createVote(postId) {
+    const query = `
+      mutation createVote($payload: MemberPostUpvotesPostUpvotesCreateInput) {
+        createMemberPostUpvotesPostUpvotes(payload: $payload) {
+          id
+        }
+      }
+    `;
+    const variables = {
+      payload: {
+        member_post_upvote_id: LOGGED_IN_USER_ID,
+        post_upvote_id: postId,
+      },
+    };
+
+    const response = await ApiService.query(query, variables);
+    return response.createMemberPostUpvotesPostUpvotes.id;
+  }
+
+  async deleteVotes(postId) {
+    const voteIds = this.votedPostIds.get(postId) || new Set();
+
+    await Promise.all(
+      [...voteIds].map((id) =>
+        ApiService.query(
+          `
+                mutation deleteVote($id: PriestessMemberPostUpvotesPostUpvotesID) {
+                    deleteMemberPostUpvotesPostUpvotes(query: [{ where: { id: $id } }]) {
+                        id
+                    }
+                }
+            `,
+          { id }
+        )
+      )
+    );
+
+    this.votedPostIds.delete(postId); // ✅ Remove from local state
+  }
+
+  updateVoteUI(postId) {
+    document
+      .querySelectorAll(`[data-post-id="${postId}"] .vote-button`)
+      .forEach((button) => {
+        const isVoted = this.votedPostIds.has(postId);
+        const voteCount = this.voteCounts.get(postId) || 0;
+
+        // ✅ Update icon & count
+        button.innerHTML = this.getVoteSVG(isVoted);
+        button.nextElementSibling.textContent = voteCount;
+      });
+  }
+
+  getVoteSVG(isVoted) {
+    return `
+      <svg width="24" height="24" viewBox="0 0 24 24" 
+          fill="${isVoted ? "#044047" : "none"}" 
+          stroke="#044047">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+  `;
+  }
+
   initEventListeners() {
     document.addEventListener("click", async (e) => {
+      if (e.target.closest(".vote-button")) {
+        const postId = e.target.closest(".vote-button").dataset.postId;
+        this.toggleVote(postId);
+      }
+
       if (e.target.closest(".refresh-button")) {
         this.refreshPosts();
       }
@@ -321,12 +470,12 @@ class ForumManager {
       ]);
 
       const posts = data.calcForumPosts.map((post) => {
-        const postIdString = String(post.ID); // Convert post.ID to string
-        const isBookmarked = this.savedPostIds.has(postIdString);
-
+        const postId = String(post.ID);
         return {
-          isBookmarked,
-          id: post.ID,
+          id: postId,
+          isBookmarked: this.savedPostIds.has(postId),
+          isVoted: this.votedPostIds.has(postId), // ✅ Correctly check if user voted
+          voteCount: this.voteCounts.get(postId) || 0, // ✅ Get vote count
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
           defaultAuthorImage: CONFIG.api.defaultAuthorImage,
@@ -601,7 +750,6 @@ class ContactService {
   }
 }
 
-// Add this after ContactService class
 class MentionManager {
   static init() {
     this.tribute = new Tribute({
