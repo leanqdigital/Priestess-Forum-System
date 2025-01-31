@@ -601,120 +601,130 @@ class ContactService {
   }
 }
 
-async function initializeEditor() {
-  if (!window.DevExpress || !$.fn.dxHtmlEditor || !window.Quill) {
-    setTimeout(initializeEditor, 500);
-    return;
+// Add this after ContactService class
+class MentionManager {
+  static init() {
+    this.tribute = new Tribute({
+      trigger: "@",
+      allowSpaces: true,
+      lookup: "name",
+      values: this.fetchMentionContacts,
+      menuItemTemplate: this.mentionTemplate,
+      selectTemplate: this.selectTemplate,
+      menuContainer: document.body,
+    });
+
+    const editor = document.getElementById("post-editor");
+    this.tribute.attach(editor);
   }
 
-  const contacts = await ContactService.fetchContacts();
+  static async fetchMentionContacts(text, cb) {
+    try {
+      const contacts = await ContactService.fetchContacts();
+      cb(
+        contacts.map((contact) => ({
+          key: contact.name,
+          value: contact.name,
+          ...contact,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching contacts:", error);
+      cb([]);
+    }
+  }
 
-  $("#html-objects").dxHtmlEditor({
-    height: 200,
-    mentions: [
-      {
-        dataSource: contacts,
-        searchExpr: "name",
-        displayExpr: "name",
-        valueExpr: "id",
-        template: (data) => `
-          <div class="flex items-center gap-2">
-            <img src="${data.profileImage}" class="w-8 h-8 rounded-full">
-            <span>${data.name}</span>
+  static mentionTemplate(item) {
+    return `
+          <div class="flex items-center gap-3 px-3 py-2">
+              <img src="${item.original.profileImage}" 
+                   class="w-8 h-8 rounded-full object-cover"
+                   onerror="this.src='${CONFIG.api.defaultAuthorImage}'">
+              <div>
+                  <div class="o2 text-primary">${item.original.name}</div>
+              </div>
           </div>
-        `,
-        marker: "@",
-        insertExpr: (data) => `@${data.name}`,
-      },
-    ],
-    placeholder: "Type @ to mention someone..",
-  });
+      `;
+  }
+
+  static selectTemplate(item) {
+    return `<span class="mention" data-contact-id="${item.original.id}">@${item.original.name}</span>`;
+  }
 }
 
-initializeEditor();
+// Initialize when DOM is ready
+document.addEventListener("DOMContentLoaded", () => MentionManager.init());
 
 document.getElementById("submit-post").addEventListener("click", async () => {
-  const editor = $("#html-objects").dxHtmlEditor("instance");
-  const postCopy = editor.option("value")?.trim();
+  const editor = document.getElementById("post-editor");
+  const postContent = editor.innerHTML;
+  const textContent = editor.innerText.trim();
 
-  if (!postCopy) {
+  if (!textContent) {
     UIManager.showError("Post content cannot be empty.");
     return;
   }
 
-  const tempPostId = `temp-${Date.now()}`;
+  // Extract mentioned contact IDs
+  const mentionedIds = [];
+  const mentions = editor.querySelectorAll(".mention");
+  mentions.forEach((mention) => {
+    const id = mention.dataset.contactId;
+    if (id) mentionedIds.push(id);
+  });
+
+  // Create temporary post
   const tempPost = {
-    id: tempPostId,
-    author_id: LOGGED_IN_USER_ID, // Add this line
+    id: `temp-${Date.now()}`,
+    author_id: LOGGED_IN_USER_ID,
     author: {
-      name: "Dipesh Adhikari",
+      name: "Dipesh Adhikari", // Replace with actual user data
       profileImage: CONFIG.api.defaultAuthorImage,
     },
     date: "Just now",
-    content: postCopy,
+    content: textContent,
   };
 
+  // Render temporary post
   const template = $.templates("#post-template");
   const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
-  const tempPostElement = document.createElement("div");
-
-  // Render post template
-  tempPostElement.innerHTML = template.render(tempPost);
-
-  // 🔹 Get the first ELEMENT child (skip text nodes)
-  const postElement = tempPostElement.children[0];
-
-  if (!postElement) {
-    return;
-  }
-
-  // Add loading styles
-  postElement.classList.add("opacity-50", "pointer-events-none");
-  postContainer.prepend(postElement);
+  postContainer.insertAdjacentHTML("afterbegin", template.render(tempPost));
 
   try {
-    const query = `
-      mutation createForumPost($payload: ForumPostCreateInput) {
-        createForumPost(payload: $payload) {
-          id  
-          author_id
-          post_copy
-        }
+    // Submit to API
+    const response = await ApiService.query(
+      `
+          mutation createForumPost($payload: ForumPostCreateInput!) {
+              createForumPost(payload: $payload) {
+                  author_id
+                  post_copy
+                  Mentioned_Users {
+                      id
+                  }
+              }
+          }
+      `,
+      {
+        payload: {
+          author_id: LOGGED_IN_USER_ID,
+          post_copy: textContent,
+          Mentioned_Users: mentionedIds.map((id) => ({ id: Number(id) })),
+        },
       }
-    `;
-    const variables = {
-      payload: {
-        author_id: LOGGED_IN_USER_ID,
-        post_copy: postCopy,
-      },
-    };
+    );
 
-    const response = await ApiService.query(query, variables);
+    // Update with real ID
+    const newPost = response.createForumPost;
+    const postElement = postContainer.firstElementChild;
+    postElement.dataset.postId = newPost.id;
+    postElement.querySelectorAll("[data-post-id]").forEach((el) => {
+      el.dataset.postId = newPost.id;
+    });
 
-    if (response && response.createForumPost && response.createForumPost.id) {
-      const actualPostId = response.createForumPost.id;
-      postElement.setAttribute("data-post-id", actualPostId);
-      // Update all elements with data-post-id within the post
-      const elementsWithPostId = postElement.querySelectorAll("[data-post-id]");
-      elementsWithPostId.forEach((element) => {
-        element.dataset.postId = actualPostId;
-      });
-    }
-
-    postElement.classList.remove("opacity-50", "pointer-events-none");
+    // Clear editor
+    editor.innerHTML = "";
   } catch (error) {
     UIManager.showError("Failed to post. Please try again.");
-    postElement.remove();
+    postContainer.removeChild(postContainer.firstElementChild);
   }
 });
-
-function extractMentions(content) {
-  const mentionRegex = /@([a-zA-Z\s]+)/g;
-  let matches = [];
-  let match;
-
-  while ((match = mentionRegex.exec(content)) !== null) {
-    matches.push(match[1].trim());
-  }
-  return matches;
-}

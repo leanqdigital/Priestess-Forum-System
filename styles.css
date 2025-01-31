@@ -358,3 +358,27 @@ h4 {
   opacity: 0;
   visibility: hidden;
 }
+
+
+.mention {
+  background-color: #E2F4F5;
+  border-radius: 4px;
+  padding: 2px 4px;
+  color: #044047;
+  font-weight: 500;
+}
+
+.tribute-container {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tribute-container ul li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.tribute-container ul li.highlight {
+  background: #F2F4F8;
+}
