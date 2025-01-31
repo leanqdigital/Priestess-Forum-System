@@ -120,7 +120,7 @@ sl-dialog::part(overlay) {
   background-color: #04404780;
 }
 #postNewModal::part(panel) {
-width: 656px;
+  width: 656px;
 }
 sl-dialog::part(base) {
   top: 50px;
@@ -138,7 +138,7 @@ sl-dialog::part(base) {
     path {
       fill: var(--primary);
       transition: all 0.3s;
-    } 
+    }
   }
 }
 
@@ -146,7 +146,7 @@ sl-dialog::part(base) {
 .icon-button:hover,
 .icon-button:active {
   background: var(--primary);
-  svg{
+  svg {
     path {
       fill: var(--white);
     }
@@ -387,7 +387,6 @@ h4 {
   line-height: 16px;
   border-radius: 4px;
 }
-
 
 .tribute-container {
   background: white;

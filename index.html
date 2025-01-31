@@ -345,8 +345,13 @@
                             {{/if}}
                             <!-- Three Dots Ends -->
                         </div>
-                        <div class="post-content">
-                        <div class="p2 text-black !font-[350]">{{:content}}</div>
+                        <div class="post-content flex flex-col gap-2">
+                            {{if post_image}}
+                            <div class = "post-image-wrapper">
+                                <img src = "{{:post_image}}">
+                            </div>
+                            {{/if}}
+                            <div class="p2 text-black !font-[350]">{{:content}}</div>
                         </div>
                         <!-- Post Cmt Like Bookmark -->
                         <div class="flex items-center justify-between w-full">

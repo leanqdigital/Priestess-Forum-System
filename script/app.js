@@ -377,6 +377,7 @@ class ForumManager {
       if (e.target.closest(".refresh-button")) {
         this.refreshPosts();
       }
+
       if (e.target.closest("#load-more-button")) {
         this.loadMorePosts();
       }
@@ -394,6 +395,11 @@ class ForumManager {
           `[data-post-id="${postId}"]`
         );
         if (postElement) {
+          const imageElement = postElement.querySelector(
+            ".post-image-wrapper img"
+          );
+          const postImage = imageElement ? imageElement.src : "";
+
           const post = {
             id: postId,
             author: {
@@ -403,7 +409,9 @@ class ForumManager {
             date: postElement.querySelector("time").textContent,
             title: postElement.querySelector("h3")?.textContent || "",
             content: postElement.querySelector(".post-content div").textContent,
+            post_image: postImage, // Ensures posts without images work
           };
+
           await PostModalManager.open(post);
         }
       }
@@ -478,6 +486,7 @@ class ForumManager {
           voteCount: this.voteCounts.get(postId) || 0, // ✅ Get vote count
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
+          post_image: post.Post_Image,
           defaultAuthorImage: CONFIG.api.defaultAuthorImage,
           author: Formatter.formatAuthor({
             firstName: post.Author_First_Name,
@@ -543,6 +552,7 @@ class ForumManager {
           Post_Title: field(arg: ["post_title"])
           Post_Copy: field(arg: ["post_copy"])
           Featured_Post: field(arg: ["featured_post"])
+          Post_Image: field(arg: ["post_image"])
         }
       }
     `;
@@ -668,35 +678,47 @@ class PostModalManager {
     const modal = document.querySelector("#post-modal");
     const modalContent = document.querySelector("#post-modal-content");
 
-    modalContent.innerHTML = `
-        <article class="post bg-white rounded-lg shadow-sm p-6">
-          <header class="flex items-center gap-4 mb-4">
-            <img class="w-12 h-12 rounded-full object-cover" 
-                 src="${post.author.profileImage}" 
-                 alt="${post.author.name}">
-            <div>
-              <h2 class="font-semibold text-gray-800">${post.author.name}</h2>
-              <time class="text-sm text-gray-500">${post.date}</time>
-            </div>
-          </header>
-          
-          <div class="post-content mb-4">
-            ${
-              post.title
-                ? `<h3 class="text-xl font-medium mb-2">${post.title}</h3>`
-                : ""
-            }
-            <div class="text-gray-700 whitespace-pre-wrap">${post.content}</div>
-          </div>
+    // Debugging: Log the post image URL
+    console.log("Post Image URL:", post.post_image);
 
-          <section id="modal-comments-section" class="mt-6">
-            <h3 class="text-lg font-semibold text-gray-800">Comments</h3>
-            <div id="modal-comments-container" class="space-y-4 mt-4">
-              <p class="text-gray-500">Loading comments...</p>
-            </div>
-          </section>
-        </article>
-      `;
+    // Render modal content
+    modalContent.innerHTML = `
+      <article class="post bg-white rounded-lg shadow-sm p-6">
+        <header class="flex items-center gap-4 mb-4">
+          <img class="w-12 h-12 rounded-full object-cover" 
+               src="${post.author.profileImage}" 
+               alt="${post.author.name}">
+          <div>
+            <h2 class="font-semibold text-gray-800">${post.author.name}</h2>
+            <time class="text-sm text-gray-500">${post.date}</time>
+          </div>
+        </header>
+        
+        <div class="post-content mb-4">
+          ${
+            post.title
+              ? `<h3 class="text-xl font-medium mb-2">${post.title}</h3>`
+              : ""
+          }
+          ${
+            post.post_image
+              ? `<img class="w-full rounded-lg mb-4" 
+                   src="${post.post_image}" 
+                   alt="Post image"
+                   onerror="console.error('Failed to load image:', this.src)">`
+              : ""
+          }
+          <div class="text-gray-700 whitespace-pre-wrap">${post.content}</div>
+        </div>
+
+        <section id="modal-comments-section" class="mt-6">
+          <h3 class="text-lg font-semibold text-gray-800">Comments</h3>
+          <div id="modal-comments-container" class="space-y-4 mt-4">
+            <p class="text-gray-500">Loading comments...</p>
+          </div>
+        </section>
+      </article>
+    `;
 
     await modal.show();
     await PostModalManager.loadComments(post.id);
@@ -871,6 +893,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
 
     // Clear editor
     editor.innerHTML = "";
+    document.getElementById("postNewModal").hide();
   } catch (error) {
     UIManager.showError("Failed to post. Please try again.");
     postContainer.removeChild(postContainer.firstElementChild);
