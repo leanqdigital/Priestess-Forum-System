@@ -121,7 +121,7 @@ sl-dialog::part(overlay) {
   background: #044047B2;
   backdrop-filter: blur(4px);
 }
-#postNewModal::part(panel) {
+sl-dialog::part(panel) {
   width: 656px;
 }
 sl-dialog::part(base) {
@@ -302,14 +302,22 @@ h4 {
   .tab-Button {
     padding: 8px 12px;
   }
+sl-dialog::part(panel) {
+  max-height: 100%;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+}
+sl-dialog::part(base) {
+  top: 0;
+}
+.tab-Active {
+  background: var(--primary);
 
-  .tab-Active {
-    background: var(--primary);
-
-    div {
-      display: flex;
-    }
+  div {
+    display: flex;
   }
+}
 
   .tab-Inactive {
     div {
