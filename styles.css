@@ -359,9 +359,8 @@ h4 {
   visibility: hidden;
 }
 
-
 .mention {
-  background-color: #E2F4F5;
+  background-color: #e2f4f5;
   border-radius: 4px;
   padding: 2px 4px;
   color: #044047;
@@ -369,7 +368,7 @@ h4 {
 }
 
 .tribute-container {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -380,5 +379,5 @@ h4 {
 }
 
 .tribute-container ul li.highlight {
-  background: #F2F4F8;
+  background: #f2f4f8;
 }
