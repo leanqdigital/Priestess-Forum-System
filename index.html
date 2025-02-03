@@ -14,7 +14,7 @@
 </head>
 
 <body class="bg-primary my-10" x-data="{ openCommentModal: false }">
-<!-- Open Comment Modal -->
+    <!-- Open Comment Modal -->
     <div x-cloak x-show="openCommentModal" x-transition.opacity.duration.200ms x-trap.inert.noscroll="openCommentModal"
         x-on:keydown.esc.window="openCommentModal = false"
         class="fixed inset-0 flex items-start justify-center z-[50]  backdrop-blur-md sm:items-center lg:p-8 [background: #286D7580;backdrop-filter: blur(4px);]"
@@ -474,25 +474,47 @@
     </script>
 
     <script type="text/html" id="comment-template">
-        <div class="comment p-3 bg-gray-800 rounded-lg relative" data-comment-id="{{:id}}">
-            <div class="flex items-center gap-3 mb-2">
-                <img class="w-8 h-8 rounded-full object-cover"
-                     src="{{:author.profileImage}}"
-                     alt="{{:author.name}}"
-                     onerror="this.src='{{:defaultAuthorImage}}'">
-                <div>
-                    <h4 class="text-sm font-medium text-white">{{:author.name}}</h4>
-                    <time class="text-xs text-gray-300">{{:date}}</time>
-                </div>
-                <!-- Delete Button -->
-                <button class="delete-comment-btn absolute top-2 right-2 text-red-500 hover:text-red-700" 
-                        data-comment-id="{{:id}}">
-                    🗑️
-                </button>
+                <div class="comment p-3 bg-primary rounded-lg relative" data-comment-id="{{:id}}">
+                    <div class="flex items-center justify-between mb-2">
+                     <div class="flex items-center gap-2">
+                        <img class="w-8 h-8 rounded-full object-cover"
+                             src="{{:author.profileImage}}"
+                             alt="{{:author.name}}"
+                             onerror="this.src='{{:defaultAuthorImage}}'">
+                        <div>
+                            <h4 class="text-sm font-medium text-white">{{:author.name}}</h4>
+                            <time class="text-xs text-gray-300">{{:date}}</time>
+                        </div>
+                    </div>
+                        <!-- Delete Button -->
+        <div x-data="{ editDeletePost: false, openedWithKeyboard: false }" class="relative w-fit"
+            x-on:keydown.esc.window="editDeletePost = false, openedWithKeyboard = false">
+            <div class="size-4 cursor-pointer" x-on:click="editDeletePost = ! editDeletePost" aria-haspopup="true"
+                x-on:keydown.space.prevent="openedWithKeyboard = true" x-on:keydown.enter.prevent="openedWithKeyboard = true"
+                x-on:keydown.down.prevent="openedWithKeyboard = true"
+                x-bind:class="editDeletePost || openedWithKeyboard ? 'text-on-surface-strong dark:text-on-surface-dark-strong' : 'text-on-surface dark:text-on-surface-dark'"
+                x-bind:aria-expanded="editDeletePost || openedWithKeyboard">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M8.66666 7.99998C8.66666 8.19776 8.60801 8.3911 8.49813 8.55555C8.38824 8.72 8.23207 8.84817 8.04934 8.92386C7.86661 8.99955 7.66555 9.01935 7.47157 8.98076C7.27759 8.94218 7.0994 8.84694 6.95955 8.70709C6.8197 8.56723 6.72446 8.38905 6.68587 8.19507C6.64729 8.00109 6.66709 7.80002 6.74278 7.6173C6.81847 7.43457 6.94664 7.27839 7.11109 7.16851C7.27554 7.05863 7.46888 6.99998 7.66666 6.99998C7.93187 6.99998 8.18623 7.10534 8.37376 7.29287C8.5613 7.48041 8.66666 7.73476 8.66666 7.99998ZM7.66666 3.33331C7.86444 3.33331 8.05778 3.27466 8.22223 3.16478C8.38668 3.0549 8.51485 2.89872 8.59054 2.716C8.66622 2.53327 8.68603 2.3322 8.64744 2.13822C8.60886 1.94424 8.51362 1.76606 8.37376 1.62621C8.23391 1.48635 8.05573 1.39111 7.86175 1.35253C7.66777 1.31394 7.4667 1.33375 7.28397 1.40943C7.10125 1.48512 6.94507 1.61329 6.83519 1.77774C6.72531 1.94219 6.66666 2.13553 6.66666 2.33331C6.66666 2.59853 6.77201 2.85288 6.95955 3.04042C7.14709 3.22796 7.40144 3.33331 7.66666 3.33331ZM7.66666 12.6666C7.46888 12.6666 7.27554 12.7253 7.11109 12.8352C6.94664 12.9451 6.81847 13.1012 6.74278 13.284C6.66709 13.4667 6.64729 13.6678 6.68587 13.8617C6.72446 14.0557 6.8197 14.2339 6.95955 14.3738C7.0994 14.5136 7.27759 14.6088 7.47157 14.6474C7.66555 14.686 7.86661 14.6662 8.04934 14.5905C8.23207 14.5148 8.38824 14.3867 8.49813 14.2222C8.60801 14.0578 8.66666 13.8644 8.66666 13.6666C8.66666 13.4014 8.5613 13.1471 8.37376 12.9595C8.18623 12.772 7.93187 12.6666 7.66666 12.6666Z"
+                        fill="white" />
+                </svg>
             </div>
-            <div class="text-white text-sm whitespace-pre-wrap">{{:content}}</div>
+            <div x-cloak x-show="editDeletePost || openedWithKeyboard" x-transition x-trap="openedWithKeyboard"
+                x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
+                x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
+                class="absolute -top-[100%] right-0 flex p-1 bg-[#084D55] rounded w-[100px] flex-col z-[999] shadow-[0px_4px_4px_0px_#0000000F]">
+                <button type="button" data-post-id="{{:id}}"
+                    class="edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Edit</button>
+                <button type="button" data-post-id="{{:id}}"
+                    class="delete-comment-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left"
+                    data-comment-id="{{:id}}">Delete</button>
+            </div>
         </div>
-    </script>
+                    </div>
+                    <div class="text-white text-sm whitespace-pre-wrap">{{:content}}</div>
+                </div>
+            </script>
 
 
     <script src="https://cdn.tailwindcss.com"></script>
