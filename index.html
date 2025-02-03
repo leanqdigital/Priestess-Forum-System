@@ -167,7 +167,7 @@
             <!-- Tab Section -->
             <div class="w-full flex items-center justify-between">
                 <div class="flex  items-center max-[500px]:justify-between  gap-1 max-[500px]:gap-2 w-full">
-                    <button @click="document.querySelector('.recent-post-text').textContent = 'Recent Post'"
+                    <button
                         class="filter-button tab-Button tab-Active w-full text-nowrap" data-filter="recent"
                         id="recent-posts">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -177,7 +177,7 @@
                         </svg>
                         <div class="o1">Recent Posts</div>
                     </button>
-                    <button @click="document.querySelector('.recent-post-text').textContent = 'Featured Post'"
+                    <button 
                         class="filter-button tab-Button tab-Inactive w-full text-nowrap" data-filter="featured"
                         id="featured-posts">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
