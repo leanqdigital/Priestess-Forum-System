@@ -18,7 +18,7 @@ class PostModalManager {
                      onerror="console.error('Failed to load image:', this.src)"></div>`
            : ""
        }
-        <article class="flex-1 w-full post bg-primary-100 rounded-lg shadow-sm p-6">
+        <article class="flex-1 w-full post bg-primary-100 rounded-lg shadow-sm p-6 max-[500px]:mb-[150px]">
         <div class="flex items-start justify-between w-full">
           <header class="flex items-center gap-4 mb-4">
             <img class="w-12 h-12 rounded-full object-cover"
@@ -58,18 +58,18 @@ class PostModalManager {
            
           </div>
   
-  <section id="modal-comments-section" class="mt-6 max-h-[80vh] overflow-auto min-[1100px]:h-max">
+  <section id="modal-comments-section" class="mt-6 max-h-[80vh] overflow-auto min-[1100px]:h-max max-[500px]:h-[40vh] ">
         <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
         
         <!-- Add comment form -->
-        <div class="comment-form bg-primary-100 rounded-lg p-4 mb-6">
+        <div class="comment-form bg-primary-100 min-[500px]:rounded max-[500px]:p-4 z-[999] min-[500px]:mb-6 max-[500px]:fixed bottom-0 pb-6 right-0  w-full max-[500px]:bg-primary">
           <div id="comment-editor" 
-               class="comment-editor text-white p-2 min-h-[100px] border border-gray-600 rounded mb-3" 
+               class="comment-editor text-white p-2 h-[100px]  max-[500px]:h-10 border border-gray-600 rounded mb-3"
                contenteditable="true"
                placeholder="Write a comment..."></div>
           <button id="submit-comment" 
                   class="bg-secondary text-white px-4 py-2 rounded hover:bg-secondary-200 transition-colors">
-            Post Comment
+            Post
           </button>
         </div>
   
