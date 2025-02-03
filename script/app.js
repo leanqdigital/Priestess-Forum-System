@@ -827,19 +827,19 @@ class PostModalManager {
         : ""
           }
           ${post.content
-      ? ` <div class="text-white whitespace-pre-wrap">${post.content}</div>`
+      ? ` <div class="text-white ">${post.content}</div>`
       : ""
           }
          
         </div>
 
-<section id="modal-comments-section" class="mt-6">
+<section id="modal-comments-section" class="mt-6 max-h-[80vh] overflow-auto min-[1100px]:h-max">
       <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
       
       <!-- Add comment form -->
       <div class="comment-form bg-primary-100 rounded-lg p-4 mb-6">
         <div id="comment-editor" 
-             class="comment-editor p-2 min-h-[100px] border border-gray-600 rounded mb-3" 
+             class="comment-editor text-white p-2 min-h-[100px] border border-gray-600 rounded mb-3" 
              contenteditable="true"
              placeholder="Write a comment..."></div>
         <button id="submit-comment" 
