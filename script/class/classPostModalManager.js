@@ -4,20 +4,18 @@ class PostModalManager {
     const modalContent = document.querySelector("#post-modal-content");
     // Render modal content
     modalContent.innerHTML = `
-      <div class="flex items-start gap-3 max-[1100px]:flex-col  ${
-        post.post_image
-          ? ` w-[1232px] max-[1240px]:w-full`
-          : "min-[500px]:w-[656px] mx-auto"
+      <div class="flex items-start gap-3 max-[1100px]:flex-col  ${post.post_image
+        ? ` w-[1232px] max-[1240px]:w-full`
+        : "min-[500px]:w-[656px] mx-auto"
       }">
-       ${
-         post.post_image
-           ? `<div class="flex-1"><img class=" max-[500px]:hidden   size-full" 
+       ${post.post_image
+        ? `<div class="flex-1"><img class=" max-[500px]:hidden   size-full" 
                      src="${post.post_image}" 
                      alt="Post image"
                      class="object-cover "
                      onerror="console.error('Failed to load image:', this.src)"></div>`
-           : ""
-       }
+        : ""
+      }
         <article class="flex-1 flex flex-col gap-3 w-full post bg-primary-100 rounded-lg shadow-sm p-6 max-[500px]:mb-[150px]">
         <div class="flex items-start justify-between w-full">
           <header class="flex items-center gap-4 ">
@@ -36,31 +34,27 @@ class PostModalManager {
                  </div>
           
           <div class="post-content">
-            ${
-              post.title
-                ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
-                : ""
-            }
-              ${
-                post.post_image
-                  ? `<img class="  min-[500px]:hidden size-full" 
+            ${post.title
+        ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
+        : ""
+      }
+              ${post.post_image
+        ? `<img class="  min-[500px]:hidden size-full" 
                      src="${post.post_image}" 
                      alt="Post image"
                      class="object-cover "
                      onerror="console.error('Failed to load image:', this.src)">`
-                  : ""
-              }
-            ${
-              post.content
-                ? ` <div class="text-white ">${post.content}</div>`
-                : ""
-            }
+        : ""
+      }
+            ${post.content
+        ? ` <div class="text-white ">${post.content}</div>`
+        : ""
+      }
            
           </div>
   
-  <section id="modal-comments-section" class=" max-h-[80vh] overflow-auto min-[1100px]:h-max  ${
-      post.post_image
-      ? `max-[500px]:h-[45vh] `
+  <section id="modal-comments-section" class=" max-h-[80vh] overflow-auto min-[1100px]:h-max  ${post.post_image
+        ? `max-[500px]:h-[45vh] `
         : ""
       } ">
         <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
@@ -89,12 +83,13 @@ class PostModalManager {
     const commentEditor = document.getElementById("comment-editor");
     MentionManager.tribute.attach(commentEditor);
 
-    const forumManager = new ForumManager();
+    
 
     // Add comment submit handler
     document
       .getElementById("submit-comment")
       .addEventListener("click", async () => {
+        const forumManager = new ForumManager();
         const editor = document.getElementById("comment-editor");
         const content = editor.innerText.trim();
         const mentions = Array.from(editor.querySelectorAll(".mention")).map(

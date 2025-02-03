@@ -695,10 +695,10 @@ class ForumManager {
         this.handleFilterChange(filterType);
       }
 
-      const button = e.target.closest(".load-comments-btn");
-      if (button) {
+      const buttonForComment = e.target.closest(".load-comments-btn");
+      if (buttonForComment) {
        // document.querySelector('body').setAttribute('x-data', `{ openCommentModal: true}`);
-        const postId = button.dataset.postId;
+        const postId = buttonForComment.dataset.postId;
         const postElement = document.querySelector(
           `[data-post-id="${postId}"]`
         );
