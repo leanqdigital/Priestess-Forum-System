@@ -121,11 +121,12 @@ h1,h2,h3,h4 {
 }
 
 /* Modal Styling */
-sl-dialog::part(overlay) {
+sl-dialog::part(overlay),
+.modal-overlay {
   background: #286D7580;
   backdrop-filter: blur(4px);
 }
-sl-dialog::part(panel) {
+sl-dialog::part(panel),.modal-background {
   width: 656px;
   background: var(--primary-100);
 }
