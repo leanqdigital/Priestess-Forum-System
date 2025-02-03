@@ -697,7 +697,7 @@ class ForumManager {
 
       const buttonForComment = e.target.closest(".load-comments-btn");
       if (buttonForComment) {
-       // document.querySelector('body').setAttribute('x-data', `{ openCommentModal: true}`);
+        // document.querySelector('body').setAttribute('x-data', `{ openCommentModal: true}`);
         const postId = buttonForComment.dataset.postId;
         const postElement = document.querySelector(
           `[data-post-id="${postId}"]`

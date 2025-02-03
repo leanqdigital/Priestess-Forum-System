@@ -84,13 +84,12 @@ class UIManager {
       // Append modal to <body> to make sure it's always on top
       document.body.insertAdjacentHTML("beforeend", modalHTML);
       // Event listeners
-      document.querySelectorAll(".cancel-delete-method").forEach(button => {
+      document.querySelectorAll(".cancel-delete-method").forEach((button) => {
         button.addEventListener("click", () => {
           document.getElementById("delete-confirmation-modal").remove();
           resolve(false);
         });
       });
-
 
       document
         .getElementById("confirm-delete")
@@ -103,6 +102,7 @@ class UIManager {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  window.forumManager = new ForumManager();
   const filterButtons = document.querySelectorAll(".filter-button");
 
   // Set initial active class to "Recent Posts" button
