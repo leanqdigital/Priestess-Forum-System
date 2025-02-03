@@ -93,7 +93,6 @@ class PostModalManager {
     document
       .getElementById("submit-comment")
       .addEventListener("click", async () => {
-        const forumManager = new ForumManager();
         const editor = document.getElementById("comment-editor");
         const content = editor.innerText.trim();
         const mentions = Array.from(editor.querySelectorAll(".mention")).map(
