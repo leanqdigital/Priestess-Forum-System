@@ -544,8 +544,12 @@ class ForumManager {
   }
 
   async loadMorePosts() {
+    if (this.isLoading) return;
+    this.isLoading = true;
     await this.fetchAndRenderPosts(false);
+    this.isLoading = false;
   }
+  
 
   getSkeletonLoader(count = 1) {
     let skeletons = "";
