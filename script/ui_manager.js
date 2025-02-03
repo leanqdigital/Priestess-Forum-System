@@ -63,12 +63,12 @@ class UIManager {
       document.getElementById("delete-confirmation-modal")?.remove();
 
       const modalHTML = `
-            <div id="delete-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100]">
-                <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative z-[101]">
-                    <h3 class="text-lg font-semibold text-gray-800">${message}</h3>
+            <div id="delete-confirmation-modal" class="fixed inset-0 modal-overlay bg-opacity-60 flex items-center justify-center z-[100]">
+                <div class="p-6 rounded  relative z-[101] modal-background">
+                    <h3 class="p2 text-white">${message}</h3>
                     <div class="flex justify-end gap-3 mt-4">
-                        <button id="cancel-delete" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-                        <button id="confirm-delete" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+                        <button id="cancel-delete" class="button  o2 text-white">Cancel</button>
+                        <button id="confirm-delete" class="text-white o2  button bg-danger-100 hover:bg-danger-200 transition-all">Delete</button>
                     </div>
                 </div>
             </div>
