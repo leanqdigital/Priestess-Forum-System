@@ -717,7 +717,21 @@ class PostModalManager {
     console.log("Post Image URL:", post.post_image);
     // Render modal content
     modalContent.innerHTML = `
-      <article class="post bg-transparent rounded-lg shadow-sm p-6">
+    <div class="flex items-start gap-3 max-[1100px]:flex-col  ${
+      post.post_image
+      ? ` w-[1232px] max-[1240px]:w-full`
+      : "min-[500px]:w-[656px] mx-auto"
+          }">
+     ${
+      post.post_image
+      ? `<div class="flex-1"><img class=" max-[500px]:hidden   size-full" 
+                   src="${post.post_image}" 
+                   alt="Post image"
+                   class="object-cover "
+                   onerror="console.error('Failed to load image:', this.src)"></div>`
+        : ""
+          }
+      <article class="flex-1 w-full post bg-primary-100 rounded-lg shadow-sm p-6">
       <div class="flex items-start justify-between w-full">
         <header class="flex items-center gap-4 mb-4">
           <img class="w-12 h-12 rounded-full object-cover"
@@ -740,15 +754,20 @@ class PostModalManager {
               ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
               : ""
           }
-          ${
-            post.post_image
-              ? `<img class="w-full rounded-lg mb-4" 
+            ${
+      post.post_image
+      ? `<img class="  min-[500px]:hidden size-full" 
                    src="${post.post_image}" 
                    alt="Post image"
+                   class="object-cover "
                    onerror="console.error('Failed to load image:', this.src)">`
-              : ""
+        : ""
           }
-          <div class="text-white whitespace-pre-wrap">${post.content}</div>
+          ${post.content
+      ? ` <div class="text-white whitespace-pre-wrap">${post.content}</div>`
+      : ""
+          }
+         
         </div>
 
         <section id="modal-comments-section" class="mt-6">
@@ -758,6 +777,7 @@ class PostModalManager {
           </div>
         </section>
       </article>
+      </div>
     `;
 
     //await modal.show();
