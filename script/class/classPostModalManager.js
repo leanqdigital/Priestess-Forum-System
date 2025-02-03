@@ -18,9 +18,9 @@ class PostModalManager {
                      onerror="console.error('Failed to load image:', this.src)"></div>`
            : ""
        }
-        <article class="flex-1 w-full post bg-primary-100 rounded-lg shadow-sm p-6 max-[500px]:mb-[150px]">
+        <article class="flex-1 flex flex-col gap-3 w-full post bg-primary-100 rounded-lg shadow-sm p-6 max-[500px]:mb-[150px]">
         <div class="flex items-start justify-between w-full">
-          <header class="flex items-center gap-4 mb-4">
+          <header class="flex items-center gap-4 ">
             <img class="w-12 h-12 rounded-full object-cover"
                  src="${post.author.profileImage}" 
                  alt="${post.author.name}">
@@ -35,7 +35,7 @@ class PostModalManager {
   
                  </div>
           
-          <div class="post-content mb-4">
+          <div class="post-content">
             ${
               post.title
                 ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
@@ -58,17 +58,21 @@ class PostModalManager {
            
           </div>
   
-  <section id="modal-comments-section" class="mt-6 max-h-[80vh] overflow-auto min-[1100px]:h-max max-[500px]:h-[40vh] ">
+  <section id="modal-comments-section" class=" max-h-[80vh] overflow-auto min-[1100px]:h-max  ${
+      post.post_image
+      ? `max-[500px]:h-[45vh] `
+        : ""
+      } ">
         <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
         
         <!-- Add comment form -->
-        <div class="comment-form bg-primary-100 min-[500px]:rounded max-[500px]:p-4 z-[999] min-[500px]:mb-6 max-[500px]:fixed bottom-0 pb-6 right-0  w-full max-[500px]:bg-primary">
+        <div class="comment-form flex min-[500px]:flex-col gap-3 w-full  bg-primary-100 min-[500px]:rounded max-[500px]:p-4 z-[999] max-[500px]:fixed bottom-0 pb-6 right-0  w-full max-[500px]:bg-primary">
           <div id="comment-editor" 
-               class="comment-editor text-white p-2 h-[100px]  max-[500px]:h-10 border border-gray-600 rounded mb-3"
+               class="comment-editor text-white p-2 h-[100px] w-full  max-[500px]:h-10 border border-gray-600 rounded"
                contenteditable="true"
                placeholder="Write a comment..."></div>
           <button id="submit-comment" 
-                  class="bg-secondary text-white px-4 py-2 rounded hover:bg-secondary-200 transition-colors">
+                  class="w-fit bg-secondary text-white px-4 py-2 rounded hover:bg-secondary-200 transition-colors">
             Post
           </button>
         </div>
