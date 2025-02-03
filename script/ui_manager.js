@@ -54,6 +54,43 @@ class UIManager {
       modal.show();
     });
   }
+
+  static async showDeleteConfirmation(
+    message = "Are you sure you want to delete this?"
+  ) {
+    return new Promise((resolve) => {
+      // Remove existing modal if any
+      document.getElementById("delete-confirmation-modal")?.remove();
+
+      const modalHTML = `
+            <div id="delete-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[100]">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative z-[101]">
+                    <h3 class="text-lg font-semibold text-gray-800">${message}</h3>
+                    <div class="flex justify-end gap-3 mt-4">
+                        <button id="cancel-delete" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                        <button id="confirm-delete" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+      // Append modal to <body> to make sure it's always on top
+      document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+      // Event listeners
+      document.getElementById("cancel-delete").addEventListener("click", () => {
+        document.getElementById("delete-confirmation-modal").remove();
+        resolve(false);
+      });
+
+      document
+        .getElementById("confirm-delete")
+        .addEventListener("click", () => {
+          document.getElementById("delete-confirmation-modal").remove();
+          resolve(true);
+        });
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -86,10 +123,11 @@ window.addEventListener("load", function () {
   }, 500);
 });
 
-
 // Open New Post Modal
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById('openCreateNewPostModal').addEventListener('click', function () {
-    document.getElementById('postNewModal').show();
-  });
+  document
+    .getElementById("openCreateNewPostModal")
+    .addEventListener("click", function () {
+      document.getElementById("postNewModal").show();
+    });
 });

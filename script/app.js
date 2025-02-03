@@ -372,10 +372,10 @@ class ForumManager {
       const scrollPosition = window.scrollY + window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       if (scrollPosition >= documentHeight - 100 && !isLoading) {
-        isLoading = true; 
+        isLoading = true;
         setTimeout(() => {
           this.loadMorePosts();
-          isLoading = false; 
+          isLoading = false;
         }, 700);
       }
     });
@@ -455,6 +455,7 @@ class ForumManager {
   async loadMorePosts() {
     await this.fetchAndRenderPosts(false);
   }
+
   getSkeletonLoader(count = 1) {
     let skeletons = "";
     for (let i = 0; i < count; i++) {
@@ -472,12 +473,13 @@ class ForumManager {
     return skeletons;
   }
 
-
   async fetchAndRenderPosts(isInitialLoad = false) {
     try {
       if (!this.hasMorePosts) return;
 
-      const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
+      const postContainer = document.querySelector(
+        CONFIG.selectors.postsContainer
+      );
 
       // ✅ Show skeleton loader before fetching posts
       if (isInitialLoad) {
@@ -494,7 +496,9 @@ class ForumManager {
       const data = await dataPromise; // Wait for the data to be available after the delay
 
       // ✅ Remove skeleton loader before rendering actual posts
-      document.querySelectorAll(".skeleton-loader").forEach(el => el.remove());
+      document
+        .querySelectorAll(".skeleton-loader")
+        .forEach((el) => el.remove());
 
       if (!data || !data.calcForumPosts || data.calcForumPosts.length === 0) {
         this.hasMorePosts = false;
@@ -557,7 +561,9 @@ class ForumManager {
       this.updateBookmarkIcons();
     } catch (error) {
       // ✅ Remove skeleton loader on error
-      document.querySelectorAll(".skeleton-loader").forEach(el => el.remove());
+      document
+        .querySelectorAll(".skeleton-loader")
+        .forEach((el) => el.remove());
 
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
       <div class="text-center text-red-600 p-4">
@@ -566,8 +572,6 @@ class ForumManager {
     `;
     }
   }
-
-
 
   buildQuery() {
     let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
@@ -644,6 +648,7 @@ class ForumManager {
       }
 
       return data.calcForumComments.map((comment) => ({
+        id: comment.ID,
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
         author: Formatter.formatAuthor({
@@ -705,6 +710,64 @@ class ForumManager {
         "opacity-50",
         "pointer-events-none"
       );
+    }
+  }
+
+  async createComment(postId, content, mentions) {
+    try {
+      const tempComment = {
+        id: `temp-${Date.now()}`,
+        content,
+        date: "Just now",
+        author: {
+          name: "Current User", // Replace with actual user data
+          profileImage: CONFIG.api.defaultAuthorImage,
+        },
+        defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+      };
+
+      // Optimistic rendering
+      const template = $.templates("#comment-template");
+      const commentsContainer = document.getElementById(
+        "modal-comments-container"
+      );
+      commentsContainer.insertAdjacentHTML(
+        "afterbegin",
+        template.render(tempComment)
+      );
+
+      // API call
+      const query = `
+        mutation createForumComment($payload: ForumCommentCreateInput!) {
+          createForumComment(payload: $payload) {
+            id
+            comment
+            forum_post_id
+          }
+        }
+      `;
+
+      const variables = {
+        payload: {
+          author_id: LOGGED_IN_USER_ID,
+          comment: content,
+          forum_post_id: postId,
+          Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
+        },
+      };
+
+      const response = await ApiService.query(query, variables);
+      const newComment = response.createForumComment;
+
+      // Replace temporary comment with real data
+      const commentElement = commentsContainer.firstElementChild;
+      commentElement.dataset.commentId = newComment.id;
+
+      // Refresh comments to get full data
+      await PostModalManager.loadComments(postId);
+    } catch (error) {
+      UIManager.showError("Failed to post comment");
+      commentsContainer.removeChild(commentsContainer.firstElementChild);
     }
   }
 }
@@ -770,37 +833,109 @@ class PostModalManager {
          
         </div>
 
-        <section id="modal-comments-section" class="mt-6">
-          <h3 class="text-lg font-semibold text-white">Comments</h3>
-          <div id="modal-comments-container" class="space-y-4 mt-4">
-            <p class="text-white">Loading comments...</p>
-          </div>
-        </section>
+<section id="modal-comments-section" class="mt-6">
+      <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
+      
+      <!-- Add comment form -->
+      <div class="comment-form bg-primary-100 rounded-lg p-4 mb-6">
+        <div id="comment-editor" 
+             class="comment-editor p-2 min-h-[100px] border border-gray-600 rounded mb-3" 
+             contenteditable="true"
+             placeholder="Write a comment..."></div>
+        <button id="submit-comment" 
+                class="bg-secondary text-white px-4 py-2 rounded hover:bg-secondary-200 transition-colors">
+          Post Comment
+        </button>
+      </div>
+
+      <div id="modal-comments-container" class="space-y-4">
+        <p class="text-gray-300">Loading comments...</p>
+      </div>
+    </section>
       </article>
       </div>
     `;
+
+    // Initialize mention functionality for comments
+    const commentEditor = document.getElementById("comment-editor");
+    MentionManager.tribute.attach(commentEditor);
+
+    const forumManager = new ForumManager();
+
+    // Add comment submit handler
+    document
+      .getElementById("submit-comment")
+      .addEventListener("click", async () => {
+        const editor = document.getElementById("comment-editor");
+        const content = editor.innerText.trim();
+        const mentions = Array.from(editor.querySelectorAll(".mention")).map(
+          (el) => el.dataset.contactId
+        );
+
+        if (!content) {
+          UIManager.showError("Comment cannot be empty");
+          return;
+        }
+
+        await forumManager.createComment(post.id, content, mentions);
+        editor.innerHTML = ""; // Clear editor
+      });
 
     //await modal.show();
     await PostModalManager.loadComments(post.id);
   }
 
+  static async confirmDeleteComment(commentId) {
+    const confirmed = await UIManager.showDeleteConfirmation(
+      "Are you sure you want to delete this comment?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await PostModalManager.deleteComment(commentId);
+
+      // Remove only the deleted comment, not the entire modal
+      document.querySelector(`[data-comment-id="${commentId}"]`).remove();
+
+      UIManager.showSuccess("Comment deleted successfully.");
+    } catch (error) {
+      UIManager.showError("Failed to delete comment.");
+    }
+  }
+
+  static async deleteComment(commentId) {
+    const query = `
+        mutation deleteForumComment($id: PriestessForumCommentID) {
+          deleteForumComment(query: [{ where: { id: $id } }]) {
+            id
+          }
+        }
+    `;
+
+    const variables = { id: commentId };
+    await ApiService.query(query, variables);
+  }
+
   static async loadComments(postId) {
     try {
       const comments = await ForumManager.fetchComments(postId);
-      const commentsContainer = document.querySelector(
-        "#modal-comments-container"
+      const commentsContainer = document.getElementById(
+        "modal-comments-container"
       );
 
-      if (comments.length > 0) {
-        const template = $.templates("#comment-template");
-        commentsContainer.innerHTML = comments
-          .map((comment) => template.render(comment))
-          .join("");
-      } else {
-        commentsContainer.innerHTML = `<p class="text-gray-500">No comments yet.</p>`;
-      }
+      // Render comments using JSRender
+      const template = $.templates("#comment-template");
+      commentsContainer.innerHTML = template.render(comments);
+
+      // Attach event listeners for delete buttons
+      document.querySelectorAll(".delete-comment-btn").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const commentId = e.target.dataset.commentId;
+          PostModalManager.confirmDeleteComment(commentId);
+        });
+      });
     } catch (error) {
-      UIManager.showError("Failed to load comments.");
+      commentsContainer.innerHTML = `<p class="text-red-300">Error loading comments</p>`;
     }
   }
 }
