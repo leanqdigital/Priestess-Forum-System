@@ -372,10 +372,10 @@ class ForumManager {
       const scrollPosition = window.scrollY + window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       if (scrollPosition >= documentHeight - 100 && !isLoading) {
-        isLoading = true; 
+        isLoading = true;
         setTimeout(() => {
           this.loadMorePosts();
-          isLoading = false; 
+          isLoading = false;
         }, 700);
       }
     });
@@ -455,6 +455,7 @@ class ForumManager {
   async loadMorePosts() {
     await this.fetchAndRenderPosts(false);
   }
+
   getSkeletonLoader(count = 1) {
     let skeletons = "";
     for (let i = 0; i < count; i++) {
@@ -472,12 +473,13 @@ class ForumManager {
     return skeletons;
   }
 
-
   async fetchAndRenderPosts(isInitialLoad = false) {
     try {
       if (!this.hasMorePosts) return;
 
-      const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
+      const postContainer = document.querySelector(
+        CONFIG.selectors.postsContainer
+      );
 
       // ✅ Show skeleton loader before fetching posts
       if (isInitialLoad) {
@@ -494,7 +496,9 @@ class ForumManager {
       const data = await dataPromise; // Wait for the data to be available after the delay
 
       // ✅ Remove skeleton loader before rendering actual posts
-      document.querySelectorAll(".skeleton-loader").forEach(el => el.remove());
+      document
+        .querySelectorAll(".skeleton-loader")
+        .forEach((el) => el.remove());
 
       if (!data || !data.calcForumPosts || data.calcForumPosts.length === 0) {
         this.hasMorePosts = false;
@@ -557,7 +561,9 @@ class ForumManager {
       this.updateBookmarkIcons();
     } catch (error) {
       // ✅ Remove skeleton loader on error
-      document.querySelectorAll(".skeleton-loader").forEach(el => el.remove());
+      document
+        .querySelectorAll(".skeleton-loader")
+        .forEach((el) => el.remove());
 
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
       <div class="text-center text-red-600 p-4">
@@ -567,12 +573,9 @@ class ForumManager {
     }
   }
 
-
-
   buildQuery() {
-    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
-      this.needsUserId() ? ", $id: PriestessContactID" : ""
-    }) {
+    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${this.needsUserId() ? ", $id: PriestessContactID" : ""
+      }) {
         calcForumPosts(
           ${this.buildFilterCondition()}
           limit: $limit
@@ -731,19 +734,17 @@ class PostModalManager {
         </header>
         
         <div class="post-content mb-4">
-          ${
-            post.title
-              ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
-              : ""
-          }
-          ${
-            post.post_image
-              ? `<img class="w-full rounded-lg mb-4" 
+          ${post.title
+        ? `<h3 class="text-xl text-white font-medium mb-2">${post.title}</h3>`
+        : ""
+      }
+          ${post.post_image
+        ? `<img class="w-full rounded-lg mb-4" 
                    src="${post.post_image}" 
                    alt="Post image"
                    onerror="console.error('Failed to load image:', this.src)">`
-              : ""
-          }
+        : ""
+      }
           <div class="text-white whitespace-pre-wrap">${post.content}</div>
         </div>
 
