@@ -8,6 +8,8 @@ class ForumManager {
     this.savedPostIds = new Map();
     this.votedPostIds = new Map();
     this.voteCounts = new Map();
+    this.votedCommentIds = new Map();
+    this.voteCommentCounts = new Map();
     this.init();
   }
 
@@ -15,6 +17,7 @@ class ForumManager {
     try {
       await this.fetchSavedPosts();
       await this.fetchVotes();
+      await this.fetchVoteForComment();
       this.initEventListeners();
       await this.loadInitialPosts();
     } catch (error) {
@@ -549,7 +552,6 @@ class ForumManager {
     await this.fetchAndRenderPosts(false);
     this.isLoading = false;
   }
-  
 
   getSkeletonLoader(count = 1) {
     let skeletons = "";
@@ -571,28 +573,23 @@ class ForumManager {
   //Posts Methods
 
   // Comments for Posts
-  static async fetchComments(postId) {
+  async fetchComments(postId) {
     try {
       const query = `
-          query {
-            calcForumComments(query: [{ where: { Forum_Post: [{ where: { id: "${postId}" } }] } }]) {
-              ID: field(arg: ["id"])
-              Author_First_Name: field(arg: ["Author", "first_name"])
-              Author_Last_Name: field(arg: ["Author", "last_name"])
-              Author_Profile_Image: field(arg: ["Author", "profile_image"])
-              Date_Added: field(arg: ["created_at"])
-              Comment: field(arg: ["comment"])
-            }
+        query {
+          calcForumComments(query: [{ where: { Forum_Post: [{ where: { id: "${postId}" } }] } }]) {
+            ID: field(arg: ["id"])
+            Author_First_Name: field(arg: ["Author", "first_name"])
+            Author_Last_Name: field(arg: ["Author", "last_name"])
+            Author_Profile_Image: field(arg: ["Author", "profile_image"])
+            Date_Added: field(arg: ["created_at"])
+            Comment: field(arg: ["comment"])
           }
-        `;
-
+        }
+      `;
       const data = await ApiService.query(query);
-
-      if (!data || !data.calcForumComments) {
-        throw new Error("No comments found or invalid API response.");
-      }
-
-      return data.calcForumComments.map((comment) => ({
+      const comments = data?.calcForumComments || [];
+      return comments.map((comment) => ({
         id: comment.ID,
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
@@ -601,6 +598,8 @@ class ForumManager {
           lastName: comment.Author_Last_Name,
           profileImage: comment.Author_Profile_Image,
         }),
+        isCommentVoted: this.votedCommentIds.has(comment.ID),
+        voteCommentCount: this.voteCommentCounts.get(comment.ID) || 0,
       }));
     } catch (error) {
       return [];
@@ -664,6 +663,186 @@ class ForumManager {
       commentsContainer.removeChild(commentsContainer.firstElementChild);
     }
   }
+
+  //Comment Voting Functionality
+  async fetchVoteForComment(commentId) {
+    try {
+      const query = `
+        query calcMemberCommentUpvotesForumCommentUpvotesMany(
+          $member_comment_upvote_id: PriestessContactID
+          $forum_comment_upvote_id: PriestessForumCommentID
+        ) {
+          calcMemberCommentUpvotesForumCommentUpvotesMany(
+            query: [
+              {
+                where: {
+                  member_comment_upvote_id: $member_comment_upvote_id
+                }
+              },
+              {
+                andWhere: {
+                  forum_comment_upvote_id: $forum_comment_upvote_id
+                }
+              }
+            ]
+          ) {
+            ID: field(arg: ["id"])
+          }
+        }
+      `;
+      const variables = {
+        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        forum_comment_upvote_id: commentId
+      };
+      const data = await ApiService.query(query, variables);
+      const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
+      return votes;
+    } catch (error) {
+      console.error("Error fetching vote for comment", commentId, error);
+      return [];
+    }
+  }
+
+  async toggleCommentVote(commentId) {
+    const buttons = document.querySelectorAll(
+      `.vote-button[data-comment-id="${commentId}"]`
+    );
+
+    // Check if the user has already voted for this comment.
+    const voteRecords = await this.fetchVoteForComment(commentId);
+    const isCommentVoted = voteRecords.length > 0;
+
+    // Get the current vote count for this comment from the local map (defaulting to 0).
+    let voteCount = this.voteCommentCounts.get(commentId) || 0;
+
+    try {
+      buttons.forEach((button) => (button.disabled = true));
+
+      if (isCommentVoted) {
+        // Remove the vote.
+        await this.deleteCommentVote(commentId);
+        // Remove our local record for this comment.
+        this.votedCommentIds.delete(commentId);
+        voteCount = Math.max(0, voteCount - 1);
+      } else {
+        // Create a new vote.
+        const voteId = await this.createCommentVote(commentId);
+        // If no local record exists yet, initialize a Set.
+        if (!this.votedCommentIds.has(commentId)) {
+          this.votedCommentIds.set(commentId, new Set());
+        }
+        this.votedCommentIds.get(commentId).add(voteId);
+        voteCount += 1;
+      }
+
+      // Update the local vote count.
+      this.voteCommentCounts.set(commentId, voteCount);
+
+      // Update the UI for this comment.
+      this.updateCommentVoteUI(commentId);
+      UIManager.showSuccess(`Comment ${isCommentVoted ? "unvoted" : "voted"}`);
+    } catch (error) {
+      UIManager.showError(
+        `Failed to ${isCommentVoted ? "unvote" : "vote"} comment`
+      );
+    } finally {
+      buttons.forEach((button) => (button.disabled = false));
+    }
+  }
+
+  async createCommentVote(commentId) {
+    const query = `
+      mutation createMemberCommentUpvotesForumCommentUpvotes(
+        $payload: MemberCommentUpvotesForumCommentUpvotesCreateInput!
+      ) {
+        createMemberCommentUpvotesForumCommentUpvotes(payload: $payload) {
+          id
+        }
+      }
+    `;
+    const variables = {
+      payload: {
+        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        forum_comment_upvote_id: commentId,
+      },
+    };
+    const response = await ApiService.query(query, variables);
+    return response.createMemberCommentUpvotesForumCommentUpvotes.id;
+  }
+
+  async deleteCommentVote(commentId) {
+    let voteIds = this.votedCommentIds.get(commentId);
+    if (!voteIds || voteIds.size === 0) {
+      // If no local record, try to fetch them first.
+      const voteRecords = await this.fetchVoteForComment(commentId);
+      voteRecords.forEach((vote) => {
+        if (!this.votedCommentIds.has(commentId)) {
+          this.votedCommentIds.set(commentId, new Set());
+        }
+        this.votedCommentIds.get(commentId).add(vote.ID);
+      });
+      voteIds = this.votedCommentIds.get(commentId);
+    }
+
+    if (!voteIds) return;
+
+    await Promise.all(
+      [...voteIds].map((id) =>
+        ApiService.query(
+          `
+            mutation deleteMemberCommentUpvotesForumCommentUpvotes(
+              $id: PriestessMemberCommentUpvotesForumCommentUpvotesID
+            ) {
+              deleteMemberCommentUpvotesForumCommentUpvotes(
+                query: [{ where: { id: $id } }]
+              ) {
+                id
+              }
+            }
+          `,
+          { id }
+        )
+      )
+    );
+
+    // Remove the entry from the local map.
+    this.votedCommentIds.delete(commentId);
+  }
+
+  updateCommentVoteUI(commentId) {
+    const commentElement = document.querySelector(
+      `[data-comment-id="${commentId}"]`
+    );
+    if (!commentElement) return;
+
+    const isVoted = this.votedCommentIds.has(commentId);
+    const voteCount = this.voteCommentCounts.get(commentId) || 0;
+
+    const voteButton = commentElement.querySelector(".vote-button");
+    if (voteButton) {
+      voteButton.innerHTML = this.getCommentVoteSVG(isVoted);
+    }
+    const voteCountElement = commentElement.querySelector(".vote-count");
+    if (voteCountElement) {
+      voteCountElement.textContent = voteCount;
+    }
+  }
+
+  getCommentVoteSVG(isVoted) {
+    return `
+      <svg width="24" height="24" viewBox="0 0 24 24" 
+           fill="${isVoted ? "#C29D68" : "none"}" 
+           stroke="#C29D68">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                 C13.09 3.81 14.76 3 16.5 3
+                 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54
+                 L12 21.35z"/>
+      </svg>
+    `;
+  }
+  //Comment Voting Functionality
+
   // Comments for Posts
 
   //Handle event listeners
@@ -683,9 +862,18 @@ class ForumManager {
     });
 
     document.addEventListener("click", async (e) => {
-      if (e.target.closest(".vote-button")) {
-        const postId = e.target.closest(".vote-button").dataset.postId;
-        this.toggleVote(postId);
+      const voteButton = e.target.closest(".vote-button");
+
+      if (voteButton) {
+        const postId = voteButton.dataset.postId;
+        const commentId = voteButton.dataset.commentId;
+
+        if (postId) {
+          this.toggleVote(postId);
+        } else if (commentId) {
+          console.log("clicked");
+          this.toggleCommentVote(commentId);
+        }
       }
 
       if (e.target.closest(".refresh-button")) {
