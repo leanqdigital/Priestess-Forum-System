@@ -99,48 +99,6 @@ class UIManager {
         });
     });
   }
-
-  static showEditPostModal() {
-    return new Promise((resolve) => {
-      const modal = document.getElementById("edit-post-modal");
-
-      const handleHide = () => {
-        modal.removeEventListener("sl-after-hide", handleHide);
-        resolve(false);
-      };
-
-      const cleanUp = (result) => {
-        modal.removeEventListener("sl-after-hide", handleHide);
-        confirmBtn.removeEventListener("click", confirmHandler);
-        cancelBtn.removeEventListener("click", cancelHandler);
-        resolve(result);
-      };
-
-      const confirmHandler = () => {
-        modal.hide();
-        cleanUp(true);
-      };
-
-      const cancelHandler = () => {
-        modal.hide();
-        cleanUp(false);
-      };
-
-      modal.addEventListener("sl-after-hide", handleHide);
-      confirmBtn.addEventListener("click", confirmHandler);
-      cancelBtn.addEventListener("click", cancelHandler);
-
-      modal.show();
-    });
-  }
-
-  static async showEditPostModal(message = "Edit Post") {
-    return new Promise((resolve) => {
-      // Remove existing modal if any
-      document.getElementById("delete-confirmation-modal")?.remove();
-      const modalHTML = `<p>Edit Post</p>`;
-    });
-  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -179,6 +137,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("openCreateNewPostModal")
     .addEventListener("click", function () {
-      document.getElementById("postNewModal").show();
+      let postModal = document.getElementById("postNewModal");
+      postModal.querySelector("#edit-post").classList.add("hidden");
+      postModal.querySelector("#submit-post").classList.remove("hidden");
+      postModal.removeAttribute("postid");
+      postModal.show();
     });
 });

@@ -71,8 +71,8 @@
                 </button>
             </div>
             <div class="h-[1px] w-full bg-grey-200"></div>
-            <button id="submit-post" variant="primary" class="w-fit ml-auto submit-button o2">Post</button>
-
+            <button id="submit-post" variant="primary" class="hidden w-fit ml-auto submit-button o2">Post</button>
+            <button id="edit-post" variant="primary" class="edit-post hidden w-fit ml-auto submit-button o2">Post</button>
         </section>
     </sl-dialog>
 
@@ -352,7 +352,7 @@
 
     <!-- Templates -->
     <script type="text/html" id="post-template">
-                    <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded" data-post-id="{{:id}}">
+                    <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded postCard" data-post-id="{{:id}}">
                         <!-- Avatar Section -->
                         <div class="flex items-center justify-between w-full">
                             <div class="flex items-center gap-2">
@@ -394,7 +394,14 @@
                                         x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
                                         x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
                                         class="absolute top-5 right-0 flex p-1 bg-[#084D55] rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
-                                        <button type="button" data-post-id="{{:id}}" class="edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left">Edit</button>
+                                        <button @click = "
+                                                            document.querySelector('.post-editor').textContent = '{{:content}}';
+                                                            let postModal = document.getElementById('postNewModal');
+                                                            postModal.setAttribute('data-postid', '{{:id}}');
+                                                            postModal.querySelector('#edit-post').classList.remove('hidden');
+                                                            postModal.querySelector('#submit-post').classList.add('hidden');
+                                                            postModal.show();"
+                                        type="button" data-post-id="{{:id}}" class="editPostModal edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left">Edit</button>
                                         <button type="button" data-post-id="{{:id}}" class="delete-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left">Delete</button>
                                     </div>
                                 </div>

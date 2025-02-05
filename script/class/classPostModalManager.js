@@ -108,7 +108,9 @@ class PostModalManager {
                                                     fill="#C29D68" />
                                             </svg>
                                         </button>
-                                        <div class="o1 text-white postVoteCount">${post.PostVotesCount}</div>
+                                        <div class="o1 text-white postVoteCount">${
+                                          post.PostVotesCount
+                                        }</div>
                                     </div>
                                 </div>
                                 <button class="!flex items-center gap-2 load-comments-btn cursor-pointer" data-post-id="{{:id}}">
@@ -119,7 +121,9 @@ class PostModalManager {
                                                 fill="#C29D68" />
                                         </svg>
                                     </div>
-                                    <div class="o1 text-white postCommentCount">${post.PostCommentCount}</div>
+                                    <div class="o1 text-white postCommentCount">${
+                                      post.PostCommentCount
+                                    }</div>
                                 </button>
                             </div>
                             <!-- Bookmark -->
