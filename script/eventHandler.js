@@ -75,3 +75,47 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     postContainer.removeChild(postContainer.firstElementChild);
   }
 });
+
+document.addEventListener("click", async (e) => {
+  // Look for clicks on any element with the 'submit-reply' class.
+  const replyButton = e.target.closest(".submit-reply");
+  if (replyButton) {
+    // Get the comment ID from the button’s data attribute.
+    const commentId = replyButton.dataset.commentId;
+
+    // Find the reply form associated with this comment.
+    const replyForm = replyButton.closest(".reply-form");
+    if (!replyForm) {
+      console.error("Reply form not found for comment:", commentId);
+      return;
+    }
+
+    // Get the reply editor within this form.
+    const editor = replyForm.querySelector(".reply-editor");
+    if (!editor) {
+      console.error("Reply editor not found for comment:", commentId);
+      return;
+    }
+
+    // Get the text content of the reply.
+    const content = editor.innerText.trim();
+    if (!content) {
+      UIManager.showError("Reply cannot be empty");
+      return;
+    }
+
+    // Optionally, extract mentioned contact IDs from the reply editor.
+    const mentionedIds = [];
+    const mentionElements = editor.querySelectorAll(".mention");
+    mentionElements.forEach((mention) => {
+      const id = mention.dataset.contactId;
+      if (id) mentionedIds.push(id);
+    });
+
+    // Call your ForumManager method to create the reply.
+    await forumManager.createReply(commentId, content, mentionedIds);
+
+    // Clear the reply editor after submission.
+    editor.innerHTML = "";
+  }
+});

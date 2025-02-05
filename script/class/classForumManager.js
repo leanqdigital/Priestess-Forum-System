@@ -10,6 +10,8 @@ class ForumManager {
     this.voteCounts = new Map();
     this.votedCommentIds = new Map();
     this.voteCommentCounts = new Map();
+    this.votedReplyIds = new Map();
+    this.voteReplyCounts = new Map();
     this.init();
   }
 
@@ -18,14 +20,19 @@ class ForumManager {
       await this.fetchSavedPosts();
       await this.fetchVotes();
       await this.fetchVoteForComment();
+      await this.fetchVoteForReply();
       this.initEventListeners();
       await this.loadInitialPosts();
     } catch (error) {
+      console.error("Error during forum initialization:", error);
       UIManager.showError("Failed to initialize forum.");
     }
   }
 
-  //Posts Methods
+  //@@Full Post Method Start
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
   async loadInitialPosts() {
     try {
       this.postsOffset = 0;
@@ -222,7 +229,6 @@ class ForumManager {
     }
   }
 
-  //Filter Posts on Tab Click
   handleFilterChange(filterType) {
     this.currentFilter = filterType;
     this.refreshPosts().then(() => {
@@ -231,9 +237,7 @@ class ForumManager {
       }
     });
   }
-  //Filter Posts on Tab Click
 
-  //Saved Posts (Bookmarked)
   async fetchSavedPosts() {
     try {
       const query = `
@@ -398,9 +402,6 @@ class ForumManager {
       `;
   }
 
-  //Saved Posts (Bookmarked)
-
-  //Post Voting Functionality
   async fetchVotes() {
     try {
       const query = `
@@ -536,9 +537,7 @@ class ForumManager {
         </svg>
     `;
   }
-  //Post Voting Functionality
 
-  // Lazy loading and skeleton
   async refreshPosts() {
     document.querySelector(CONFIG.selectors.postsContainer).innerHTML = "";
     this.postsOffset = 0;
@@ -569,15 +568,36 @@ class ForumManager {
     }
     return skeletons;
   }
-  // Lazy loading and skeleton
-  //Posts Methods
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //@@Full Post Method End
 
-  // Comments for Posts
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+
+  //@@Full Comment Method Start
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
   async fetchComments(postId) {
     try {
       const query = `
         query {
-          calcForumComments(query: [{ where: { Forum_Post: [{ where: { id: "${postId}" } }] } }]) {
+          calcForumComments(
+            query: [{
+              where: {
+                Forum_Post: [{ where: { id: "${postId}" } }],
+                Parent_Comment: [{ where: { id: null } }]
+              }
+            }]
+          ) {
             ID: field(arg: ["id"])
             Author_First_Name: field(arg: ["Author", "first_name"])
             Author_Last_Name: field(arg: ["Author", "last_name"])
@@ -664,7 +684,6 @@ class ForumManager {
     }
   }
 
-  //Comment Voting Functionality
   async fetchVoteForComment(commentId) {
     try {
       const query = `
@@ -692,7 +711,7 @@ class ForumManager {
       `;
       const variables = {
         member_comment_upvote_id: this.LOGGED_IN_USER_ID,
-        forum_comment_upvote_id: commentId
+        forum_comment_upvote_id: commentId,
       };
       const data = await ApiService.query(query, variables);
       const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
@@ -841,9 +860,369 @@ class ForumManager {
       </svg>
     `;
   }
-  //Comment Voting Functionality
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //@@Full Comment Method End
 
-  // Comments for Posts
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+
+  //@@Full Reply Method Start
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  async fetchReplies(commentId) {
+    try {
+      const query = `
+        query {
+          calcForumComments(query: [{
+            where: { Parent_Comment: [{ where: { id: "${commentId}" } }] }
+          }]) {
+            ID: field(arg: ["id"])
+            Author_First_Name: field(arg: ["Author", "first_name"])
+            Author_Last_Name: field(arg: ["Author", "last_name"])
+            Author_Profile_Image: field(arg: ["Author", "profile_image"])
+            Date_Added: field(arg: ["created_at"])
+            Comment: field(arg: ["comment"])
+          }
+        }
+      `;
+      const data = await ApiService.query(query);
+      return (
+        data?.calcForumComments?.map((reply) => ({
+          id: reply.ID,
+          content: reply.Comment,
+          date: Formatter.formatTimestamp(reply.Date_Added),
+          author: Formatter.formatAuthor({
+            firstName: reply.Author_First_Name,
+            lastName: reply.Author_Last_Name,
+            profileImage: reply.Author_Profile_Image,
+          }),
+          defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+        })) || []
+      );
+    } catch (error) {
+      console.error("Error in fetchReplies:", error);
+      return [];
+    }
+  }
+
+  async createReply(commentId, content, mentions) {
+    try {
+      // Create a temporary reply for optimistic rendering.
+      const tempReply = {
+        id: `temp-${Date.now()}`,
+        content,
+        date: "Just now",
+        author: {
+          name: "Current User", // Replace with actual user data if available.
+          profileImage: CONFIG.api.defaultAuthorImage,
+        },
+        defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+      };
+
+      // Locate the replies container within the specific comment.
+      const repliesContainer = document.querySelector(
+        `[data-comment-id="${commentId}"] .replies-container`
+      );
+      if (!repliesContainer) {
+        throw new Error(
+          "Replies container not found for comment: " + commentId
+        );
+      }
+
+      // Optimistically render the temporary reply.
+      const template = $.templates("#reply-template");
+      repliesContainer.insertAdjacentHTML(
+        "afterbegin",
+        template.render(tempReply)
+      );
+
+      // Prepare the GraphQL mutation for creating a reply.
+      const query = `
+        mutation createForumComment($payload: ForumCommentCreateInput!) {
+          createForumComment(payload: $payload) {
+            id
+            comment
+            parent_comment_id
+          }
+        }
+      `;
+      const variables = {
+        payload: {
+          author_id: LOGGED_IN_USER_ID,
+          comment: content,
+          parent_comment_id: commentId,
+          Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
+        },
+      };
+
+      // Execute the API call.
+      const response = await ApiService.query(query, variables);
+      const newReply = response.createForumComment;
+
+      // Replace the temporary reply with the actual reply data.
+      const replyElement = repliesContainer.firstElementChild;
+      replyElement.dataset.replyId = newReply.id;
+
+      // Optionally, refresh the replies for this comment here.
+    } catch (error) {
+      UIManager.showError("Failed to post reply");
+      // Remove the optimistic reply if an error occurs.
+      const repliesContainer = document.querySelector(
+        `[data-comment-id="${commentId}"] .replies-container`
+      );
+      if (repliesContainer && repliesContainer.firstElementChild) {
+        repliesContainer.removeChild(repliesContainer.firstElementChild);
+      }
+    }
+  }
+
+  async deleteReply(replyId) {
+    const replyElement = document.querySelector(`[data-reply-id="${replyId}"]`);
+    if (!replyElement) return;
+
+    try {
+      // Show visual effects
+      replyElement.classList.add("opacity-50", "pointer-events-none");
+
+      const confirmed = await UIManager.showDeleteConfirmation();
+
+      if (!confirmed) {
+        // Reset styles if not confirmed
+        replyElement.classList.remove("opacity-50", "pointer-events-none");
+        return;
+      }
+
+      // Show processing state
+      replyElement.classList.add("animate-pulse");
+
+      const query = `
+        mutation deleteForumComment($id: PriestessForumCommentID) {
+            deleteForumComment(query: [{ where: { id: $id } }]) {
+            id
+            }
+        }
+        `;
+      const variables = { id: replyId };
+      const response = await ApiService.query(query, variables);
+
+      if (response?.deleteForumComment?.id) {
+        // Add removal animation
+        replyElement.classList.add(
+          "opacity-0",
+          "transition-opacity",
+          "duration-300"
+        );
+        setTimeout(() => replyElement.remove(), 300);
+        UIManager.showSuccess("Reply deleted successfully");
+      }
+    } catch (error) {
+      UIManager.showError("Failed to delete reply. Please try again.");
+    } finally {
+      // Ensure styles are reset even if error occurs after confirmation
+      replyElement?.classList.remove(
+        "animate-pulse",
+        "opacity-50",
+        "pointer-events-none"
+      );
+    }
+  }
+
+  async fetchVoteForReply(replyId) {
+    try {
+      const query = `
+        query calcMemberCommentUpvotesForumCommentUpvotesMany(
+          $member_comment_upvote_id: PriestessContactID
+          $forum_comment_upvote_id: PriestessForumCommentID
+        ) {
+          calcMemberCommentUpvotesForumCommentUpvotesMany(
+            query: [
+              {
+                where: {
+                  member_comment_upvote_id: $member_comment_upvote_id
+                }
+              },
+              {
+                andWhere: {
+                  forum_comment_upvote_id: $forum_comment_upvote_id
+                }
+              }
+            ]
+          ) {
+            ID: field(arg: ["id"])
+          }
+        }
+      `;
+      const variables = {
+        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        forum_comment_upvote_id: replyId,
+      };
+      const data = await ApiService.query(query, variables);
+      const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
+      return votes;
+    } catch (error) {
+      console.error("Error fetching vote for comment", replyId, error);
+      return [];
+    }
+  }
+
+  async toggleReplyVote(replyId) {
+    const buttons = document.querySelectorAll(
+      `.vote-button[data-reply-id="${replyId}"]`
+    );
+
+    // Check if the user has already voted for this comment.
+    const voteRecords = await this.fetchVoteForReply(replyId);
+    const isReplyVoted = voteRecords.length > 0;
+
+    // Get the current vote count for this comment from the local map (defaulting to 0).
+    let voteCount = this.voteReplyCounts.get(replyId) || 0;
+
+    try {
+      buttons.forEach((button) => (button.disabled = true));
+
+      if (isReplyVoted) {
+        // Remove the vote.
+        await this.deleteReplyVote(replyId);
+        // Remove our local record for this comment.
+        this.votedReplyIds.delete(replyId);
+        voteCount = Math.max(0, voteCount - 1);
+      } else {
+        // Create a new vote.
+        const voteId = await this.createReplyVote(replyId);
+        // If no local record exists yet, initialize a Set.
+        if (!this.votedReplyIds.has(replyId)) {
+          this.votedReplyIds.set(replyId, new Set());
+        }
+        this.votedReplyIds.get(replyId).add(voteId);
+        voteCount += 1;
+      }
+
+      // Update the local vote count.
+      this.voteReplyCounts.set(replyId, voteCount);
+
+      // Update the UI for this comment.
+      this.updateReplyVoteUI(replyId);
+      UIManager.showSuccess(`Comment ${isReplyVoted ? "unvoted" : "voted"}`);
+    } catch (error) {
+      UIManager.showError(
+        `Failed to ${isReplyVoted ? "unvote" : "vote"} comment`
+      );
+    } finally {
+      buttons.forEach((button) => (button.disabled = false));
+    }
+  }
+
+  async createReplyVote(replyId) {
+    const query = `
+      mutation createMemberCommentUpvotesForumCommentUpvotes(
+        $payload: MemberCommentUpvotesForumCommentUpvotesCreateInput!
+      ) {
+        createMemberCommentUpvotesForumCommentUpvotes(payload: $payload) {
+          id
+        }
+      }
+    `;
+    const variables = {
+      payload: {
+        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        forum_comment_upvote_id: replyId,
+      },
+    };
+    const response = await ApiService.query(query, variables);
+    return response.createMemberCommentUpvotesForumCommentUpvotes.id;
+  }
+
+  async deleteReplyVote(replyId) {
+    let voteIds = this.votedReplyIds.get(replyId);
+    if (!voteIds || voteIds.size === 0) {
+      // If no local record, try to fetch them first.
+      const voteRecords = await this.fetchVoteForReply(replyId);
+      voteRecords.forEach((vote) => {
+        if (!this.votedReplyIds.has(replyId)) {
+          this.votedReplyIds.set(replyId, new Set());
+        }
+        this.votedReplyIds.get(replyId).add(vote.ID);
+      });
+      voteIds = this.votedReplyIds.get(replyId);
+    }
+
+    if (!voteIds) return;
+
+    await Promise.all(
+      [...voteIds].map((id) =>
+        ApiService.query(
+          `
+            mutation deleteMemberCommentUpvotesForumCommentUpvotes(
+              $id: PriestessMemberCommentUpvotesForumCommentUpvotesID
+            ) {
+              deleteMemberCommentUpvotesForumCommentUpvotes(
+                query: [{ where: { id: $id } }]
+              ) {
+                id
+              }
+            }
+          `,
+          { id }
+        )
+      )
+    );
+
+    // Remove the entry from the local map.
+    this.votedReplyIds.delete(replyId);
+  }
+
+  updateReplyVoteUI(replyId) {
+    const replyElement = document.querySelector(`[data-reply-id="${replyId}"]`);
+    if (!replyElement) return;
+
+    const isVoted = this.votedReplyIds.has(replyId);
+    const voteCount = this.voteReplyCounts.get(replyId) || 0;
+
+    const voteButton = replyElement.querySelector(".vote-button");
+    if (voteButton) {
+      voteButton.innerHTML = this.getReplyVoteSVG(isVoted);
+    }
+    const voteCountElement = commentElement.querySelector(".vote-count");
+    if (voteCountElement) {
+      voteCountElement.textContent = voteCount;
+    }
+  }
+
+  getReplyVoteSVG(isVoted) {
+    return `
+      <svg width="24" height="24" viewBox="0 0 24 24" 
+           fill="${isVoted ? "#C29D68" : "none"}" 
+           stroke="#C29D68">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                 C13.09 3.81 14.76 3 16.5 3
+                 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54
+                 L12 21.35z"/>
+      </svg>
+    `;
+  }
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //@@Full Reply Method End
+
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
+  //-----------------------------------------------------------------------
 
   //Handle event listeners
   initEventListeners() {
@@ -867,12 +1246,16 @@ class ForumManager {
       if (voteButton) {
         const postId = voteButton.dataset.postId;
         const commentId = voteButton.dataset.commentId;
+        const replyId = voteButton.dataset.replyId;
 
         if (postId) {
           this.toggleVote(postId);
         } else if (commentId) {
           console.log("clicked");
           this.toggleCommentVote(commentId);
+        } else if (replyId) {
+          console.log("clicked");
+          this.toggleReplyVote(replyId);
         }
       }
 
@@ -924,6 +1307,11 @@ class ForumManager {
       if (e.target.closest(".bookmark-button")) {
         const postId = e.target.closest(".bookmark-button").dataset.postId;
         this.toggleBookmark(postId);
+      }
+
+      if (e.target.closest(".delete-reply-btn")) {
+        const replyId = e.target.closest(".delete-reply-btn").dataset.replyId;
+        this.deleteReply(replyId);
       }
     });
   }
