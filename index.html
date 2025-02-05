@@ -14,6 +14,7 @@
 </head>
 
 <body class="bg-primary my-10" x-data="{ openCommentModal: false }">
+
     <!-- Open Comment Modal -->
     <div x-cloak x-show="openCommentModal" x-transition.opacity.duration.200ms x-trap.inert.noscroll="openCommentModal"
         x-on:keydown.esc.window="openCommentModal = false"
@@ -26,10 +27,12 @@
             <div id="post-modal-content" class="space-y-4 min-[500px]:mx-auto"></div>
         </div>
     </div>
+
     <!-- Initial Loader -->
     <div id="loader" class="loader">
         <div class="spinner"></div>
     </div>
+
     <!-- Create New Post Modal -->
     <sl-dialog id="postNewModal" label="Start a post">
         <section class="flex flex-col gap-4 bg-transparent">
@@ -38,7 +41,7 @@
                     <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                         alt="Profile" class="size-full object-cover rounded-full">
                 </div>
-                <h3 class="text-white">User Name</h3>
+                <h3 class="text-white">Dipesh Adhikari</h3>
             </div>
 
             <div id="post-editor" class="post-editor text-white p-4 min-h-[230px] editor" contenteditable="true"
@@ -73,7 +76,7 @@
         </section>
     </sl-dialog>
 
-    <!-- Delete Comment Moadl-->
+    <!-- Delete Comment Moadl
     <sl-dialog id="delete-modal" label="Confirm Deletion">
         <div class="space-y-4">
             <div class="p2 text-white">Are you sure you want to delete this post? This action cannot be undone.</div>
@@ -84,7 +87,7 @@
                     class="confirm-delete text-white o2  button bg-danger-100 hover:bg-danger-200 transition-all">Delete</button>
             </div>
         </div>
-    </sl-dialog>
+    </sl-dialog> -->
 
     <div class="container  max-w-[680px] mx-auto max-[700px]:p-4">
         <!-- Controls Section -->
@@ -391,10 +394,8 @@
                                         x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
                                         x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
                                         class="absolute top-5 right-0 flex p-1 bg-[#084D55] rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
-                                        <button type="button" data-post-id="{{:id}}"
-                                            class="edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Edit</button>
-                                        <button type="button" data-post-id="{{:id}}"
-                                            class="delete-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Delete</button>
+                                        <button type="button" data-post-id="{{:id}}" class="edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left">Edit</button>
+                                        <button type="button" data-post-id="{{:id}}" class="delete-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left">Delete</button>
                                     </div>
                                 </div>
                             {{/if}}
@@ -430,7 +431,7 @@
                                             </svg>
                                             {{/if}}
                                         </button>
-                                        <div class="o1 text-white vote-count">{{:voteCount}}</div>
+                                        <div class="o1 text-white postVoteCount">{{:PostVotesCount}}</div>
                                     </div>
                                 </div>
                                 <button class="!flex items-center gap-2 load-comments-btn cursor-pointer" data-post-id="{{:id}}"
@@ -442,7 +443,7 @@
                                                 fill="#C29D68" />
                                         </svg>
                                     </div>
-                                    <div class="o1 text-white">55</div>
+                                    <div class="o1 text-white postCommentCount">{{:PostCommentCount}}</div>
                                 </button>
                             </div>
                             <!-- Bookmark -->
@@ -534,11 +535,11 @@
                     </div>
                 </div>
                 <!-- Add reply form -->
-                <div class="reply-form flex items-center gap-3 w-full mt-4">
+                <div class="reply-form flex items-center gap-3 w-full">
                     <div id="reply-editor-{{:id}}" class="reply-editor text-white p-2 w-full h-10 border border-gray-600 rounded" contenteditable="true" data-comment-id="{{:id}}"></div>
                     <button class="submit-reply bg-secondary text-white px-4 py-2 rounded" data-comment-id="{{:id}}">Post</button>
                 </div>
-                <div class="replies-container space-y-4 w-full pl-8 mt-2" ></div>
+                <div class="replies-container space-y-4 w-full pl-8" ></div>
             </div>
         </div>
     </script>
@@ -603,8 +604,26 @@
         </div>
     </script>
 
-
-
+    <script>
+        const LOGGED_IN_USER_ID = "171031";
+        // Configuration Constants
+        const CONFIG = {
+            api: {
+                endpoint: "https://priestess.vitalstats.app/api/v1/graphql",
+                key: "U6F6ofQc_Oes9BimgiEs5",
+                defaultAuthorImage:
+                    "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA",
+            },
+            pagination: {
+                postsPerPage: 5,
+            },
+            selectors: {
+                postsContainer: "#posts-container",
+                loadingIndicator: "#loading-indicator",
+                errorDisplay: "#error-display",
+            },
+        };
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -618,11 +637,9 @@
     <script src="script/class/classPostModalManager.js"></script>
     <script src="script/class/classContactService.js"></script>
     <script src="script/class/classMentionManager.js"></script>
-    <script src="script/config.js"></script>
     <script src="script/api_service.js"></script>
     <script src="script/formatter.js"></script>
     <script src="script/ui_manager.js"></script>
-    <script src="script/app.js"></script>
     <script src="script/tab.js"></script>
     <script src="script/tailwindConfig.js"></script>
     <script src="script/eventHandler.js"></script>

@@ -108,7 +108,7 @@ class PostModalManager {
                                                     fill="#C29D68" />
                                             </svg>
                                         </button>
-                                        <div class="o1 text-white vote-count">88</div>
+                                        <div class="o1 text-white postVoteCount">${post.PostVotesCount}</div>
                                     </div>
                                 </div>
                                 <button class="!flex items-center gap-2 load-comments-btn cursor-pointer" data-post-id="{{:id}}">
@@ -119,7 +119,7 @@ class PostModalManager {
                                                 fill="#C29D68" />
                                         </svg>
                                     </div>
-                                    <div class="o1 text-white">55</div>
+                                    <div class="o1 text-white postCommentCount">${post.PostCommentCount}</div>
                                 </button>
                             </div>
                             <!-- Bookmark -->
@@ -201,75 +201,6 @@ class PostModalManager {
     const variables = { id: commentId };
     await ApiService.query(query, variables);
   }
-
-  // static async loadComments(postId) {
-  //   try {
-  //     // Fetch all comments for the post.
-  //     const comments = await forumManager.fetchComments(postId);
-
-  //     setTimeout(async () => {
-  //       await Promise.all(
-
-  //         comments.map(async (comment) => {
-
-  //           try {
-
-  //             const replies = await forumManager.fetchReplies(comment.id);
-  //             replies.map(async (reply) => {
-  //               const voteRecords = await forumManager.fetchVoteForReply(reply.id);
-  //               reply.isReplyVoted = voteRecords.length > 0;
-  //               reply.voteReplyCount = voteRecords.length;
-  //             });
-  //             const container = document.querySelector(`[data-comment-id="${comment.id}"] .replies-container`);
-  //             if (container) {
-  //               const replyTemplate = $.templates("#reply-template");
-  //               container.innerHTML = replies.map((reply) => replyTemplate.render(reply)).join("");
-  //             }
-  //           }
-
-  //           catch (error) {
-  //             console.error(`Error fetching replies for comment ${comment.id}:`,error);
-  //           }
-  //         })
-
-  //       );
-  //     }, 0);
-
-  //     // Existing vote handling
-  //     await Promise.all(
-  //       comments.map(async (comment) => {
-  //         const voteRecords = await forumManager.fetchVoteForComment(
-  //           comment.id
-  //         );
-  //         comment.isCommentVoted = voteRecords.length > 0;
-  //         comment.voteCommentCount = voteRecords.length;
-  //       })
-  //     );
-
-  //     const commentsContainer = document.getElementById("modal-comments-container");
-  //     const template = $.templates("#comment-template");
-  //     commentsContainer.innerHTML = template.render(comments);
-
-  //     const replyEditor = commentsContainer.querySelectorAll(".reply-editor");
-  //     replyEditor.forEach((editor) => {
-  //       setTimeout(async () => {
-  //         MentionManager.tribute.attach(editor);
-  //       }, 500);
-  //     });
-
-  //     // Attach event listeners for delete buttons.
-  //     document.querySelectorAll(".delete-comment-btn").forEach((button) => {
-  //       button.addEventListener("click", (e) => {
-  //         const commentId = e.target.dataset.commentId;
-  //         PostModalManager.confirmDeleteComment(commentId);
-  //       });
-  //     });
-  //   } catch (error) {
-  //     document.getElementById(
-  //       "modal-comments-container"
-  //     ).innerHTML = `<p class="text-red-300">Error loading comments</p>`;
-  //   }
-  // }
 
   static async loadComments(postId) {
     try {

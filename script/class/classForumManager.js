@@ -7,7 +7,7 @@ class ForumManager {
     this.currentFilter = "recent";
     this.savedPostIds = new Map();
     this.votedPostIds = new Map();
-    this.voteCounts = new Map();
+
     this.votedCommentIds = new Map();
     this.voteCommentCounts = new Map();
     this.votedReplyIds = new Map();
@@ -84,11 +84,12 @@ class ForumManager {
           id: postId,
           isBookmarked: this.savedPostIds.has(postId),
           isVoted: this.votedPostIds.has(postId),
-          voteCount: this.voteCounts.get(postId) || 0,
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
           post_image: post.Post_Image,
           defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+          PostVotesCount: post.Member_Post_Upvotes_DataTotal_Count,
+          PostCommentCount: post.ForumCommentsTotalCount,
           author: Formatter.formatAuthor({
             firstName: post.Author_First_Name,
             lastName: post.Author_Last_Name,
@@ -145,6 +146,8 @@ class ForumManager {
             Post_Copy: field(arg: ["post_copy"])
             Featured_Post: field(arg: ["featured_post"])
             Post_Image: field(arg: ["post_image"])
+            ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
           }
         }
       `;
@@ -414,27 +417,30 @@ class ForumManager {
                   }
               }
           `;
-
       const data = await ApiService.query(query);
       const votes = data?.calcMemberPostUpvotesPostUpvotesMany || [];
-
-      // ✅ Reset before updating
       this.votedPostIds.clear();
-      this.voteCounts.clear();
-
       votes.forEach((vote) => {
         const postId = String(vote.Post_Upvote_ID);
-
-        // ✅ Store vote IDs in a Set (prevents duplicates)
         if (!this.votedPostIds.has(postId)) {
           this.votedPostIds.set(postId, new Set());
         }
         this.votedPostIds.get(postId).add(vote.ID);
-
-        // ✅ Initialize vote count (if not already set)
-        this.voteCounts.set(postId, (this.voteCounts.get(postId) || 0) + 1);
       });
     } catch (error) {}
+  }
+
+  async fetchPostVoteCount(postId) {
+    const query = `
+        query {
+            calcForumPosts(query: [{ where: { id: "${postId}" } }]) {
+            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+          }
+        }
+    `;
+
+    const response = await ApiService.query(query);
+    return response.calcForumPosts[0].Member_Post_Upvotes_DataTotal_Count;
   }
 
   async toggleVote(postId) {
@@ -442,36 +448,37 @@ class ForumManager {
       `.vote-button[data-post-id="${postId}"]`
     );
     const isVoted = this.votedPostIds.has(postId);
-    let voteCount = this.voteCounts.get(postId) || 0;
 
     try {
-      buttons.forEach((button) => (button.disabled = true));
+      // Disable buttons and set opacity
+      buttons.forEach((button) => {
+        button.disabled = true;
+        button.style.opacity = "0.5"; // Add this line
+      });
 
       if (isVoted) {
-        // ✅ Remove all existing votes for this post
         await this.deleteVotes(postId);
         this.votedPostIds.delete(postId);
-        voteCount = Math.max(0, voteCount - 1); // Prevent negative votes
       } else {
-        // ✅ Add new vote
         const voteId = await this.createVote(postId);
         if (!this.votedPostIds.has(postId)) {
           this.votedPostIds.set(postId, new Set());
         }
         this.votedPostIds.get(postId).add(voteId);
-        voteCount += 1;
       }
 
-      // ✅ Update local vote count
-      this.voteCounts.set(postId, voteCount);
+      const updatedVoteCount = await this.fetchPostVoteCount(postId);
 
-      // ✅ Update UI
-      this.updateVoteUI(postId);
+      this.updateVoteUI(postId, updatedVoteCount);
       UIManager.showSuccess(`Post ${isVoted ? "unvoted" : "voted"}`);
     } catch (error) {
       UIManager.showError(`Failed to ${isVoted ? "unvote" : "vote"}`);
     } finally {
-      buttons.forEach((button) => (button.disabled = false));
+      // Re-enable buttons and reset opacity
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.style.opacity = "1"; // Add this line
+      });
     }
   }
 
@@ -512,19 +519,16 @@ class ForumManager {
       )
     );
 
-    this.votedPostIds.delete(postId); // ✅ Remove from local state
+    this.votedPostIds.delete(postId);
   }
 
-  updateVoteUI(postId) {
+  updateVoteUI(postId, updatedVoteCount) {
     document
       .querySelectorAll(`[data-post-id="${postId}"] .vote-button`)
       .forEach((button) => {
         const isVoted = this.votedPostIds.has(postId);
-        const voteCount = this.voteCounts.get(postId) || 0;
-
-        // ✅ Update icon & count
         button.innerHTML = this.getVoteSVG(isVoted);
-        button.nextElementSibling.textContent = voteCount;
+        button.nextElementSibling.textContent = updatedVoteCount;
       });
   }
 
@@ -1293,6 +1297,10 @@ class ForumManager {
             title: postElement.querySelector("h3")?.textContent || "",
             content: postElement.querySelector(".post-content div").textContent,
             post_image: postImage,
+            PostVotesCount:
+              postElement.querySelector(".postVoteCount").textContent,
+            PostCommentCount:
+              postElement.querySelector(".postCommentCount").textContent,
           };
 
           await PostModalManager.open(post);
