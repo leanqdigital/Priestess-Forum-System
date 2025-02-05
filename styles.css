@@ -438,6 +438,48 @@ h4 {
   background: var(--primary-100);
 }
 
-.comment-editor:focus-visible {
-  border: 1px solid white !important;
+.comment-editor:focus,
+.comment-editor:focus-visible,
+.comment-editor:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.comment-editor [contenteditable]:focus,
+.comment-editor [contenteditable]:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.comment-form-wrapper:active,
+.comment-form-wrapper:focus,
+.comment-form-wrapper:focus-visible,
+.comment-form-wrapper:hover{
+  border: 1px solid white;
+}
+
+
+
+.reply-editor:focus,
+.reply-editor:focus-visible,
+.reply-editor:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.reply-editor [contenteditable]:focus,
+.reply-editor [contenteditable]:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.reply-form-wrapper:active,
+.reply-form-wrapper:focus,
+.reply-form-wrapper:focus-visible,
+.reply-form-wrapper:hover{
+  border: 1px solid white;
 }

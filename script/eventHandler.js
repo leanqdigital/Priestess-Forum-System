@@ -127,7 +127,6 @@ document.addEventListener("click", (event) => {
     const editor = postElement.querySelector(".post-editor");
     const content = editor.innerText.trim();
     forumManager.editPost(postId, content);
-    // Show modal
     postElement.hide();
   }
 });
