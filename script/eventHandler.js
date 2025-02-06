@@ -12,7 +12,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
 
   // Clear editor
   document.getElementById("postNewModal").hide();
-  
+
   // Extract mentioned contact IDs
   const mentionedIds = [];
   const mentions = editor.querySelectorAll(".mention");
@@ -34,15 +34,15 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     date: "Just now",
     content: textContent,
   };
-  
+
   // Render temporary post
   const template = $.templates("#post-template");
   const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
   postContainer.insertAdjacentHTML("afterbegin", template.render(tempPost));
-  
+
   const postElement = postContainer.firstElementChild;
   postElement.classList.add("state-disabled");
-  
+
   try {
     // Submit to API
     const response = await ApiService.query(
@@ -113,8 +113,8 @@ document.getElementById("submit-post").addEventListener("click", async () => {
       actualPost.Member_Post_Upvotes_DataTotal_Count;
     postElement.dataset.postId = actualPost.ID;
   } catch (error) {
-    UIManager.showError("Failed to post. Please try again.");
-    postContainer.removeChild(postElement);
+    // UIManager.showError("Failed to post. Please try again.");
+    // postContainer.removeChild(postElement);
   } finally {
     editor.innerHTML = "";
     postElement.classList.remove("state-disabled");
