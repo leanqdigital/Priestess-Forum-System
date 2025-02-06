@@ -1384,28 +1384,27 @@ class ForumManager {
       if (buttonForComment) {
         const postId = buttonForComment.dataset.postId;
         const postElement = document.querySelector(`[data-post-id="${postId}"]`);
-        const authorId = postElement.dataset.authorId;
         if (postElement) {
-          const imageElement = postElement.querySelector(
-            ".post-image-wrapper img"
-          );
+          const authorId = postElement.dataset.authorId; // Move inside the if block to prevent null access
+      
+          const imageElement = postElement.querySelector(".post-image-wrapper img");
           const postImage = imageElement ? imageElement.src : "";
-
+      
           const post = {
             id: postId,
             authorId: authorId,
             author: {
-              name: postElement.querySelector(".post-author-name").textContent,
-              profileImage: postElement.querySelector("img").src,
+              name: postElement.querySelector(".post-author-name")?.textContent || "", // Add optional chaining
+              profileImage: postElement.querySelector("img")?.src || "", // Ensure this selector is correct
             },
-            date: postElement.querySelector("time").textContent,
+            date: postElement.querySelector("time")?.textContent || "",
             title: postElement.querySelector("h3")?.textContent || "",
-            content: postElement.querySelector(".post-content div").textContent,
+            content: postElement.querySelector(".post-content div")?.textContent || "",
             post_image: postImage,
-            PostVotesCount: postElement.querySelector(".postVoteCount").textContent,
-            PostCommentCount: postElement.querySelector(".postCommentCount").textContent,
+            PostVotesCount: postElement.querySelector(".postVoteCount")?.textContent || "0",
+            PostCommentCount: postElement.querySelector(".postCommentCount")?.textContent || "0",
           };
-
+      
           await PostModalManager.open(post);
         }
       }
