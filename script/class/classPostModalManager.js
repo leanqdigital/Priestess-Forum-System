@@ -1,5 +1,11 @@
 class PostModalManager {
   static async open(post) {
+    const modalElement = document.querySelector('[x-ref="postModal"]');
+
+    if (modalElement) {
+      Alpine.store("postModalData").post = post;
+    }
+
     const modal = document.querySelector("#post-modal");
     const modalContent = document.querySelector("#post-modal-content");
     // Render modal content
@@ -48,9 +54,11 @@ class PostModalManager {
                 </div>
                 </div>
                 <!-- Three Dots -->
-              <!-- {{if author_id == "171031"}} -->
-              <div x-data="{ editDeletePost: false, openedWithKeyboard: false }" class="relative w-fit"
-                  x-on:keydown.esc.window="editDeletePost = false, openedWithKeyboard = false">
+<div x-data="{ post: $store.postModalData.post, editDeletePost: false, openedWithKeyboard: false }"
+     x-show="post.authorId === '171031'"
+     class="relative w-fit"
+     x-on:keydown.esc.window="editDeletePost = false; openedWithKeyboard = false"
+     x-ref="postModal">
                   <div class="size-4 cursor-pointer" x-on:click="editDeletePost = ! editDeletePost" aria-haspopup="true"
                       x-on:keydown.space.prevent="openedWithKeyboard = true"
                       x-on:keydown.enter.prevent="openedWithKeyboard = true"
@@ -67,13 +75,33 @@ class PostModalManager {
                       x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
                       x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
                       class="absolute top-5 right-0 flex p-1 bg-[#084D55] rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
-                      <button type="button" data-post-id="{{:id}}"
-                          class="edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Edit</button>
-                      <button type="button" data-post-id="{{:id}}"
-                          class="delete-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3  text-left">Delete</button>
+                            <button @click = "
+                                                document.querySelector('.post-editor').textContent = '${
+                                                  post.content
+                                                }';
+                                                let postModal = document.getElementById('postNewModal');
+                                                let postElement = document.querySelector('.postCard');
+                                                postModal.setAttribute('data-postid', ${
+                                                  post.id
+                                                });
+                                                postModal.querySelector('#edit-post').classList.remove('hidden');
+                                                postModal.querySelector('#submit-post').classList.add('hidden');
+                                                postModal.show();"
+                            type="button" data-post-id="{{:id}}" class="editPostModal edit-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left">Edit</button>
+                            <button 
+                            type="button" 
+                            data-post-id="${post.id}" 
+                            class="delete-post-btn p-[10px] hover:bg-primary-100 transition-all text-white rounded cursor-pointer o3 text-left
+                              @click = "
+                              let postModal = document.getElementById('postNewModal');
+                              postModal.hide();
+                              "
+                            ">
+                            Delete
+                            </button>
+
                   </div>
               </div>
-              <!-- {{/if}} -->
               <!-- Three Dots Ends -->
               </header>
             </div>
@@ -182,7 +210,9 @@ class PostModalManager {
               post.post_image ? `max-[500px]:h-[45vh] ` : "max-[500px]:h-[70vh]"
             }">
               <div class="my-4 text-white text-sm font-['Avenir LT Std'] leading-[14px]">Comments</div>
-              <div id="modal-comments-container" class="space-y-4">
+              <div id="modal-comments-container" class="space-y-4 modal-comments-container-${
+                post.id
+              }">
                 <p class="text-gray-300">Loading comments...</p>
               </div>
             </section>
@@ -198,15 +228,25 @@ class PostModalManager {
     document
       .getElementById("submit-comment")
       .addEventListener("click", async () => {
+        const commentForm = document.querySelector(".comment-form-wrapper");
         const editor = document.getElementById("comment-editor");
         const content = editor.innerText.trim();
-        const mentions = Array.from(editor.querySelectorAll(".mention")).map((el) => el.dataset.contactId);
+        const mentions = Array.from(editor.querySelectorAll(".mention")).map(
+          (el) => el.dataset.contactId
+        );
+        commentForm.classList.add("state-disabled");
+        editor.innerHTML = "";
         if (!content) {
           UIManager.showError("Comment cannot be empty");
           return;
         }
-        await forumManager.createComment(post.id, content, mentions);
-        editor.innerHTML = ""; // Clear editor
+        try {
+          await forumManager.createComment(post.id, content, mentions);
+        } catch (error) {
+          console.log("Error is", error);
+        } finally {
+          commentForm.classList.remove("state-disabled");
+        }
       });
     await PostModalManager.loadComments(post.id);
   }
@@ -234,6 +274,10 @@ class PostModalManager {
       }
     `;
     const variables = { id: commentId };
+    const toDeleteComment = document.querySelector(
+      `[data-comment-id="${commentId}"]`
+    );
+    toDeleteComment.classList.add("state-disabled");
     await ApiService.query(query, variables);
   }
 

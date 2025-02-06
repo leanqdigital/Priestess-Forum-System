@@ -10,7 +10,7 @@ class UIManager {
   static showSuccess(message) {
     const successDiv = document.createElement("div");
     successDiv.className =
-      "fixed top-4 right-4 p-4 bg-green-100 text-green-700 rounded-lg shadow-lg";
+      "fixed top-4 right-4 p-4 bg-green-100 text-green-700 rounded-lg shadow-lg z-[123456]";
     successDiv.textContent = message;
     document.body.appendChild(successDiv);
 
@@ -121,6 +121,14 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add active state to clicked button
       button.classList.add("active");
       button.setAttribute("variant", "primary"); // Shoelace Primary Style
+    });
+  });
+
+  document.querySelectorAll(".sort-button").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const sortType = e.currentTarget.dataset.sort;
+      forumManager.currentSort = sortType; // Update sort type
+      forumManager.loadInitialPosts(); // Reload and sort posts
     });
   });
 });

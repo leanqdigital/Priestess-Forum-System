@@ -58,8 +58,7 @@ class MentionManager {
     return `
       <div class="flex items-center gap-3 px-3 py-2">
         <img src="${item.original.profileImage}" 
-             class="w-8 h-8 rounded-full object-cover"
-             onerror="this.src='${CONFIG.api.defaultAuthorImage}'">
+            class="w-8 h-8 rounded-full object-cover" onerror="this.src='${CONFIG.api.defaultAuthorImage}'">
         <div>
           <div class="o2 text-primary">${item.original.name}</div>
         </div>

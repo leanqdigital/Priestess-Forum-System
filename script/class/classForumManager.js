@@ -1,13 +1,17 @@
 class ForumManager {
   constructor() {
-    this.LOGGED_IN_USER_ID = LOGGED_IN_USER_ID;
+    this.userId = CONFIG.api.userId;
+    this.firstName = CONFIG.api.firstName;
+    this.lastName = CONFIG.api.lastName;
+    this.fullName = CONFIG.api.fullName;
+    this.defaultAuthorImage = CONFIG.api.defaultAuthorImage;
     this.postsOffset = 0;
     this.postsLimit = CONFIG.pagination.postsPerPage;
     this.hasMorePosts = true;
     this.currentFilter = "recent";
+    this.currentSort = "latest";
     this.savedPostIds = new Map();
     this.votedPostIds = new Map();
-
     this.votedCommentIds = new Map();
     this.voteCommentCounts = new Map();
     this.votedReplyIds = new Map();
@@ -24,7 +28,6 @@ class ForumManager {
       this.initEventListeners();
       await this.loadInitialPosts();
     } catch (error) {
-      console.error("Error during forum initialization:", error);
       UIManager.showError("Failed to initialize forum.");
     }
   }
@@ -71,7 +74,7 @@ class ForumManager {
               <div class="size-[200px]">
                 <img src="./assets/emptyPost.svg" alt="Empty Post" class="size-full object-contain">
               </div>
-              <div class="p2 text-black">No posts available.</div>
+              <div class="p2 text-white">No posts available.</div>
             </div>
           `;
         }
@@ -127,14 +130,21 @@ class ForumManager {
   }
 
   buildQuery() {
+    const filterCondition = this.buildFilterCondition();
+    const sortCondition = this.buildSortCondition();
+
+    let args = [];
+    if (filterCondition) args.push(filterCondition);
+    args.push(`limit: $limit`, `offset: $offset`);
+    if (sortCondition) args.push(sortCondition);
+
+    const argsString = args.join(", ");
+
     let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
       this.needsUserId() ? ", $id: PriestessContactID" : ""
     }) {
           calcForumPosts(
-            ${this.buildFilterCondition()}
-            limit: $limit
-            offset: $offset
-            orderBy: [{ path: ["created_at"], type: desc }]
+             ${argsString}
           ) {
             ID: field(arg: ["id"])
             Author_ID: field(arg: ["author_id"])
@@ -148,6 +158,7 @@ class ForumManager {
             Post_Image: field(arg: ["post_image"])
             ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
             Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+            ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
           }
         }
       `;
@@ -158,7 +169,7 @@ class ForumManager {
     };
 
     if (this.needsUserId()) {
-      variables.id = LOGGED_IN_USER_ID;
+      variables.id = this.userId;
     }
 
     return { query, variables };
@@ -177,8 +188,30 @@ class ForumManager {
     }
   }
 
+  buildSortCondition() {
+    switch (this.currentSort) {
+      case "latest":
+        return 'orderBy: [{ path: ["created_at"], type: desc }]';
+      case "oldest":
+        return 'orderBy: [{ path: ["created_at"], type: asc }]';
+      case "popular":
+        return 'orderBy: [{ path: ["ForumCommentsIDCalc"], type: desc }]';
+      default:
+        return 'orderBy: [{ path: ["created_at"], type: desc }]';
+    }
+  }
+
   needsUserId() {
     return this.currentFilter === "my" || this.currentFilter === "saved";
+  }
+
+  handleFilterChange(filterType) {
+    this.currentFilter = filterType;
+    this.refreshPosts().then(() => {
+      if (filterType === "saved") {
+        this.updateBookmarkIcons(); // ✅ Update icons when switching to Saved Posts
+      }
+    });
   }
 
   async deletePost(postId) {
@@ -232,21 +265,12 @@ class ForumManager {
     }
   }
 
-  handleFilterChange(filterType) {
-    this.currentFilter = filterType;
-    this.refreshPosts().then(() => {
-      if (filterType === "saved") {
-        this.updateBookmarkIcons(); // ✅ Update icons when switching to Saved Posts
-      }
-    });
-  }
-
   async fetchSavedPosts() {
     try {
       const query = `
               query {
                   calcOContactSavedPosts(
-                      query: [{ where: { contact_id: "${LOGGED_IN_USER_ID}" } }]
+                      query: [{ where: { contact_id: "${this.userId}" } }]
                       orderBy: [{ path: ["created_at"], type: desc }]
                   ) {
                       ID: field(arg: ["id"])
@@ -274,7 +298,7 @@ class ForumManager {
         query {
           calcOContactSavedPosts(query: [{
             where: {
-              contact_id: "${LOGGED_IN_USER_ID}",
+              contact_id: "${this.userId}",
               saved_post_id: "${postId}"
             }
           }]) {
@@ -295,7 +319,10 @@ class ForumManager {
     const existingBookmarkIds = await this.fetchAllBookmarkIdsForPost(postId);
     const isBookmarked = existingBookmarkIds.length > 0;
     try {
-      buttons.forEach((button) => (button.disabled = true));
+      buttons.forEach((button) => {
+        button.disabled = true;
+        button.style.opacity = "0.5"; // Add this line
+      });
 
       if (isBookmarked) {
         await this.deleteMultipleBookmarks(existingBookmarkIds);
@@ -326,7 +353,11 @@ class ForumManager {
         `Failed to ${isBookmarked ? "remove" : "save"} bookmark`
       );
     } finally {
-      buttons.forEach((button) => (button.disabled = false));
+      // Re-enable buttons and reset opacity
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.style.opacity = "1"; // Add this line
+      });
     }
   }
 
@@ -346,7 +377,7 @@ class ForumManager {
       `;
     const variables = {
       payload: {
-        contact_id: LOGGED_IN_USER_ID,
+        contact_id: this.userId,
         saved_post_id: postId,
       },
     };
@@ -410,7 +441,7 @@ class ForumManager {
       const query = `
               query {
                   calcMemberPostUpvotesPostUpvotesMany(
-                      query: [{ where: { member_post_upvote_id: "${LOGGED_IN_USER_ID}" } }]
+                      query: [{ where: { member_post_upvote_id: "${this.userId}" } }]
                   ) {
                       ID: field(arg: ["id"])
                       Post_Upvote_ID: field(arg: ["post_upvote_id"])
@@ -487,12 +518,14 @@ class ForumManager {
         mutation createVote($payload: MemberPostUpvotesPostUpvotesCreateInput) {
           createMemberPostUpvotesPostUpvotes(payload: $payload) {
             id
+            post_upvote_id
+            member_post_upvote_id
           }
         }
       `;
     const variables = {
       payload: {
-        member_post_upvote_id: LOGGED_IN_USER_ID,
+        member_post_upvote_id: this.userId,
         post_upvote_id: postId,
       },
     };
@@ -631,10 +664,11 @@ class ForumManager {
       const query = `
         query {
           calcForumComments(
+            orderBy: [{ path: ["created_at"], type: desc }]
             query: [{
               where: {
                 Forum_Post: [{ where: { id: "${postId}" } }],
-                Parent_Comment: [{ where: { id: null } }]
+                Parent_Comment: [{ where: { id: null } }],
               }
             }]
           ) {
@@ -668,15 +702,16 @@ class ForumManager {
 
   async createComment(postId, content, mentions) {
     try {
+      const tempCommentId = `temp-${Date.now()}`;
       const tempComment = {
-        id: `temp-${Date.now()}`,
+        id: tempCommentId,
         content,
         date: "Just now",
         author: {
-          name: "Current User", // Replace with actual user data
-          profileImage: CONFIG.api.defaultAuthorImage,
+          name: this.fullName,
+          profileImage: this.defaultAuthorImage,
         },
-        defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+        defaultAuthorImage: this.defaultAuthorImage,
       };
 
       // Optimistic rendering
@@ -689,6 +724,13 @@ class ForumManager {
         template.render(tempComment)
       );
 
+      // Find the newly added comment and disable it
+      const commentElement =
+        commentsContainer.querySelector(
+          `[data-comment-id="${tempCommentId}"]`
+        ) || commentsContainer.firstElementChild;
+      commentElement.classList.add("state-disabled"); // Add disabled class
+
       // API call
       const query = `
           mutation createForumComment($payload: ForumCommentCreateInput!) {
@@ -699,10 +741,9 @@ class ForumManager {
             }
           }
         `;
-
       const variables = {
         payload: {
-          author_id: LOGGED_IN_USER_ID,
+          author_id: this.userId,
           comment: content,
           forum_post_id: postId,
           Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
@@ -712,15 +753,25 @@ class ForumManager {
       const response = await ApiService.query(query, variables);
       const newComment = response.createForumComment;
 
-      // Replace temporary comment with real data
-      const commentElement = commentsContainer.firstElementChild;
+      // Update the temporary comment with the real comment ID
       commentElement.dataset.commentId = newComment.id;
+      commentElement.classList.remove("state-disabled"); // Enable comment
 
-      // Refresh comments to get full data
+      // Reload comments
       await PostModalManager.loadComments(postId);
     } catch (error) {
       UIManager.showError("Failed to post comment");
-      commentsContainer.removeChild(commentsContainer.firstElementChild);
+    } finally {
+      const commentsContainer = document.getElementById(
+        "modal-comments-container"
+      );
+      const tempCommentElement =
+        commentsContainer.querySelector(
+          `[data-comment-id="${tempCommentId}"]`
+        ) || commentsContainer.firstElementChild;
+      if (tempCommentElement) {
+        tempCommentElement.remove();
+      }
     }
   }
 
@@ -750,7 +801,7 @@ class ForumManager {
         }
       `;
       const variables = {
-        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        member_comment_upvote_id: this.userId,
         forum_comment_upvote_id: commentId,
       };
       const data = await ApiService.query(query, variables);
@@ -775,7 +826,11 @@ class ForumManager {
     let voteCount = this.voteCommentCounts.get(commentId) || 0;
 
     try {
-      buttons.forEach((button) => (button.disabled = true));
+      // Disable buttons and set opacity
+      buttons.forEach((button) => {
+        button.disabled = true;
+        button.style.opacity = "0.5"; // Add this line
+      });
 
       if (isCommentVoted) {
         // Remove the vote.
@@ -805,7 +860,11 @@ class ForumManager {
         `Failed to ${isCommentVoted ? "unvote" : "vote"} comment`
       );
     } finally {
-      buttons.forEach((button) => (button.disabled = false));
+      // Re-enable buttons and reset opacity
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.style.opacity = "1"; // Add this line
+      });
     }
   }
 
@@ -821,7 +880,7 @@ class ForumManager {
     `;
     const variables = {
       payload: {
-        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        member_comment_upvote_id: this.userId,
         forum_comment_upvote_id: commentId,
       },
     };
@@ -956,16 +1015,16 @@ class ForumManager {
 
   async createReply(commentId, content, mentions) {
     try {
-      // Create a temporary reply for optimistic rendering.
+      const tempReplyId = `temp-${Date.now()}`;
       const tempReply = {
-        id: `temp-${Date.now()}`,
+        id: tempReplyId,
         content,
         date: "Just now",
         author: {
-          name: "Current User", // Replace with actual user data if available.
-          profileImage: CONFIG.api.defaultAuthorImage,
+          name: this.fullName, // Replace with actual user data if available.
+          profileImage: this.defaultAuthorImage,
         },
-        defaultAuthorImage: CONFIG.api.defaultAuthorImage,
+        defaultAuthorImage: this.defaultAuthorImage,
       };
 
       // Locate the replies container within the specific comment.
@@ -985,6 +1044,12 @@ class ForumManager {
         template.render(tempReply)
       );
 
+      // Find the newly added reply and disable it
+      const replyElement =
+        repliesContainer.querySelector(`[data-reply-id="${tempReplyId}"]`) ||
+        repliesContainer.firstElementChild;
+      replyElement.classList.add("state-disabled"); // Add disabled class
+
       // Prepare the GraphQL mutation for creating a reply.
       const query = `
         mutation createForumComment($payload: ForumCommentCreateInput!) {
@@ -997,7 +1062,7 @@ class ForumManager {
       `;
       const variables = {
         payload: {
-          author_id: LOGGED_IN_USER_ID,
+          author_id: this.userId,
           comment: content,
           parent_comment_id: commentId,
           Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
@@ -1008,9 +1073,13 @@ class ForumManager {
       const response = await ApiService.query(query, variables);
       const newReply = response.createForumComment;
 
-      // Replace the temporary reply with the actual reply data.
-      const replyElement = repliesContainer.firstElementChild;
+      // Update the temporary reply with the real reply ID.
       replyElement.dataset.replyId = newReply.id;
+      let replyVoteButton = replyElement.querySelector(".vote-button");
+      let replyDeleteButton = replyElement.querySelector(".delete-reply-btn");
+      replyDeleteButton.dataset.replyId = newReply.id;
+      replyVoteButton.dataset.replyId = newReply.id;
+      replyElement.classList.remove("state-disabled"); // Enable reply
 
       // Optionally, refresh the replies for this comment here.
     } catch (error) {
@@ -1019,8 +1088,11 @@ class ForumManager {
       const repliesContainer = document.querySelector(
         `[data-comment-id="${commentId}"] .replies-container`
       );
-      if (repliesContainer && repliesContainer.firstElementChild) {
-        repliesContainer.removeChild(repliesContainer.firstElementChild);
+      const tempReplyElement =
+        repliesContainer.querySelector(`[data-reply-id="${tempReplyId}"]`) ||
+        repliesContainer.firstElementChild;
+      if (tempReplyElement) {
+        tempReplyElement.remove(); // Remove temp reply on failure
       }
     }
   }
@@ -1028,6 +1100,8 @@ class ForumManager {
   async deleteReply(replyId) {
     const replyElement = document.querySelector(`[data-reply-id="${replyId}"]`);
     if (!replyElement) return;
+
+    replyElement.classList.add("state-disabled");
 
     try {
       // Show visual effects
@@ -1102,7 +1176,7 @@ class ForumManager {
         }
       `;
       const variables = {
-        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        member_comment_upvote_id: this.userId,
         forum_comment_upvote_id: replyId,
       };
       const data = await ApiService.query(query, variables);
@@ -1118,47 +1192,49 @@ class ForumManager {
     const buttons = document.querySelectorAll(
       `.vote-button[data-reply-id="${replyId}"]`
     );
-
-    // Check if the user has already voted for this comment.
     const voteRecords = await this.fetchVoteForReply(replyId);
     const isReplyVoted = voteRecords.length > 0;
-
-    // Get the current vote count for this comment from the local map (defaulting to 0).
     let voteCount = this.voteReplyCounts.get(replyId) || 0;
 
+    let successMessage = "";
+
     try {
-      buttons.forEach((button) => (button.disabled = true));
+      buttons.forEach((button) => {
+        button.disabled = true;
+        button.style.opacity = "0.5";
+      });
 
       if (isReplyVoted) {
-        // Remove the vote.
         await this.deleteReplyVote(replyId);
-        // Remove our local record for this comment.
         this.votedReplyIds.delete(replyId);
         voteCount = Math.max(0, voteCount - 1);
+        successMessage = "Comment unvoted";
       } else {
-        // Create a new vote.
         const voteId = await this.createReplyVote(replyId);
-        // If no local record exists yet, initialize a Set.
         if (!this.votedReplyIds.has(replyId)) {
           this.votedReplyIds.set(replyId, new Set());
         }
         this.votedReplyIds.get(replyId).add(voteId);
         voteCount += 1;
+        successMessage = "Comment voted";
       }
 
-      // Update the local vote count.
       this.voteReplyCounts.set(replyId, voteCount);
-
-      // Update the UI for this comment.
       this.updateReplyVoteUI(replyId);
-      UIManager.showSuccess(`Comment ${isReplyVoted ? "unvoted" : "voted"}`);
     } catch (error) {
       UIManager.showError(
         `Failed to ${isReplyVoted ? "unvote" : "vote"} comment`
       );
+      return; // Stop execution if there's an error
     } finally {
-      buttons.forEach((button) => (button.disabled = false));
+      buttons.forEach((button) => {
+        button.disabled = false;
+        button.style.opacity = "1";
+      });
     }
+
+    // ✅ Ensure success message is only shown if there was no error
+    UIManager.showSuccess(successMessage);
   }
 
   async createReplyVote(replyId) {
@@ -1168,12 +1244,14 @@ class ForumManager {
       ) {
         createMemberCommentUpvotesForumCommentUpvotes(payload: $payload) {
           id
+          member_comment_upvote_id
+          forum_comment_upvote_id
         }
       }
     `;
     const variables = {
       payload: {
-        member_comment_upvote_id: this.LOGGED_IN_USER_ID,
+        member_comment_upvote_id: this.userId,
         forum_comment_upvote_id: replyId,
       },
     };
@@ -1231,7 +1309,8 @@ class ForumManager {
     if (voteButton) {
       voteButton.innerHTML = this.getReplyVoteSVG(isVoted);
     }
-    const voteCountElement = commentElement.querySelector(".vote-count");
+
+    const voteCountElement = replyElement.querySelector(".vote-count"); // 🔥 Fixed from `commentElement`
     if (voteCountElement) {
       voteCountElement.textContent = voteCount;
     }
@@ -1312,11 +1391,9 @@ class ForumManager {
 
       const buttonForComment = e.target.closest(".load-comments-btn");
       if (buttonForComment) {
-        // document.querySelector('body').setAttribute('x-data', `{ openCommentModal: true}`);
         const postId = buttonForComment.dataset.postId;
-        const postElement = document.querySelector(
-          `[data-post-id="${postId}"]`
-        );
+        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        const authorId = postElement.dataset.authorId;
         if (postElement) {
           const imageElement = postElement.querySelector(
             ".post-image-wrapper img"
@@ -1325,18 +1402,17 @@ class ForumManager {
 
           const post = {
             id: postId,
+            authorId: authorId,
             author: {
-              name: postElement.querySelector("h2").textContent,
+              name: postElement.querySelector(".post-author-name").textContent,
               profileImage: postElement.querySelector("img").src,
             },
             date: postElement.querySelector("time").textContent,
             title: postElement.querySelector("h3")?.textContent || "",
             content: postElement.querySelector(".post-content div").textContent,
             post_image: postImage,
-            PostVotesCount:
-              postElement.querySelector(".postVoteCount").textContent,
-            PostCommentCount:
-              postElement.querySelector(".postCommentCount").textContent,
+            PostVotesCount: postElement.querySelector(".postVoteCount").textContent,
+            PostCommentCount: postElement.querySelector(".postCommentCount").textContent,
           };
 
           await PostModalManager.open(post);
@@ -1355,6 +1431,7 @@ class ForumManager {
 
       if (e.target.closest(".delete-reply-btn")) {
         const replyId = e.target.closest(".delete-reply-btn").dataset.replyId;
+        console.log(replyId);
         this.deleteReply(replyId);
       }
     });
