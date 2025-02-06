@@ -21,7 +21,6 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     if (id) mentionedIds.push(id);
   });
 
-  console.log("Post mentions are after", mentionedIds);
 
   // Create temporary post
   const tempPost = {
@@ -128,13 +127,11 @@ document.addEventListener("click", async (e) => {
     const replyForm = replyButton.closest(".reply-form");
     replyForm.classList.add("state-disabled");
     if (!replyForm) {
-      console.error("Reply form not found for comment:", commentId);
       return;
     }
     const editor = replyForm.querySelector(".reply-editor");
     // Clear the reply editor after submission.
     if (!editor) {
-      console.error("Reply editor not found for comment:", commentId);
       return;
     }
     const content = editor.innerText.trim();

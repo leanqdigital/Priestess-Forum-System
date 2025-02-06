@@ -401,9 +401,7 @@ class ForumManager {
   async deleteMultipleBookmarks(bookmarkIds) {
     await Promise.all(
       bookmarkIds.map((id) =>
-        this.deleteBookmark(id).catch((error) =>
-          console.error("Failed to delete bookmark:", id, error)
-        )
+        this.deleteBookmark(id).catch((error))
       )
     );
 
@@ -420,8 +418,6 @@ class ForumManager {
     document.querySelectorAll(".bookmark-button").forEach((button) => {
       const postId = button.dataset.postId;
       const isBookmarked = this.savedPostIds.has(postId);
-      console.log(`🔎 Post ID: ${postId}, Bookmarked: ${isBookmarked}`);
-
       button.innerHTML = this.getBookmarkSVG(isBookmarked);
     });
   }
@@ -808,7 +804,6 @@ class ForumManager {
       const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
       return votes;
     } catch (error) {
-      console.error("Error fetching vote for comment", commentId, error);
       return [];
     }
   }
@@ -1008,7 +1003,6 @@ class ForumManager {
         })) || []
       );
     } catch (error) {
-      console.error("Error in fetchReplies:", error);
       return [];
     }
   }
@@ -1183,7 +1177,6 @@ class ForumManager {
       const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
       return votes;
     } catch (error) {
-      console.error("Error fetching vote for comment", replyId, error);
       return [];
     }
   }
@@ -1370,10 +1363,8 @@ class ForumManager {
         if (postId) {
           this.toggleVote(postId);
         } else if (commentId) {
-          console.log("clicked");
           this.toggleCommentVote(commentId);
         } else if (replyId) {
-          console.log("clicked");
           this.toggleReplyVote(replyId);
         }
       }
@@ -1431,7 +1422,6 @@ class ForumManager {
 
       if (e.target.closest(".delete-reply-btn")) {
         const replyId = e.target.closest(".delete-reply-btn").dataset.replyId;
-        console.log(replyId);
         this.deleteReply(replyId);
       }
     });

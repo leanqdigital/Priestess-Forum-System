@@ -27,7 +27,7 @@ class PostModalManager {
           ${
             post.post_image
               ? `<div class="flex-1">
-                   <img class="max-[500px]:hidden size-full" src="${post.post_image}" alt="Post image" class="object-cover" onerror="console.error('Failed to load image:', this.src)">
+                   <img class="max-[500px]:hidden size-full" src="${post.post_image}" alt="Post image" class="object-cover">
                  </div>`
               : ""
           }
@@ -113,7 +113,7 @@ class PostModalManager {
               }
               ${
                 post.post_image
-                  ? `<img class="min-[500px]:hidden size-full" src="${post.post_image}" alt="Post image" class="object-cover" onerror="console.error('Failed to load image:', this.src)">`
+                  ? `<img class="min-[500px]:hidden size-full" src="${post.post_image}" alt="Post image" class="object-cover">`
                   : ""
               }
               ${
@@ -243,7 +243,6 @@ class PostModalManager {
         try {
           await forumManager.createComment(post.id, content, mentions);
         } catch (error) {
-          console.log("Error is", error);
         } finally {
           commentForm.classList.remove("state-disabled");
         }
@@ -346,12 +345,7 @@ class PostModalManager {
                 .map((reply) => replyTemplate.render(reply))
                 .join("");
             }
-          } catch (error) {
-            console.error(
-              `Error fetching replies for comment ${comment.id}:`,
-              error
-            );
-          }
+          } catch (error) {}
         })
       );
     }

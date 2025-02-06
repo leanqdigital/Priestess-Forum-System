@@ -1,4 +1,3 @@
-// Data Formatter
 class Formatter {
   static formatTimestamp(timestamp) {
     const seconds = Math.floor((Date.now() - timestamp * 1000) / 1000);

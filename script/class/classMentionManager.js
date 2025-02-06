@@ -49,7 +49,6 @@ class MentionManager {
         }))
       );
     } catch (error) {
-      console.error("Error fetching contacts:", error);
       cb([]);
     }
   }
