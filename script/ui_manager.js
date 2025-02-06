@@ -131,17 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
       forumManager.loadInitialPosts(); // Reload and sort posts
     });
   });
-});
 
-window.addEventListener("load", function () {
-  const loader = document.getElementById("loader");
-  setTimeout(() => {
-    loader.classList.add("fade-out");
-  }, 500);
-});
-
-// Open New Post Modal
-document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("openCreateNewPostModal")
     .addEventListener("click", function () {
@@ -151,4 +141,11 @@ document.addEventListener("DOMContentLoaded", function () {
       postModal.removeAttribute("postid");
       postModal.show();
     });
+});
+
+window.addEventListener("load", function () {
+  const loader = document.getElementById("loader");
+  setTimeout(() => {
+    loader.classList.add("fade-out");
+  }, 500);
 });

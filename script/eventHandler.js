@@ -11,9 +11,8 @@ document.getElementById("submit-post").addEventListener("click", async () => {
   }
 
   // Clear editor
-  editor.innerHTML = "";
   document.getElementById("postNewModal").hide();
-
+  
   // Extract mentioned contact IDs
   const mentionedIds = [];
   const mentions = editor.querySelectorAll(".mention");
@@ -22,26 +21,28 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     if (id) mentionedIds.push(id);
   });
 
+  console.log("Post mentions are after", mentionedIds);
+
   // Create temporary post
   const tempPost = {
     id: `temp-${Date.now()}`,
     author_id: forumManager.userId,
     author: {
-      name: forumManager.fullName, // Replace with actual user data
+      name: forumManager.fullName,
       profileImage: forumManager.defaultAuthorImage,
     },
     date: "Just now",
     content: textContent,
   };
-
+  
   // Render temporary post
   const template = $.templates("#post-template");
   const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
   postContainer.insertAdjacentHTML("afterbegin", template.render(tempPost));
-
+  
   const postElement = postContainer.firstElementChild;
   postElement.classList.add("state-disabled");
-
+  
   try {
     // Submit to API
     const response = await ApiService.query(
@@ -115,6 +116,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     UIManager.showError("Failed to post. Please try again.");
     postContainer.removeChild(postElement);
   } finally {
+    editor.innerHTML = "";
     postElement.classList.remove("state-disabled");
   }
 });
