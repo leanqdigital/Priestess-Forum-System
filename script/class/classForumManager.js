@@ -321,14 +321,11 @@ class ForumManager {
     try {
       buttons.forEach((button) => {
         button.disabled = true;
-        button.style.opacity = "0.5"; // Add this line
+        button.style.opacity = "0.5";
       });
-
       if (isBookmarked) {
         await this.deleteMultipleBookmarks(existingBookmarkIds);
-        this.savedPostIds.delete(postId); // ✅ Update local state immediately
-
-        // ✅ If in "Saved" tab, remove the post from UI
+        this.savedPostIds.delete(postId);
         if (this.currentFilter === "saved" && postElement) {
           postElement.classList.add(
             "opacity-0",
@@ -339,24 +336,17 @@ class ForumManager {
         }
       } else {
         const newBookmarkId = await this.createBookmark(postId);
-        this.savedPostIds.set(postId, newBookmarkId); // ✅ Update local state immediately
+        this.savedPostIds.set(postId, newBookmarkId);
       }
-
-      // ✅ Update icons without re-fetching everything
       this.updateBookmarkIcons();
-
-      UIManager.showSuccess(
-        `Post ${isBookmarked ? "removed from" : "added to"} bookmarks`
-      );
+      UIManager.showSuccess(`Post ${isBookmarked ? "removed from" : "added to"} bookmarks`);
     } catch (error) {
-      UIManager.showError(
-        `Failed to ${isBookmarked ? "remove" : "save"} bookmark`
-      );
+      console.error("Error in toggleBookmark:", error); // Log the error for debugging
+      UIManager.showError(`Failed to ${isBookmarked ? "remove" : "save"} bookmark`);
     } finally {
-      // Re-enable buttons and reset opacity
       buttons.forEach((button) => {
         button.disabled = false;
-        button.style.opacity = "1"; // Add this line
+        button.style.opacity = "1";
       });
     }
   }
@@ -386,6 +376,17 @@ class ForumManager {
     return response.createOContactSavedPost.id;
   }
 
+  async deleteMultipleBookmarks(bookmarkIds) {
+    try {
+      for (const id of bookmarkIds) {
+        await this.deleteBookmark(id);
+      }
+    } catch (error) {
+      console.error("Error in deleteMultipleBookmarks:", error); // Log the error for debugging
+      throw error; // Re-throw the error to be caught by the outer try-catch block
+    }
+  }
+
   async deleteBookmark(savedRecordId) {
     const query = `
         mutation deleteOContactSavedPost($id: PriestessOContactSavedPostID) {
@@ -395,23 +396,10 @@ class ForumManager {
         }
       `;
     const variables = { id: savedRecordId };
-    await ApiService.query(query, variables);
-  }
-
-  async deleteMultipleBookmarks(bookmarkIds) {
-    await Promise.all(
-      bookmarkIds.map((id) =>
-        this.deleteBookmark(id).catch((error))
-      )
-    );
-
-    // Update local state
-    bookmarkIds.forEach((id) => {
-      const postId = [...this.savedPostIds.entries()].find(
-        ([_, bookmarkId]) => bookmarkId === id
-      )?.[0];
-      if (postId) this.savedPostIds.delete(postId);
-    });
+    const response = await ApiService.query(query, variables);
+    if (!response || !response.deleteOContactSavedPost) {
+      throw new Error("Failed to delete bookmark");
+    }
   }
 
   updateBookmarkIcons() {
@@ -1383,28 +1371,38 @@ class ForumManager {
       const buttonForComment = e.target.closest(".load-comments-btn");
       if (buttonForComment) {
         const postId = buttonForComment.dataset.postId;
-        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+        const postElement = document.querySelector(
+          `[data-post-id="${postId}"]`
+        );
         if (postElement) {
           const authorId = postElement.dataset.authorId; // Move inside the if block to prevent null access
-      
-          const imageElement = postElement.querySelector(".post-image-wrapper img");
+
+          const imageElement = postElement.querySelector(
+            ".post-image-wrapper img"
+          );
           const postImage = imageElement ? imageElement.src : "";
-      
+
           const post = {
             id: postId,
             authorId: authorId,
             author: {
-              name: postElement.querySelector(".post-author-name")?.textContent || "", // Add optional chaining
+              name:
+                postElement.querySelector(".post-author-name")?.textContent ||
+                "", // Add optional chaining
               profileImage: postElement.querySelector("img")?.src || "", // Ensure this selector is correct
             },
             date: postElement.querySelector("time")?.textContent || "",
             title: postElement.querySelector("h3")?.textContent || "",
-            content: postElement.querySelector(".post-content div")?.textContent || "",
+            content:
+              postElement.querySelector(".post-content div")?.textContent || "",
             post_image: postImage,
-            PostVotesCount: postElement.querySelector(".postVoteCount")?.textContent || "0",
-            PostCommentCount: postElement.querySelector(".postCommentCount")?.textContent || "0",
+            PostVotesCount:
+              postElement.querySelector(".postVoteCount")?.textContent || "0",
+            PostCommentCount:
+              postElement.querySelector(".postCommentCount")?.textContent ||
+              "0",
           };
-      
+
           await PostModalManager.open(post);
         }
       }
