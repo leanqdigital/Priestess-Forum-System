@@ -14,7 +14,6 @@ class ForumManager {
     this.votedPostIds = new Map();
     this.votedCommentIds = new Map();
     this.votedReplyIds = new Map();
-    this.voteReplyCounts = new Map();
     this.init();
   }
 
@@ -1027,7 +1026,8 @@ class ForumManager {
             Author_Last_Name: field(arg: ["Author", "last_name"])
             Author_Profile_Image: field(arg: ["Author", "profile_image"])
             Date_Added: field(arg: ["created_at"])
-            Comment: field(arg: ["comment"])
+            Comment: field(arg: ["comment"]) 
+            Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }]) 
           }
         }
       `;
@@ -1037,6 +1037,7 @@ class ForumManager {
           id: reply.ID,
           content: reply.Comment,
           date: Formatter.formatTimestamp(reply.Date_Added),
+          ReplyVoteCount: reply.Member_Comment_Upvotes_DataTotal_Count,
           author: Formatter.formatAuthor({
             firstName: reply.Author_First_Name,
             lastName: reply.Author_Last_Name,
@@ -1230,7 +1231,6 @@ class ForumManager {
     );
     const voteRecords = await this.fetchVoteForReply(replyId);
     const isReplyVoted = voteRecords.length > 0;
-    let voteCount = this.voteReplyCounts.get(replyId) || 0;
 
     let successMessage = "";
 
@@ -1243,7 +1243,6 @@ class ForumManager {
       if (isReplyVoted) {
         await this.deleteReplyVote(replyId);
         this.votedReplyIds.delete(replyId);
-        voteCount = Math.max(0, voteCount - 1);
         successMessage = "Comment unvoted";
       } else {
         const voteId = await this.createReplyVote(replyId);
@@ -1251,25 +1250,21 @@ class ForumManager {
           this.votedReplyIds.set(replyId, new Set());
         }
         this.votedReplyIds.get(replyId).add(voteId);
-        voteCount += 1;
         successMessage = "Comment voted";
       }
-
-      this.voteReplyCounts.set(replyId, voteCount);
-      this.updateReplyVoteUI(replyId);
+      // Update both the vote icon and the vote count.
+      await this.updateReplyVoteUI(replyId);
     } catch (error) {
       UIManager.showError(
         `Failed to ${isReplyVoted ? "unvote" : "vote"} comment`
       );
-      return; // Stop execution if there's an error
+      return;
     } finally {
       buttons.forEach((button) => {
         button.disabled = false;
         button.style.opacity = "1";
       });
     }
-
-    // ✅ Ensure success message is only shown if there was no error
     UIManager.showSuccess(successMessage);
   }
 
@@ -1329,26 +1324,40 @@ class ForumManager {
         )
       )
     );
-
-    // Remove the entry from the local map.
     this.votedReplyIds.delete(replyId);
   }
 
-  updateReplyVoteUI(replyId) {
+  async updateReplyVoteUI(replyId) {
     const replyElement = document.querySelector(`[data-reply-id="${replyId}"]`);
     if (!replyElement) return;
 
-    const isVoted = this.votedReplyIds.has(replyId);
-    const voteCount = this.voteReplyCounts.get(replyId) || 0;
+    // Use a proper variable ($id) instead of an undefined commentId.
+    const query = `
+      query calcForumComments($id: PriestessForumCommentID) {
+        calcForumComments(query: [{ where: { id: $id } }]) {
+          Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
+        }
+      }
+    `;
 
+    try {
+      const data = await ApiService.query(query, { id: replyId });
+      const updatedCount =
+        data?.calcForumComments?.[0]?.Member_Comment_Upvotes_DataTotal_Count;
+      const voteCountElement = replyElement.querySelector(".vote-count");
+      if (voteCountElement && updatedCount !== undefined) {
+        voteCountElement.textContent = updatedCount;
+      }
+    } catch (error) {
+      console.error("Failed to update vote count for reply", error);
+      // Optionally: return here or handle the error gracefully.
+    }
+
+    // Update the vote icon based on the local state.
+    const isVoted = this.votedReplyIds.has(replyId);
     const voteButton = replyElement.querySelector(".vote-button");
     if (voteButton) {
       voteButton.innerHTML = this.getReplyVoteSVG(isVoted);
-    }
-
-    const voteCountElement = replyElement.querySelector(".vote-count"); // 🔥 Fixed from `commentElement`
-    if (voteCountElement) {
-      voteCountElement.textContent = voteCount;
     }
   }
 
@@ -1420,10 +1429,10 @@ class ForumManager {
       }
 
       const buttonForComment = e.target.closest(".load-comments-btn");
+
       if (buttonForComment) {
         const postId = buttonForComment.dataset.postId;
         const postElement = document.querySelector(`.postcard-${postId}`);
-        console.log(postElement);
 
         if (postElement) {
           const authorId = postElement.dataset.authorId;

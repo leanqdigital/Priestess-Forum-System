@@ -232,7 +232,7 @@ class PostModalManager {
             comment.id
           );
           comment.isCommentVoted = voteRecords.length > 0;
-          comment.voteCommentCount = voteRecords.length;
+          // comment.voteCommentCount = voteRecords.length;
         })
       );
 
@@ -275,7 +275,6 @@ class PostModalManager {
                   reply.id
                 );
                 reply.isReplyVoted = voteRecords.length > 0;
-                reply.voteReplyCount = voteRecords.length;
               })
             );
 
