@@ -339,10 +339,14 @@ class ForumManager {
         this.savedPostIds.set(postId, newBookmarkId);
       }
       this.updateBookmarkIcons();
-      UIManager.showSuccess(`Post ${isBookmarked ? "removed from" : "added to"} bookmarks`);
+      UIManager.showSuccess(
+        `Post ${isBookmarked ? "removed from" : "added to"} bookmarks`
+      );
     } catch (error) {
       console.error("Error in toggleBookmark:", error); // Log the error for debugging
-      UIManager.showError(`Failed to ${isBookmarked ? "remove" : "save"} bookmark`);
+      UIManager.showError(
+        `Failed to ${isBookmarked ? "remove" : "save"} bookmark`
+      );
     } finally {
       buttons.forEach((button) => {
         button.disabled = false;
@@ -1375,13 +1379,11 @@ class ForumManager {
           `[data-post-id="${postId}"]`
         );
         if (postElement) {
-          const authorId = postElement.dataset.authorId; // Move inside the if block to prevent null access
-
+          const authorId = postElement.dataset.authorId;
           const imageElement = postElement.querySelector(
             ".post-image-wrapper img"
           );
           const postImage = imageElement ? imageElement.src : "";
-
           const post = {
             id: postId,
             authorId: authorId,

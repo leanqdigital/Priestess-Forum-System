@@ -161,3 +161,4 @@ document.addEventListener("click", (event) => {
     postElement.hide();
   }
 });
+

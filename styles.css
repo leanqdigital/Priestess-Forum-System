@@ -487,3 +487,23 @@ h4 {
   pointer-events: none;
   cursor: not-allowed;
 }
+
+#output {
+  max-width: 600px;
+  width: 100%;
+}
+
+.announcement-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  line-height: 1.4;
+  color: #333;
+}
+
+.bg-unread {
+  background-color: #022327;
+}
