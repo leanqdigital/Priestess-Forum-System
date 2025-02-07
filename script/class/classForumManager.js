@@ -561,6 +561,13 @@ class ForumManager {
     `;
   }
 
+  async refreshPosts() {
+    document.querySelector(CONFIG.selectors.postsContainer).innerHTML = "";
+    this.postsOffset = 0;
+    this.hasMorePosts = true;
+    await this.fetchAndRenderPosts(true);
+  }
+
   async loadMorePosts() {
     if (this.isLoading) return;
     this.isLoading = true;
@@ -1477,6 +1484,10 @@ class ForumManager {
       if (e.target.closest(".delete-reply-btn")) {
         const replyId = e.target.closest(".delete-reply-btn").dataset.replyId;
         this.deleteReply(replyId);
+      }
+
+      if (e.target.closest(".refresh-button")) {
+        this.refreshPosts();
       }
     });
   }
