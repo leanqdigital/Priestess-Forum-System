@@ -21,7 +21,6 @@ document.getElementById("submit-post").addEventListener("click", async () => {
     if (id) mentionedIds.push(id);
   });
 
-
   // Create temporary post
   const tempPost = {
     id: `temp-${Date.now()}`,
@@ -110,6 +109,8 @@ document.getElementById("submit-post").addEventListener("click", async () => {
       actualPost.ForumCommentsTotalCount;
     postElement.querySelector(".postVoteCount").textContent =
       actualPost.Member_Post_Upvotes_DataTotal_Count;
+    postElement.querySelector(".delete-post-btn").dataset.postId =
+      actualPost.ID;
     postElement.dataset.postId = actualPost.ID;
   } catch (error) {
     // UIManager.showError("Failed to post. Please try again.");
@@ -161,4 +162,3 @@ document.addEventListener("click", (event) => {
     postElement.hide();
   }
 });
-
