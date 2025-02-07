@@ -112,9 +112,9 @@ class PostModalManager {
                         <div class="h-[2px] w-full bg-[#d9d9d9]"></div>
                                       
               <!-- Add comment form -->
-              <div class="comment-form-wrapper mb-4 flex flex-col gap-4 border border-gray-600 active:border-[#ffffff] focus:border-[#ffffff] comment-form flex items-center gap-3 w-full bg-primary-100 min-[500px]:rounded max-[500px]:p-4 z-[999] max-[500px]:!z-[99999] max-[500px]:fixed bottom-0 right-0 w-full max-[500px]:bg-primary">
-                  <div id="comment-editor" class="relative h-[80px] editor comment-editor text-white p-2 w-full h-10 !border-none !focus-visible:border-none rounded" contenteditable="true"></div>
-                  <div class="flex items-center justify-between w-full p-2">
+              <div class="comment-form-wrapper max-[500px]:mb-0 mb-4 flex flex-col gap-4 border border-gray-600 active:border-[#ffffff] focus:border-[#ffffff] comment-form flex items-center gap-3 w-full bg-primary-100 min-[500px]:rounded max-[500px]:p-4 z-[999] max-[500px]:!z-[99999] max-[500px]:fixed bottom-0 right-0 w-full max-[500px]:bg-primary">
+                  <div id="comment-editor" class="relative h-[80px] editor comment-editor text-white p-2 w-full h-10 max-[500px]:h-1 !border-none !focus-visible:border-none rounded" contenteditable="true"></div>
+                  <div class="flex items-center justify-between w-full p-2 max-[500px]:p-0">
                       <div class="flex items-center gap-3">
                           <button class="icon-button" type="button">
                               <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">

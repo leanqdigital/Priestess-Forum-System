@@ -14,7 +14,7 @@
 </head>
 
 <body class="bg-primary" x-data="{ openCommentModal: false }">
-    <header class="max-w-[680px] mx-auto py-10">
+    <header class="max-w-[680px] mx-auto py-10 max-[500px]:py-4">
         <div class="w-full px-4 py-2 justify-between items-center inline-flex">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -54,11 +54,11 @@
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex gap-x-2 items-center">
-                                <svg class="hidden max-[600px]:block" width="18" height="15" viewBox="0 0 18 15"
+                                <svg class="closeNotificationModal hidden max-[600px]:block" width="18" height="15" viewBox="0 0 18 15"
                                     fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M17.3332 7.27761C17.3332 7.46178 17.26 7.63841 17.1298 7.76864C16.9996 7.89887 16.8229 7.97203 16.6388 7.97203H3.03763L8.10257 13.0361C8.16709 13.1006 8.21827 13.1772 8.25319 13.2615C8.2881 13.3458 8.30608 13.4362 8.30608 13.5274C8.30608 13.6187 8.2881 13.709 8.25319 13.7933C8.21827 13.8776 8.16709 13.9542 8.10257 14.0187C8.03805 14.0832 7.96146 14.1344 7.87716 14.1693C7.79286 14.2042 7.70251 14.2222 7.61127 14.2222C7.52002 14.2222 7.42967 14.2042 7.34538 14.1693C7.26108 14.1344 7.18448 14.0832 7.11996 14.0187L0.870168 7.76892C0.805604 7.70442 0.754384 7.62784 0.719438 7.54353C0.684491 7.45923 0.666504 7.36887 0.666504 7.27761C0.666504 7.18635 0.684491 7.09599 0.719438 7.01169C0.754384 6.92739 0.805604 6.8508 0.870168 6.78631L7.11996 0.536512C7.25027 0.406211 7.42699 0.333008 7.61127 0.333008C7.79554 0.333008 7.97227 0.406211 8.10257 0.536512C8.23287 0.666814 8.30608 0.843541 8.30608 1.02782C8.30608 1.21209 8.23287 1.38882 8.10257 1.51912L3.03763 6.58319H16.6388C16.8229 6.58319 16.9996 6.65635 17.1298 6.78658C17.26 6.91681 17.3332 7.09344 17.3332 7.27761Z"
-                                        fill="#636D88" />
+                                        fill="#ffffff" />
                                 </svg>
                                 <div class="text-white text-lg font-semibold font-['Avenir LT Std'] leading-snug">
                                     Notification</div>
@@ -705,7 +705,7 @@
                                     </svg>
                                     {{/if}}
                                 </button>
-                                <div class="o1 text-white vote-count">{{:ReplyVoteCount}}</div>
+                                <div class="o1 text-white">{{:ReplyVoteCount}}</div>
                             </div>
                             <div class="o3 text-white">{{:date}}</div>
                         </div>
@@ -748,6 +748,9 @@
         document.addEventListener("click", (event) => {
             if (event.target.closest(".bellIcon")) {
                 document.querySelector(".announcements").classList.toggle("hidden");
+            }
+            if(event.target.closest(".closeNotificationModal")){
+                document.querySelector(".announcements").classList.add("hidden");
             }
         });
 

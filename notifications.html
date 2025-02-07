@@ -119,11 +119,6 @@
     </div>
 
     <script>
-        document.addEventListener("alpine:init", () => {
-            Alpine.store("postModalData", {
-                post: {},
-            });
-        });
         const LOGGED_IN_USER_ID = "171031";
         const LOGGED_IN_USER_FIRST_NAME = "Dpes";
         const LOGGED_IN_USER_LAST_NAME = "Adikari";
@@ -155,6 +150,9 @@
         document.addEventListener("click", (event) => {
             if (event.target.closest(".bellIcon")) {
                 document.querySelector(".announcements").classList.toggle("hidden");
+            }
+            if(event.target.closest(".closeNotificationModal")){
+                document.querySelector(".announcements").classList.add("hidden");
             }
         });
 
