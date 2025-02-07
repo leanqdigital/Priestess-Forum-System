@@ -13,7 +13,6 @@ class ForumManager {
     this.savedPostIds = new Map();
     this.votedPostIds = new Map();
     this.votedCommentIds = new Map();
-    this.voteCommentCounts = new Map();
     this.votedReplyIds = new Map();
     this.voteReplyCounts = new Map();
     this.init();
@@ -640,88 +639,99 @@ class ForumManager {
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
+  // --- FETCH ALL COMMENTS FOR A POST ---
   async fetchComments(postId) {
     try {
       const query = `
-        query {
-          calcForumComments(
-            orderBy: [{ path: ["created_at"], type: desc }]
-            query: [{
-              where: {
-                Forum_Post: [{ where: { id: "${postId}" } }],
-                Parent_Comment: [{ where: { id: null } }],
-              }
-            }]
-          ) {
-            ID: field(arg: ["id"])
-            Author_First_Name: field(arg: ["Author", "first_name"])
-            Author_Last_Name: field(arg: ["Author", "last_name"])
-            Author_Profile_Image: field(arg: ["Author", "profile_image"])
-            Date_Added: field(arg: ["created_at"])
-            Comment: field(arg: ["comment"])
-          }
+      query {
+        calcForumComments(
+          orderBy: [{ path: ["created_at"], type: desc }]
+          query: [{
+            where: {
+              Forum_Post: [{ where: { id: "${postId}" } }],
+              Parent_Comment: [{ where: { id: null } }]
+            }
+          }]
+        ) {
+          ID: field(arg: ["id"])
+          Author_First_Name: field(arg: ["Author", "first_name"])
+          Author_Last_Name: field(arg: ["Author", "last_name"])
+          Author_Profile_Image: field(arg: ["Author", "profile_image"])
+          Date_Added: field(arg: ["created_at"])
+          Comment: field(arg: ["comment"])
+          Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
         }
-      `;
+      }
+    `;
       const data = await ApiService.query(query);
       const comments = data?.calcForumComments || [];
       return comments.map((comment) => ({
         id: comment.ID,
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
+        CommentVotesCount: comment.Member_Comment_Upvotes_DataTotal_Count,
         author: Formatter.formatAuthor({
           firstName: comment.Author_First_Name,
           lastName: comment.Author_Last_Name,
           profileImage: comment.Author_Profile_Image,
         }),
-        isCommentVoted: this.votedCommentIds.has(comment.ID),
-        voteCommentCount: this.voteCommentCounts.get(comment.ID) || 0,
+        // If you are storing vote records in a Map (see below), check whether votes exist:
+        isCommentVoted: this.votedCommentIds.get(comment.ID)?.size > 0,
       }));
     } catch (error) {
+      console.error("Error fetching comments:", error);
       return [];
     }
   }
 
+  // --- CREATE A COMMENT WITH OPTIMISTIC RENDERING ---
   async createComment(postId, content, mentions) {
+    // Create a temporary comment for optimistic rendering.
+    const tempCommentId = `temp-${Date.now()}`;
+    const tempComment = {
+      id: tempCommentId,
+      content,
+      CommentVotesCount: "0",
+      date: "Just now",
+      author: {
+        name: this.fullName,
+        profileImage: this.defaultAuthorImage,
+      },
+    };
+
+    // Render the temporary comment using the comment template.
+    const template = $.templates("#comment-template");
+    const commentsContainer = document.getElementById(
+      "modal-comments-container"
+    );
+    commentsContainer.insertAdjacentHTML(
+      "afterbegin",
+      template.render(tempComment)
+    );
+
+    // Find and disable the temporary comment element.
+    let commentElement = commentsContainer.querySelector(
+      `[data-comment-id="${tempCommentId}"]`
+    );
+    if (commentElement) {
+      commentElement.classList.add("state-disabled");
+    }
+
+    let newComment; // to hold the mutation result
+
+    // ----- STEP 1: Run the Mutation -----
     try {
-      const tempCommentId = `temp-${Date.now()}`;
-      const tempComment = {
-        id: tempCommentId,
-        content,
-        date: "Just now",
-        author: {
-          name: this.fullName,
-          profileImage: this.defaultAuthorImage,
-        },
-        defaultAuthorImage: this.defaultAuthorImage,
-      };
-
-      // Optimistic rendering
-      const template = $.templates("#comment-template");
-      const commentsContainer = document.getElementById(
-        "modal-comments-container"
-      );
-      commentsContainer.insertAdjacentHTML(
-        "afterbegin",
-        template.render(tempComment)
-      );
-
-      // Find the newly added comment and disable it
-      const commentElement =
-        commentsContainer.querySelector(
-          `[data-comment-id="${tempCommentId}"]`
-        ) || commentsContainer.firstElementChild;
-      commentElement.classList.add("state-disabled"); // Add disabled class
-
-      // API call
-      const query = `
-          mutation createForumComment($payload: ForumCommentCreateInput!) {
-            createForumComment(payload: $payload) {
-              id
-              comment
-              forum_post_id
-            }
+      const mutationQuery = `
+        mutation createForumComment($payload: ForumCommentCreateInput!) {
+          createForumComment(payload: $payload) {
+            id
+            author_id
+            forum_post_id
+            comment
+            Comment_or_Reply_Mentions { id }
           }
-        `;
+        }
+      `;
       const variables = {
         payload: {
           author_id: this.userId,
@@ -731,56 +741,98 @@ class ForumManager {
         },
       };
 
-      const response = await ApiService.query(query, variables);
-      const newComment = response.createForumComment;
-
-      // Update the temporary comment with the real comment ID
-      commentElement.dataset.commentId = newComment.id;
-      commentElement.classList.remove("state-disabled"); // Enable comment
-
-      // Reload comments
-      await PostModalManager.loadComments(postId);
+      const mutationResponse = await ApiService.query(mutationQuery, variables);
+      newComment = mutationResponse.createForumComment;
     } catch (error) {
+      // If the mutation fails, show an error and remove the temporary comment.
       UIManager.showError("Failed to post comment");
-    } finally {
-      const commentsContainer = document.getElementById(
-        "modal-comments-container"
+      if (commentElement) {
+        commentElement.remove();
+      }
+      return;
+    }
+
+    // ----- STEP 2: Attempt to Fetch Full Comment Data -----
+    // Use a short delay to allow the backend to index the new comment.
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const fetchQuery = `
+      query calcForumComments($id: PriestessForumCommentID) {
+        calcForumComments(query: [{ where: { id: $id } }]) {
+          ID: field(arg: ["id"])
+          Author_First_Name: field(arg: ["Author", "first_name"])
+          Author_Last_Name: field(arg: ["Author", "last_name"])
+          Author_Profile_Image: field(arg: ["Author", "profile_image"])
+          Date_Added: field(arg: ["created_at"])
+          Comment: field(arg: ["comment"])
+          Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
+        }
+      }
+    `;
+
+      const fetchResponse = await ApiService.query(fetchQuery, {
+        id: newComment.id,
+      });
+      const actualComment = fetchResponse.calcForumComments[0];
+
+      // Prepare the updated comment object.
+      const updatedComment = {
+        id: actualComment.ID,
+        content: actualComment.Comment,
+        author: {
+          name: `${actualComment.Author_First_Name} ${actualComment.Author_Last_Name}`,
+          profileImage: actualComment.Author_Profile_Image,
+        },
+        CommentVotesCount: actualComment.Member_Comment_Upvotes_DataTotal_Count,
+      };
+
+      // Re-render the comment with complete data.
+      commentElement.outerHTML = template.render(updatedComment);
+      commentElement.querySelector(".vote-button").dataset.commentId =
+        newComment.id;
+    } catch (fetchError) {
+      // If fetching updated data fails, simply update the comment element:
+      // • Set the real comment ID.
+      // • Remove the disabled state so the comment remains visible.
+      commentElement.dataset.commentId = newComment.id;
+      commentElement.classList.remove("state-disabled");
+      console.error(
+        "Failed to fetch updated comment data, but the comment was created:",
+        fetchError
       );
-      const tempCommentElement =
-        commentsContainer.querySelector(
-          `[data-comment-id="${tempCommentId}"]`
-        ) || commentsContainer.firstElementChild;
-      if (tempCommentElement) {
-        tempCommentElement.remove();
+    }
+  }
+
+  // --- FETCH THE VOTE COUNT FOR A COMMENT ---
+  async fetchCommentVoteCount(commentId) {
+    const query = `
+    query {
+      calcForumComments(query: [{ where: { id: "${commentId}" } }]) {
+        Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
       }
     }
+  `;
+    const response = await ApiService.query(query);
+    return response.calcForumComments[0].Member_Comment_Upvotes_DataTotal_Count;
   }
 
   async fetchVoteForComment(commentId) {
     try {
       const query = `
-        query calcMemberCommentUpvotesForumCommentUpvotesMany(
-          $member_comment_upvote_id: PriestessContactID
-          $forum_comment_upvote_id: PriestessForumCommentID
+      query calcMemberCommentUpvotesForumCommentUpvotesMany(
+        $member_comment_upvote_id: PriestessContactID
+        $forum_comment_upvote_id: PriestessForumCommentID
+      ) {
+        calcMemberCommentUpvotesForumCommentUpvotesMany(
+          query: [
+            { where: { member_comment_upvote_id: $member_comment_upvote_id } },
+            { andWhere: { forum_comment_upvote_id: $forum_comment_upvote_id } }
+          ]
         ) {
-          calcMemberCommentUpvotesForumCommentUpvotesMany(
-            query: [
-              {
-                where: {
-                  member_comment_upvote_id: $member_comment_upvote_id
-                }
-              },
-              {
-                andWhere: {
-                  forum_comment_upvote_id: $forum_comment_upvote_id
-                }
-              }
-            ]
-          ) {
-            ID: field(arg: ["id"])
-          }
+          ID: field(arg: ["id"])
         }
-      `;
+      }
+    `;
       const variables = {
         member_comment_upvote_id: this.userId,
         forum_comment_upvote_id: commentId,
@@ -789,75 +841,72 @@ class ForumManager {
       const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
       return votes;
     } catch (error) {
+      console.error("Error fetching vote for comment:", error);
       return [];
     }
   }
 
+  // --- TOGGLE VOTE ON A COMMENT (Vote/Unvote) ---
   async toggleCommentVote(commentId) {
+    // Get all vote buttons for the comment.
     const buttons = document.querySelectorAll(
       `.vote-button[data-comment-id="${commentId}"]`
     );
 
-    // Check if the user has already voted for this comment.
+    // Check if the user has already voted.
     const voteRecords = await this.fetchVoteForComment(commentId);
     const isCommentVoted = voteRecords.length > 0;
 
-    // Get the current vote count for this comment from the local map (defaulting to 0).
-    let voteCount = this.voteCommentCounts.get(commentId) || 0;
-
     try {
-      // Disable buttons and set opacity
+      // Disable vote buttons during processing.
       buttons.forEach((button) => {
         button.disabled = true;
-        button.style.opacity = "0.5"; // Add this line
+        button.style.opacity = "0.5";
       });
 
       if (isCommentVoted) {
         // Remove the vote.
         await this.deleteCommentVote(commentId);
-        // Remove our local record for this comment.
         this.votedCommentIds.delete(commentId);
-        voteCount = Math.max(0, voteCount - 1);
       } else {
         // Create a new vote.
         const voteId = await this.createCommentVote(commentId);
-        // If no local record exists yet, initialize a Set.
         if (!this.votedCommentIds.has(commentId)) {
           this.votedCommentIds.set(commentId, new Set());
         }
         this.votedCommentIds.get(commentId).add(voteId);
-        voteCount += 1;
       }
 
-      // Update the local vote count.
-      this.voteCommentCounts.set(commentId, voteCount);
-
-      // Update the UI for this comment.
-      this.updateCommentVoteUI(commentId);
+      // Update the vote button icon and vote count.
+      await this.updateCommentVoteUI(commentId);
       UIManager.showSuccess(`Comment ${isCommentVoted ? "unvoted" : "voted"}`);
     } catch (error) {
       UIManager.showError(
         `Failed to ${isCommentVoted ? "unvote" : "vote"} comment`
       );
+      console.error("Error in toggleCommentVote:", error);
     } finally {
-      // Re-enable buttons and reset opacity
+      // Re-enable buttons.
       buttons.forEach((button) => {
         button.disabled = false;
-        button.style.opacity = "1"; // Add this line
+        button.style.opacity = "1";
       });
     }
   }
 
+  // --- CREATE A NEW COMMENT VOTE ---
   async createCommentVote(commentId) {
     const query = `
-      mutation createMemberCommentUpvotesForumCommentUpvotes(
-        $payload: MemberCommentUpvotesForumCommentUpvotesCreateInput!
-      ) {
-        createMemberCommentUpvotesForumCommentUpvotes(payload: $payload) {
-          id
-        }
+    mutation createMemberCommentUpvotesForumCommentUpvotes(
+      $payload: MemberCommentUpvotesForumCommentUpvotesCreateInput!
+    ) {
+      createMemberCommentUpvotesForumCommentUpvotes(payload: $payload) {
+        id
+        member_comment_upvote_id
+        forum_comment_upvote_id
       }
-    `;
+    }
+  `;
     const variables = {
       payload: {
         member_comment_upvote_id: this.userId,
@@ -868,10 +917,11 @@ class ForumManager {
     return response.createMemberCommentUpvotesForumCommentUpvotes.id;
   }
 
+  // --- DELETE COMMENT VOTE(S) ---
   async deleteCommentVote(commentId) {
     let voteIds = this.votedCommentIds.get(commentId);
     if (!voteIds || voteIds.size === 0) {
-      // If no local record, try to fetch them first.
+      // If no local record exists, fetch the votes.
       const voteRecords = await this.fetchVoteForComment(commentId);
       voteRecords.forEach((vote) => {
         if (!this.votedCommentIds.has(commentId)) {
@@ -888,56 +938,64 @@ class ForumManager {
       [...voteIds].map((id) =>
         ApiService.query(
           `
-            mutation deleteMemberCommentUpvotesForumCommentUpvotes(
-              $id: PriestessMemberCommentUpvotesForumCommentUpvotesID
+          mutation deleteMemberCommentUpvotesForumCommentUpvotes(
+            $id: PriestessMemberCommentUpvotesForumCommentUpvotesID
+          ) {
+            deleteMemberCommentUpvotesForumCommentUpvotes(
+              query: [{ where: { id: $id } }]
             ) {
-              deleteMemberCommentUpvotesForumCommentUpvotes(
-                query: [{ where: { id: $id } }]
-              ) {
-                id
-              }
+              id
             }
-          `,
+          }
+        `,
           { id }
         )
       )
     );
 
-    // Remove the entry from the local map.
+    // Remove the local record.
     this.votedCommentIds.delete(commentId);
   }
 
-  updateCommentVoteUI(commentId) {
+  // --- UPDATE COMMENT VOTE UI (Icon and Count) ---
+  async updateCommentVoteUI(commentId) {
     const commentElement = document.querySelector(
       `[data-comment-id="${commentId}"]`
     );
     if (!commentElement) return;
 
-    const isVoted = this.votedCommentIds.has(commentId);
-    const voteCount = this.voteCommentCounts.get(commentId) || 0;
-
+    // Determine if the comment is voted (using our local map).
+    const isVoted = this.votedCommentIds.get(commentId)?.size > 0;
     const voteButton = commentElement.querySelector(".vote-button");
     if (voteButton) {
       voteButton.innerHTML = this.getCommentVoteSVG(isVoted);
     }
-    const voteCountElement = commentElement.querySelector(".vote-count");
-    if (voteCountElement) {
-      voteCountElement.textContent = voteCount;
+
+    // Also update the vote count by fetching the latest count.
+    try {
+      const count = await this.fetchCommentVoteCount(commentId);
+      const voteCountElement = commentElement.querySelector(".vote-count");
+      if (voteCountElement) {
+        voteCountElement.textContent = count;
+      }
+    } catch (error) {
+      console.error("Error fetching vote count:", error);
     }
   }
 
+  // --- GET THE SVG FOR THE VOTE BUTTON ---
   getCommentVoteSVG(isVoted) {
     return `
-      <svg width="24" height="24" viewBox="0 0 24 24" 
-           fill="${isVoted ? "#C29D68" : "none"}" 
-           stroke="#C29D68">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-                 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-                 C13.09 3.81 14.76 3 16.5 3
-                 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54
-                 L12 21.35z"/>
-      </svg>
-    `;
+    <svg width="24" height="24" viewBox="0 0 24 24" 
+         fill="${isVoted ? "#C29D68" : "none"}" 
+         stroke="#C29D68">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+               2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+               C13.09 3.81 14.76 3 16.5 3
+               19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54
+               L12 21.35z"/>
+    </svg>
+  `;
   }
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
@@ -1364,34 +1422,33 @@ class ForumManager {
       const buttonForComment = e.target.closest(".load-comments-btn");
       if (buttonForComment) {
         const postId = buttonForComment.dataset.postId;
-        const postElement = document.querySelector(
-          `[data-post-id="${postId}"]`
-        );
+        const postElement = document.querySelector(`.postcard-${postId}`);
+        console.log(postElement);
+
         if (postElement) {
           const authorId = postElement.dataset.authorId;
-          const imageElement = postElement.querySelector(
-            ".post-image-wrapper img"
-          );
-          const postImage = imageElement ? imageElement.src : "";
+          const authorImage = postElement.dataset.authorImage;
+          const authorName = postElement.dataset.authorName;
+          const date = postElement.dataset.postDate;
+          const title = postElement.dataset.title;
+          const content = postElement.dataset.content;
+          const postImage = postElement.dataset.postImage;
+          const voteCount = postElement.dataset.voteCount;
+          const commentCount = postElement.dataset.commentCount;
+
           const post = {
             id: postId,
             authorId: authorId,
             author: {
-              name:
-                postElement.querySelector(".post-author-name")?.textContent ||
-                "", // Add optional chaining
-              profileImage: postElement.querySelector("img")?.src || "", // Ensure this selector is correct
+              name: authorName,
+              profileImage: authorImage,
             },
-            date: postElement.querySelector("time")?.textContent || "",
-            title: postElement.querySelector("h3")?.textContent || "",
-            content:
-              postElement.querySelector(".post-content div")?.textContent || "",
+            date: date,
+            title: title,
+            content: content,
             post_image: postImage,
-            PostVotesCount:
-              postElement.querySelector(".postVoteCount")?.textContent || "0",
-            PostCommentCount:
-              postElement.querySelector(".postCommentCount")?.textContent ||
-              "0",
+            PostVotesCount: voteCount,
+            PostCommentCount: commentCount,
           };
 
           await PostModalManager.open(post);

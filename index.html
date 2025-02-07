@@ -43,7 +43,9 @@
                             d="M13.0758 19.2308C13.0758 19.4348 12.9948 19.6304 12.8505 19.7747C12.7062 19.919 12.5106 20 12.3066 20H6.15273C5.94872 20 5.75306 19.919 5.6088 19.7747C5.46455 19.6304 5.3835 19.4348 5.3835 19.2308C5.3835 19.0268 5.46455 18.8311 5.6088 18.6868C5.75306 18.5426 5.94872 18.4615 6.15273 18.4615H12.3066C12.5106 18.4615 12.7062 18.5426 12.8505 18.6868C12.9948 18.8311 13.0758 19.0268 13.0758 19.2308ZM18.2498 14.6096C17.7152 13.6904 16.922 11.0894 16.922 7.69231C16.922 5.65218 16.1115 3.69561 14.6689 2.25302C13.2263 0.810437 11.2698 0 9.22966 0C7.18953 0 5.23296 0.810437 3.79037 2.25302C2.34778 3.69561 1.53735 5.65218 1.53735 7.69231C1.53735 11.0904 0.743116 13.6904 0.209462 14.6096C0.0731841 14.8433 0.000937784 15.1088 9.06823e-06 15.3793C-0.000919647 15.6499 0.0695022 15.9158 0.204173 16.1505C0.338843 16.3851 0.533 16.5801 0.767064 16.7157C1.00113 16.8514 1.26682 16.9229 1.53735 16.9231H16.922C17.1924 16.9227 17.458 16.8511 17.6919 16.7153C17.9258 16.5796 18.1199 16.3847 18.2544 16.1501C18.389 15.9155 18.4593 15.6495 18.4583 15.3791C18.4574 15.1087 18.3851 14.8432 18.2489 14.6096H18.2498Z"
                             fill="#C29D68" />
                     </svg>
-                    <div class="red-dot hidden w-[5px] h-[5px] bg-[#d70f0f] rounded-full absolute top-[2px] right-[2px]"></div>
+                    <div
+                        class="red-dot hidden w-[5px] h-[5px] bg-[#d70f0f] rounded-full absolute top-[2px] right-[2px]">
+                    </div>
                 </div>
 
 
@@ -407,7 +409,18 @@
 
     <!-- Templates -->
     <script type="text/html" id="post-template">
-        <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded postCard" data-post-id="{{:id}}" data-author-id ="{{:author_id}}">
+        <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded postCard postcard-{{:id}}" 
+        data-post-id="{{:id}}" 
+        data-author-id ="{{:author_id}}"
+        data-author-image = "{{:author.profileImage}}"
+        data-author-name = "{{:author.name}}"
+        data-post-date = "{{:date}}"
+        data-title = "{{:title}}"
+        data-content = "{{:content}}"
+        data-post-image = "{{:post_image}}"
+        data-vote-count = "{{:PostVotesCount}}"
+        data-comment-count = "{{:PostCommentCount}}"
+        >
             <div class="flex items-center justify-between w-full">
                 <div class="flex items-center gap-2">
                     <div class="size-8">
@@ -586,7 +599,7 @@
                                         </svg>
                                         {{/if}}
                                     </button>
-                                    <div class="o1 text-white vote-count">{{:voteCommentCount}}</div>
+                                    <div class="o1 text-white vote-count">{{:CommentVotesCount}}</div>
                                 </div>
                                 <button class = "button text-white reply-form-toggler-{{:id}}" @click = "
                                 let replyForm = document.querySelector('.reply-form-{{:id}}');
@@ -703,11 +716,6 @@
     </script>
 
     <script>
-        document.addEventListener("alpine:init", () => {
-            Alpine.store("postModalData", {
-                post: {},
-            });
-        });
         const LOGGED_IN_USER_ID = "171031";
         const LOGGED_IN_USER_FIRST_NAME = "Dpes";
         const LOGGED_IN_USER_LAST_NAME = "Adikari";
