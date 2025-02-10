@@ -128,6 +128,8 @@
                 placeholder="Enter your thoughts ... type @Name to mention members."></div>
 
             <div class="flex items-center gap-3 justify-end">
+                <input type="file" id="post-image-upload" accept="image/*" style="display: none;">
+                <button id="upload-image-button">Upload Image</button>
                 <button class="icon-button" type="button">
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -472,9 +474,9 @@
                 <!-- Three Dots Ends -->
             </div>
             <div class="post-content flex flex-col gap-2 w-full max-h-[500px] overflow-hidden">
-                {{if post_image}}
+                {{if image}}
                 <div class="post-image-wrapper">
-                    <img src="{{:post_image}}" class="size-full object-contain ">
+                    <img src="{{:image}}" class="size-full object-contain ">
                 </div>
                 {{/if}}
                 <div class="p2 text-white !font-[350] post-copy-content">{{:content}}</div>
@@ -775,6 +777,7 @@
     <script src="script/tailwindConfig.js"></script>
     <script src="script/eventHandler.js"></script>
     <script src="script/announcements.js"></script>
+    <script src="script/remove.js"></script>
 </body>
 
 </html>

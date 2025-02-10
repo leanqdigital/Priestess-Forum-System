@@ -1,12 +1,19 @@
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => MentionManager.init());
 
+document.getElementById("upload-image-button").addEventListener("click", () => {
+  document.getElementById("post-image-upload").click();
+});
+
 document.getElementById("submit-post").addEventListener("click", async () => {
+  let awsParam = "YToyOntzOjQ6Imhhc2giO3M6MzI6ImU4YWQ0M2I2ZGRhZGY1ODgzZWU3ZWMwYTk4YTU0NTBkIjtzOjY6ImV4cGlyeSI7aToxNzM5MjA5Mzc2O30=";
   const editor = document.getElementById("post-editor");
   const textContent = editor.innerText.trim();
+  const imageFile = document.getElementById("post-image-upload").files[0];
+  console.log(imageFile);
 
-  if (!textContent) {
-    UIManager.showError("Post content cannot be empty.");
+  if (!textContent && !imageFile) {
+    UIManager.showError("Post content or image is required.");
     return;
   }
 
@@ -25,6 +32,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
   const tempPost = {
     id: `temp-${Date.now()}`,
     author_id: forumManager.userId,
+    image: imageFile ? URL.createObjectURL(imageFile) : null,
     author: {
       name: forumManager.fullName,
       profileImage: forumManager.defaultAuthorImage,
@@ -42,6 +50,18 @@ document.getElementById("submit-post").addEventListener("click", async () => {
   postElement.classList.add("state-disabled");
 
   try {
+    let postImageData = null;
+    if (imageFile) {
+      const toSubmitFields = {};
+      await processFileFields(toSubmitFields, [
+        {
+          fieldName: "f4932",
+          file: imageFile,
+        },
+      ], awsParam);
+
+      postImageData = JSON.parse(toSubmitFields.f4932);
+    }
     // Submit to API
     const response = await ApiService.query(
       `
@@ -50,6 +70,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
           id
           author_id
           post_copy
+          post_image
           Mentioned_Users {
             id
           }
@@ -58,6 +79,7 @@ document.getElementById("submit-post").addEventListener("click", async () => {
       `,
       {
         payload: {
+          post_image: postImageData,
           author_id: forumManager.userId,
           post_copy: textContent,
           Mentioned_Users: mentionedIds.map((id) => ({ id: Number(id) })),
