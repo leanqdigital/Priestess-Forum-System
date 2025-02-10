@@ -507,3 +507,18 @@ h4 {
 .bg-unread {
   background-color: #022327;
 }
+
+.clear-preview-btn {
+  margin-top: 8px;
+  background-color: transparent;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.clear-preview-btn:hover {
+  background-color: #e53e3e;
+  color: #fff;
+}

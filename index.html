@@ -54,8 +54,8 @@
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex gap-x-2 items-center">
-                                <svg class="closeNotificationModal hidden max-[600px]:block" width="18" height="15" viewBox="0 0 18 15"
-                                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg class="closeNotificationModal hidden max-[600px]:block" width="18" height="15"
+                                    viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M17.3332 7.27761C17.3332 7.46178 17.26 7.63841 17.1298 7.76864C16.9996 7.89887 16.8229 7.97203 16.6388 7.97203H3.03763L8.10257 13.0361C8.16709 13.1006 8.21827 13.1772 8.25319 13.2615C8.2881 13.3458 8.30608 13.4362 8.30608 13.5274C8.30608 13.6187 8.2881 13.709 8.25319 13.7933C8.21827 13.8776 8.16709 13.9542 8.10257 14.0187C8.03805 14.0832 7.96146 14.1344 7.87716 14.1693C7.79286 14.2042 7.70251 14.2222 7.61127 14.2222C7.52002 14.2222 7.42967 14.2042 7.34538 14.1693C7.26108 14.1344 7.18448 14.0832 7.11996 14.0187L0.870168 7.76892C0.805604 7.70442 0.754384 7.62784 0.719438 7.54353C0.684491 7.45923 0.666504 7.36887 0.666504 7.27761C0.666504 7.18635 0.684491 7.09599 0.719438 7.01169C0.754384 6.92739 0.805604 6.8508 0.870168 6.78631L7.11996 0.536512C7.25027 0.406211 7.42699 0.333008 7.61127 0.333008C7.79554 0.333008 7.97227 0.406211 8.10257 0.536512C8.23287 0.666814 8.30608 0.843541 8.30608 1.02782C8.30608 1.21209 8.23287 1.38882 8.10257 1.51912L3.03763 6.58319H16.6388C16.8229 6.58319 16.9996 6.65635 17.1298 6.78658C17.26 6.91681 17.3332 7.09344 17.3332 7.27761Z"
                                         fill="#ffffff" />
@@ -104,7 +104,7 @@
             x-transition:enter="transition ease-out duration-200 delay-100 motion-reduce:transition-opacity"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             class="flex flex-col gap-4 min-[500px]:rounded absolute min-[500px]:top-[50px] w-full max-[500px]:bg-primary-100 h-full">
-            <div id="post-modal-content" class="space-y-4 min-[500px]:mx-auto"></div>
+            <div id="post-modal-content" class = "mx-auto"></div>
         </div>
     </div>
 
@@ -124,33 +124,41 @@
                 <h3 class="text-white">Dipesh Adhikari</h3>
             </div>
 
-            <div id="post-editor" class="post-editor text-white p-4 min-h-[230px] editor" contenteditable="true"
+            <div id="post-editor" class="post-editor text-white p-4 min-h-[80px] editor" contenteditable="true"
                 placeholder="Enter your thoughts ... type @Name to mention members."></div>
 
             <div class="flex items-center gap-3 justify-end">
                 <input type="file" id="post-image-upload" accept="image/*" style="display: none;">
-                <button id="upload-image-button">Upload Image</button>
-                <button class="icon-button" type="button">
+                <button id="upload-image-button" class="icon-button" type="button">
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M13.5 3H2.5C2.23478 3 1.98043 3.10536 1.79289 3.29289C1.60536 3.48043 1.5 3.73478 1.5 4V13C1.5 13.2652 1.60536 13.5196 1.79289 13.7071C1.98043 13.8946 2.23478 14 2.5 14H13.5C13.7652 14 14.0196 13.8946 14.2071 13.7071C14.3946 13.5196 14.5 13.2652 14.5 13V4C14.5 3.73478 14.3946 3.48043 14.2071 3.29289C14.0196 3.10536 13.7652 3 13.5 3ZM13.5 4V10.4219L11.8706 8.79313C11.7778 8.70024 11.6675 8.62656 11.5462 8.57629C11.4248 8.52602 11.2948 8.50015 11.1634 8.50015C11.0321 8.50015 10.902 8.52602 10.7807 8.57629C10.6594 8.62656 10.5491 8.70024 10.4563 8.79313L9.20625 10.0431L6.45625 7.29313C6.26873 7.10573 6.01448 7.00046 5.74937 7.00046C5.48427 7.00046 5.23002 7.10573 5.0425 7.29313L2.5 9.83562V4H13.5ZM2.5 11.25L5.75 8L10.75 13H2.5V11.25ZM13.5 13H12.1644L9.91438 10.75L11.1644 9.5L13.5 11.8363V13ZM9 6.75C9 6.60166 9.04399 6.45666 9.1264 6.33332C9.20881 6.20999 9.32594 6.11386 9.46299 6.05709C9.60003 6.00032 9.75083 5.98547 9.89632 6.01441C10.0418 6.04335 10.1754 6.11478 10.2803 6.21967C10.3852 6.32456 10.4566 6.4582 10.4856 6.60368C10.5145 6.74917 10.4997 6.89997 10.4429 7.03701C10.3861 7.17406 10.29 7.29119 10.1667 7.3736C10.0433 7.45601 9.89834 7.5 9.75 7.5C9.55109 7.5 9.36032 7.42098 9.21967 7.28033C9.07902 7.13968 9 6.94891 9 6.75Z"
                             fill="#C29D68" />
                     </svg>
                 </button>
-                <button class="icon-button" type="button">
+                <input type="file" id="post-audio-upload" accept="audio/*" style="display: none;">
+                <button id="upload-audio-button" class="icon-button" type="button">
                     <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M8.24421 10.1663C9.64153 10.1663 10.774 9.04729 10.774 7.66634V4.33301C10.774 2.95206 9.64153 1.83301 8.24421 1.83301C6.84689 1.83301 5.71445 2.95206 5.71445 4.33301V7.66634C5.71445 9.04729 6.84689 10.1663 8.24421 10.1663ZM13.1549 7.63658C13.1549 7.5711 13.1014 7.51753 13.0359 7.51753H12.143C12.0775 7.51753 12.024 7.5711 12.024 7.63658C12.024 9.72438 10.332 11.4163 8.24421 11.4163C6.15641 11.4163 4.46445 9.72438 4.46445 7.63658C4.46445 7.5711 4.41088 7.51753 4.3454 7.51753H3.45254C3.38707 7.51753 3.3335 7.5711 3.3335 7.63658C3.3335 10.147 5.21742 12.2184 7.64897 12.5116V14.0354H5.48677C5.2829 14.0354 5.11921 14.2482 5.11921 14.5116V15.0473C5.11921 15.1128 5.16088 15.1663 5.21147 15.1663H11.2769C11.3275 15.1663 11.3692 15.1128 11.3692 15.0473V14.5116C11.3692 14.2482 11.2055 14.0354 11.0017 14.0354H8.77992V12.519C11.2397 12.2512 13.1549 10.1678 13.1549 7.63658Z"
                             fill="#C29D68" />
                     </svg>
                 </button>
-                <button class="icon-button" type="button">
+                <input type="file" id="post-video-upload" accept="video/*" style="display: none;">
+                <button id="upload-video-button" class="icon-button" type="button">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M11.1107 4.88888V11.1111C11.1107 11.3468 11.0171 11.5729 10.8504 11.7396C10.6837 11.9063 10.4576 12 10.2219 12H2.22189C1.98615 12 1.76005 11.9063 1.59336 11.7396C1.42666 11.5729 1.33301 11.3468 1.33301 11.1111V4.88888C1.33301 4.65314 1.42666 4.42705 1.59336 4.26035C1.76005 4.09365 1.98615 4 2.22189 4H10.2219C10.4576 4 10.6837 4.09365 10.8504 4.26035C11.0171 4.42705 11.1107 4.65314 11.1107 4.88888ZM14.3329 4.90277C14.2702 4.88743 14.205 4.88554 14.1415 4.89722C14.078 4.9089 14.0177 4.93389 13.9646 4.97055L12.0985 6.21443C12.0681 6.23474 12.0431 6.26226 12.0259 6.29453C12.0086 6.3268 11.9996 6.36284 11.9996 6.39943V9.60053C11.9996 9.63712 12.0086 9.67316 12.0259 9.70543C12.0431 9.7377 12.0681 9.76522 12.0985 9.78553L13.9752 11.0366C14.0454 11.0835 14.1276 11.1094 14.212 11.1112C14.2964 11.1131 14.3796 11.0909 14.4518 11.0472C14.5187 11.0047 14.5735 10.9458 14.611 10.876C14.6486 10.8063 14.6676 10.7281 14.6663 10.6489V5.33333C14.6663 5.23476 14.6336 5.13897 14.5733 5.06103C14.5129 4.98309 14.4284 4.92742 14.3329 4.90277Z"
                             fill="#C29D68" />
                     </svg>
                 </button>
+            </div>
+            <!-- Preview Container for Uploaded Files -->
+            <div id="file-preview-container" class="flex flex-col gap-2">
+                <!-- These wrappers will be populated by JS -->
+                <div id="image-preview-wrapper"></div>
+                <div id="audio-preview-wrapper"></div>
+                <div id="video-preview-wrapper"></div>
             </div>
             <div class="h-[1px] w-full bg-grey-200"></div>
             <button id="submit-post" variant="primary" class="hidden w-fit ml-auto submit-button o2">Post</button>
@@ -177,7 +185,7 @@
                 </button>
                 <!-- Start a post Btn End-->
                 <!-- Start Post Action Buttons -->
-                <div class="flex items-center gap-4 max-[500px]:gap-3">
+                <!-- <div class="flex items-center gap-4 max-[500px]:gap-3">
                     <button
                         class="group button bg-[#042F34] text-[var(--primary)] o3 flex items-center gap-2 active:!bg-[var(--secondary)] hover:!bg-[var(--secondary)] focus:!bg-[var(--secondary)] active:!text-white focus:text-white">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -225,7 +233,7 @@
                         </svg>
 
                     </button>
-                </div>
+                </div> -->
                 <!-- Start Post Action Buttons Ends -->
             </div>
             <!-- Tab Section -->
@@ -412,17 +420,22 @@
     <!-- Templates -->
     <script type="text/html" id="post-template">
         <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded postCard postcard-{{:id}}" 
-        data-post-id="{{:id}}" 
-        data-author-id ="{{:author_id}}"
-        data-author-image = "{{:author.profileImage}}"
-        data-author-name = "{{:author.name}}"
-        data-post-date = "{{:date}}"
-        data-title = "{{:title}}"
-        data-content = "{{:content}}"
-        data-post-image = "{{:post_image}}"
-        data-vote-count = "{{:PostVotesCount}}"
-        data-comment-count = "{{:PostCommentCount}}"
-        >
+        data-post-id="{{:id}}"
+        data-author-id="{{:author_id}}"
+        data-author-image="{{:author.profileImage}}"
+        data-author-name="{{:author.name}}"
+        data-post-date="{{:date}}"
+        data-title="{{:title}}"
+        data-content="{{:content}}"
+        data-new-post-image='{{:~toJSON(new_post_image)}}'
+        data-post-audio='{{:~toJSON(post_audio)}}'
+        data-post-video='{{:~toJSON(post_video)}}'
+        data-type-image="{{:type_image}}"
+        data-type-audio="{{:type_audio}}"
+        data-type-video="{{:type_video}}"
+        data-vote-count="{{:PostVotesCount}}"
+        data-comment-count="{{:PostCommentCount}}">
+
             <div class="flex items-center justify-between w-full">
                 <div class="flex items-center gap-2">
                     <div class="size-8">
@@ -473,13 +486,35 @@
                 {{/if}}
                 <!-- Three Dots Ends -->
             </div>
-            <div class="post-content flex flex-col gap-2 w-full max-h-[500px] overflow-hidden">
-                {{if image}}
-                <div class="post-image-wrapper">
-                    <img src="{{:image}}" class="size-full object-contain ">
+            <div class="post-content flex flex-col gap-4 w-full max-h-max overflow-auto">
+                <div class="p2 text-white !font-[350] post-copy-content mb-4">{{:content}}</div>
+                {{if type_image && new_post_image}}
+                <div class="post-image-wrapper mb-4">
+                    <img src="{{:new_post_image.link}}" alt="Post Image" class="size-full object-contain">
                 </div>
                 {{/if}}
-                <div class="p2 text-white !font-[350] post-copy-content">{{:content}}</div>
+                
+                <!-- Render audio if type_audio is true and there is file data -->
+                {{if type_audio && post_audio}}
+                <div class = "text-white o1">Click on play button to play the audio</div>
+                <div class="post-audio-wrapper mb-4">
+                    <audio controls>
+                        <source src="{{:post_audio.link}}" type="{{:post_audio.type}}">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                {{/if}}
+                
+                <!-- Render video if type_video is true and there is file data -->
+                {{if type_video && post_video}}
+                <div class = "text-white o1">Click on play button to play the video</div>
+                <div class="post-video-wrapper mb-4">
+                    <video controls width="100%">
+                        <source src="{{:post_video.link}}" type="{{:post_video.type}}">
+                        Your browser does not support the video element.
+                    </video>
+                </div>
+                {{/if}}
             </div>
             <!-- Post Cmt Like Bookmark -->
             <div class="flex items-center justify-between w-full">
@@ -570,8 +605,8 @@
                                 x-on:keydown.down.prevent="$focus.wrap().next()"
                                 x-on:keydown.up.prevent="$focus.wrap().previous()"
                                 class="absolute -top-[100%] right-0 z-[999] flex w-[100px] flex-col rounded bg-[#084D55] p-1 shadow-[0px_4px_4px_0px_#0000000F]">
-                                <button type="button" data-post-id="{{:id}}"
-                                    class="edit-post-btn hover:bg-primary-100 o3 cursor-pointer rounded p-[10px] text-left text-white transition-all">Edit</button>
+                                <!-- <button type="button" data-post-id="{{:id}}"
+                                    class="edit-post-btn hover:bg-primary-100 o3 cursor-pointer rounded p-[10px] text-left text-white transition-all">Edit</button> -->
                                 <button type="button" data-post-id="{{:id}}"
                                     class="delete-comment-btn hover:bg-primary-100 o3 cursor-pointer rounded p-[10px] text-left text-white transition-all"
                                     data-comment-id="{{:id}}">Delete</button>
@@ -680,7 +715,7 @@
                                 x-on:keydown.down.prevent="$focus.wrap().next()"
                                 x-on:keydown.up.prevent="$focus.wrap().previous()"
                                 class="absolute -top-[100%] right-0 z-[999] flex w-[100px] flex-col rounded bg-[#084D55] p-1 shadow-[0px_4px_4px_0px_#0000000F]">
-                                <button type="button" data-post-id="{{:id}}" class="edit-post-btn hover:bg-primary-100 o3 cursor-pointer rounded p-[10px] text-left text-white transition-all">Edit</button>
+                                <!-- <button type="button" data-post-id="{{:id}}" class="edit-post-btn hover:bg-primary-100 o3 cursor-pointer rounded p-[10px] text-left text-white transition-all">Edit</button> -->
                                 <button type="button" data-post-id="{{:id}}" class="delete-reply-btn hover:bg-primary-100 o3 cursor-pointer rounded p-[10px] text-left text-white transition-all" data-reply-id="{{:id}}">Delete</button>
                             </div>
                         </div>
@@ -751,7 +786,7 @@
             if (event.target.closest(".bellIcon")) {
                 document.querySelector(".announcements").classList.toggle("hidden");
             }
-            if(event.target.closest(".closeNotificationModal")){
+            if (event.target.closest(".closeNotificationModal")) {
                 document.querySelector(".announcements").classList.add("hidden");
             }
         });
@@ -765,6 +800,14 @@
         src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/shoelace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.min.js"></script>
 
+    <script>
+        $.views.helpers({
+            toJSON: function (val) {
+                // If val is undefined or null, return an empty string.
+                return val != null ? JSON.stringify(val) : "";
+            }
+        });
+    </script>
     <!-- Your App Scripts -->
     <script src="script/class/classForumManager.js"></script>
     <script src="script/class/classPostModalManager.js"></script>
@@ -777,7 +820,8 @@
     <script src="script/tailwindConfig.js"></script>
     <script src="script/eventHandler.js"></script>
     <script src="script/announcements.js"></script>
-    <script src="script/remove.js"></script>
+
+
 </body>
 
 </html>

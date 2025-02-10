@@ -51,19 +51,26 @@ class ForumManager {
       const postContainer = document.querySelector(
         CONFIG.selectors.postsContainer
       );
+
+      // Show skeleton loaders while waiting
       if (isInitialLoad) {
         postContainer.innerHTML = this.getSkeletonLoader(5);
       } else {
         postContainer.insertAdjacentHTML("beforeend", this.getSkeletonLoader());
       }
+
+      // Build and run query
       const { query, variables } = this.buildQuery();
       const dataPromise = ApiService.query(query, variables);
       await new Promise((resolve) => setTimeout(resolve, 700));
       const data = await dataPromise;
+
+      // Remove all skeleton loaders
       document
         .querySelectorAll(".skeleton-loader")
         .forEach((el) => el.remove());
 
+      // If no posts were returned, update UI accordingly
       if (!data || !data.calcForumPosts || data.calcForumPosts.length === 0) {
         this.hasMorePosts = false;
         if (isInitialLoad) {
@@ -79,6 +86,7 @@ class ForumManager {
         return;
       }
 
+      // Map each returned post to include file type and file data fields
       const posts = data.calcForumPosts.map((post) => {
         const postId = String(post.ID);
         return {
@@ -87,7 +95,22 @@ class ForumManager {
           isVoted: this.votedPostIds.has(postId),
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
-          post_image: post.Post_Image,
+          // Parse the file fields (if they are strings)
+          type_audio: post.Type_Audio,
+          type_video: post.Type_Video,
+          type_image: post.Type_Image,
+          post_video:
+            typeof post.Post_Video === "string"
+              ? JSON.parse(post.Post_Video)
+              : post.Post_Video,
+          post_audio:
+            typeof post.Post_Audio === "string"
+              ? JSON.parse(post.Post_Audio)
+              : post.Post_Audio,
+          new_post_image:
+            typeof post.New_Post_Image === "string"
+              ? JSON.parse(post.New_Post_Image)
+              : post.New_Post_Image,
           defaultAuthorImage: CONFIG.api.defaultAuthorImage,
           PostVotesCount: post.Member_Post_Upvotes_DataTotal_Count,
           PostCommentCount: post.ForumCommentsTotalCount,
@@ -141,25 +164,30 @@ class ForumManager {
     let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
       this.needsUserId() ? ", $id: PriestessContactID" : ""
     }) {
-          calcForumPosts(
-             ${argsString}
-          ) {
-            ID: field(arg: ["id"])
-            Author_ID: field(arg: ["author_id"])
-            Author_First_Name: field(arg: ["Author", "first_name"])
-            Author_Last_Name: field(arg: ["Author", "last_name"])
-            Author_Profile_Image: field(arg: ["Author", "profile_image"])
-            Date_Added: field(arg: ["created_at"])
-            Post_Title: field(arg: ["post_title"])
-            Post_Copy: field(arg: ["post_copy"])
-            Featured_Post: field(arg: ["featured_post"])
-            Post_Image: field(arg: ["post_image"])
-            ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
-            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
-            ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
-          }
+        calcForumPosts(
+           ${argsString}
+        ) {
+          ID: field(arg: ["id"])
+          Author_ID: field(arg: ["author_id"])
+          Author_First_Name: field(arg: ["Author", "first_name"])
+          Author_Last_Name: field(arg: ["Author", "last_name"])
+          Author_Profile_Image: field(arg: ["Author", "profile_image"])
+          Date_Added: field(arg: ["created_at"])
+          Post_Title: field(arg: ["post_title"])
+          Post_Copy: field(arg: ["post_copy"])
+          Featured_Post: field(arg: ["featured_post"])
+          ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+          Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+          ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
+          Type_Audio: field(arg: ["type_audio"])
+          Type_Image: field(arg: ["type_image"])
+          Type_Video: field(arg: ["type_video"])
+          Post_Video: field(arg: ["post_video"])
+          Post_Audio: field(arg: ["post_audio"])
+          New_Post_Image: field(arg: ["new_post_image"])
         }
-      `;
+      }
+    `;
 
     let variables = {
       limit: this.postsLimit,
@@ -1448,21 +1476,29 @@ class ForumManager {
           const date = postElement.dataset.postDate;
           const title = postElement.dataset.title;
           const content = postElement.dataset.content;
-          const postImage = postElement.dataset.postImage;
+          // These are now valid JSON strings
+          const newPostImage = postElement.dataset.newPostImage;
+          const postAudio = postElement.dataset.postAudio;
+          const postVideo = postElement.dataset.postVideo;
+          const typeImage = postElement.dataset.typeImage;
+          const typeAudio = postElement.dataset.typeAudio;
+          const typeVideo = postElement.dataset.typeVideo;
           const voteCount = postElement.dataset.voteCount;
           const commentCount = postElement.dataset.commentCount;
 
           const post = {
             id: postId,
-            authorId: authorId,
-            author: {
-              name: authorName,
-              profileImage: authorImage,
-            },
-            date: date,
-            title: title,
-            content: content,
-            post_image: postImage,
+            authorId,
+            author: { name: authorName, profileImage: authorImage },
+            date,
+            title,
+            content,
+            new_post_image: newPostImage,
+            post_audio: postAudio,
+            post_video: postVideo,
+            type_image: typeImage,
+            type_audio: typeAudio,
+            type_video: typeVideo,
             PostVotesCount: voteCount,
             PostCommentCount: commentCount,
           };
