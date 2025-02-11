@@ -15,8 +15,15 @@ class PostModalManager {
       videoData = post.file_content;
     }
 
+    let containerClass = 'w-[600px]'; // default width for when neither image nor video is present
+
+    // Check if imageData or videoData exist, and set the class accordingly
+    if ((post.file_tpe === 'Image' && imageData) || (post.file_tpe === 'Video' && videoData)) {
+    containerClass = 'w-[1250px]'; // set to 1250px if image or video data exists
+    }
+
     modalContent.innerHTML = `
-<div class="flex w-[1250px] h-[700px] max-[1300px]:w-[900px] max-[1300px]:h-[600px] max-[900px]:w-screen max-[900px]:h-screen">
+<div class="flex ${containerClass} h-[700px] max-[1300px]:w-[900px] max-[1300px]:h-[600px] max-[900px]:w-screen max-[900px]:h-screen">
 
     
     ${post.file_tpe === "Image" && imageData? `
