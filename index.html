@@ -10,7 +10,6 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/themes/light.css">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-
 </head>
 
 <body class="bg-primary" x-data="{ openCommentModal: false }">
@@ -98,13 +97,13 @@
     <!-- Open Comment Modal -->
     <div x-cloak x-show="openCommentModal" x-transition.opacity.duration.200ms x-trap.inert.noscroll="openCommentModal"
         x-on:keydown.esc.window="openCommentModal = false"
-        class="fixed inset-0 flex items-start justify-center z-[50]  backdrop-blur-md sm:items-center lg:p-8 bg-[#286D7580] backdrop-blur-sm"
+        class="fixed inset-0 flex items-start justify-center z-[50]  backdrop-blur-md sm:items-center bg-[#286D7580] backdrop-blur-sm"
         role="dialog" aria-modal="true" aria-labelledby="defaultModalTitle">
         <div x-show="openCommentModal"
             x-transition:enter="transition ease-out duration-200 delay-100 motion-reduce:transition-opacity"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-            class="flex flex-col gap-4 min-[500px]:rounded absolute min-[500px]:top-[50px] w-full max-[500px]:bg-primary-100 h-full">
-            <div id="post-modal-content" class = "mx-auto"></div>
+            class="flex flex-col gap-4 min-[500px]:rounded absolute min-[900px]:top-[50px] w-full max-[500px]:bg-primary-100 h-full">
+            <div id="post-modal-content" class="mx-auto"></div>
         </div>
     </div>
 
@@ -126,6 +125,35 @@
 
             <div id="post-editor" class="post-editor text-white p-4 min-h-[80px] editor" contenteditable="true"
                 placeholder="Enter your thoughts ... type @Name to mention members."></div>
+
+            <!-- Preview Container for Uploaded Files -->
+            <!-- File Preview Container -->
+            <div id="file-preview-container" class="flex flex-col gap-2">
+                <!-- Wrappers for file previews (only one will be used at a time) -->
+                <div id="image-preview-wrapper"></div>
+                <div id="audio-preview-wrapper"></div>
+                <div id="video-preview-wrapper"></div>
+
+                <!-- New file control buttons: Refresh (to re-upload the same type) and Clear (to reset) -->
+                <div id="file-controls" class="hidden flex gap-2 items-center justify-end">
+                    <button id="refresh-upload" class="icon-button" type="button">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13.6668 1.31064V4.64397C13.6668 4.79132 13.6083 4.93262 13.5041 5.03681C13.3999 5.141 13.2586 5.19953 13.1113 5.19953H9.77794C9.668 5.19962 9.5605 5.16708 9.46906 5.10604C9.37762 5.045 9.30635 4.9582 9.26426 4.85664C9.22218 4.75507 9.21117 4.6433 9.23265 4.53547C9.25412 4.42765 9.3071 4.32862 9.38488 4.25092L10.6564 2.97731C9.63354 1.99727 8.273 1.44803 6.85641 1.44328H6.82516C5.3736 1.44043 3.97928 2.00924 2.94391 3.02661C2.83782 3.12566 2.69717 3.17925 2.55207 3.17592C2.40697 3.17259 2.26893 3.11261 2.16748 3.0088C2.06604 2.905 2.00925 2.76562 2.00925 2.62048C2.00926 2.47534 2.06607 2.33596 2.16752 2.23217C3.40598 1.02215 5.06662 0.341433 6.79805 0.334045C8.52948 0.326657 10.1959 0.993183 11.4446 2.19259L12.7196 0.917586C12.7974 0.840277 12.8963 0.787713 13.0039 0.766514C13.1115 0.745315 13.2229 0.756429 13.3242 0.798457C13.4255 0.840485 13.5121 0.911547 13.573 1.00269C13.634 1.09384 13.6666 1.20098 13.6668 1.31064ZM11.0564 10.7058C10.0273 11.7109 8.64855 12.2776 7.21011 12.2868C5.77167 12.296 4.38574 11.7469 3.34391 10.7551L4.61544 9.48356C4.69395 9.40597 4.74756 9.30676 4.76945 9.19858C4.79133 9.0904 4.7805 8.97815 4.73833 8.87615C4.69616 8.77415 4.62456 8.68702 4.53267 8.62588C4.44078 8.56474 4.33276 8.53236 4.22239 8.53286H0.889052C0.741709 8.53286 0.600402 8.59139 0.496215 8.69558C0.392028 8.79977 0.333496 8.94108 0.333496 9.08842V12.4218C0.33341 12.5317 0.365946 12.6392 0.426985 12.7306C0.488024 12.8221 0.574822 12.8933 0.676391 12.9354C0.777959 12.9775 0.889731 12.9885 0.997556 12.967C1.10538 12.9456 1.20441 12.8926 1.28211 12.8148L2.55572 11.5398C3.78641 12.7275 5.4287 13.3934 7.13905 13.3981H7.17586C8.91758 13.4026 10.5909 12.7208 11.8335 11.5002C11.935 11.3964 11.9918 11.2571 11.9918 11.1119C11.9918 10.9668 11.935 10.8274 11.8335 10.7236C11.7321 10.6198 11.5941 10.5598 11.449 10.5565C11.3038 10.5531 11.1632 10.6067 11.0571 10.7058H11.0564Z"
+                                fill="#C29D68" />
+                        </svg>
+
+                    </button>
+                    <button id="delete-upload" class="icon-button" type="button">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M13.7949 3.38527H11.2308V2.87245C11.2308 2.46442 11.0687 2.07311 10.7802 1.78459C10.4916 1.49607 10.1003 1.33398 9.69231 1.33398H6.61539C6.20736 1.33398 5.81605 1.49607 5.52753 1.78459C5.23901 2.07311 5.07692 2.46442 5.07692 2.87245V3.38527H2.51282C2.37681 3.38527 2.24637 3.4393 2.1502 3.53547C2.05403 3.63164 2 3.76208 2 3.89809C2 4.0341 2.05403 4.16453 2.1502 4.26071C2.24637 4.35688 2.37681 4.41091 2.51282 4.41091H3.02564V13.6417C3.02564 13.9137 3.1337 14.1746 3.32604 14.3669C3.51839 14.5593 3.77927 14.6673 4.05128 14.6673H12.2564C12.5284 14.6673 12.7893 14.5593 12.9816 14.3669C13.174 14.1746 13.2821 13.9137 13.2821 13.6417V4.41091H13.7949C13.9309 4.41091 14.0613 4.35688 14.1575 4.26071C14.2537 4.16453 14.3077 4.0341 14.3077 3.89809C14.3077 3.76208 14.2537 3.63164 14.1575 3.53547C14.0613 3.4393 13.9309 3.38527 13.7949 3.38527ZM7.12821 11.0776C7.12821 11.2136 7.07418 11.344 6.978 11.4402C6.88183 11.5364 6.75139 11.5904 6.61539 11.5904C6.47938 11.5904 6.34894 11.5364 6.25277 11.4402C6.15659 11.344 6.10256 11.2136 6.10256 11.0776V6.97501C6.10256 6.839 6.15659 6.70856 6.25277 6.61239C6.34894 6.51622 6.47938 6.46219 6.61539 6.46219C6.75139 6.46219 6.88183 6.51622 6.978 6.61239C7.07418 6.70856 7.12821 6.839 7.12821 6.97501V11.0776ZM10.2051 11.0776C10.2051 11.2136 10.1511 11.344 10.0549 11.4402C9.95876 11.5364 9.82832 11.5904 9.69231 11.5904C9.5563 11.5904 9.42586 11.5364 9.32969 11.4402C9.23352 11.344 9.17949 11.2136 9.17949 11.0776V6.97501C9.17949 6.839 9.23352 6.70856 9.32969 6.61239C9.42586 6.51622 9.5563 6.46219 9.69231 6.46219C9.82832 6.46219 9.95876 6.51622 10.0549 6.61239C10.1511 6.70856 10.2051 6.839 10.2051 6.97501V11.0776ZM10.2051 3.38527H6.10256V2.87245C6.10256 2.73644 6.15659 2.606 6.25277 2.50983C6.34894 2.41365 6.47938 2.35963 6.61539 2.35963H9.69231C9.82832 2.35963 9.95876 2.41365 10.0549 2.50983C10.1511 2.606 10.2051 2.73644 10.2051 2.87245V3.38527Z"
+                                fill="#C29D68" />
+                        </svg>
+
+                    </button>
+                </div>
+            </div>
 
             <div class="flex items-center gap-3 justify-end">
                 <input type="file" id="post-image-upload" accept="image/*" style="display: none;">
@@ -153,13 +181,7 @@
                     </svg>
                 </button>
             </div>
-            <!-- Preview Container for Uploaded Files -->
-            <div id="file-preview-container" class="flex flex-col gap-2">
-                <!-- These wrappers will be populated by JS -->
-                <div id="image-preview-wrapper"></div>
-                <div id="audio-preview-wrapper"></div>
-                <div id="video-preview-wrapper"></div>
-            </div>
+
             <div class="h-[1px] w-full bg-grey-200"></div>
             <button id="submit-post" variant="primary" class="hidden w-fit ml-auto submit-button o2">Post</button>
             <button id="edit-post" variant="primary"
@@ -374,35 +396,37 @@
                                 <!-- Dropdown Items -->
                                 <button type="button"
                                     class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
-                                    x-on:click="selectedFilter = 'All'; filterData = false;"
+                                    x-on:click="selectedFilter = 'All'; filterData = false; forumManager.handleFilterChange('All');"
                                     x-bind:class="selectedFilter === 'All' ? 'bg-primary-100' : ''">
                                     All
                                 </button>
                                 <button type="button"
                                     class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
-                                    x-on:click="selectedFilter = 'Video'; filterData = false;"
+                                    x-on:click="selectedFilter = 'Video'; filterData = false; forumManager.handleFilterChange('Video');"
                                     x-bind:class="selectedFilter === 'Video' ? 'bg-primary-100' : ''">
                                     Video
                                 </button>
                                 <button type="button"
                                     class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
-                                    x-on:click="selectedFilter = 'Audio'; filterData = false;"
+                                    x-on:click="selectedFilter = 'Audio'; filterData = false; forumManager.handleFilterChange('Audio');"
                                     x-bind:class="selectedFilter === 'Audio' ? 'bg-primary-100' : ''">
                                     Audio
                                 </button>
                                 <button type="button"
                                     class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
-                                    x-on:click="selectedFilter = 'Image'; filterData = false;"
+                                    x-on:click="selectedFilter = 'Image'; filterData = false; forumManager.handleFilterChange('Image');"
                                     x-bind:class="selectedFilter === 'Image' ? 'bg-primary-100' : ''">
                                     Image
                                 </button>
                                 <button type="button"
                                     class="o3 cursor-pointer rounded p-[10px] text-left text-white hover:bg-primary-100"
-                                    x-on:click="selectedFilter = 'Text'; filterData = false;"
+                                    x-on:click="selectedFilter = 'Text'; filterData = false; forumManager.handleFilterChange('Text');"
                                     x-bind:class="selectedFilter === 'Text' ? 'bg-primary-100' : ''">
                                     Text
                                 </button>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -418,6 +442,7 @@
     </div>
 
     <!-- Templates -->
+
     <script type="text/html" id="post-template">
         <div class="p-4 flex flex-col items-start gap-3 bg-primary-100 rounded postCard postcard-{{:id}}" 
         data-post-id="{{:id}}"
@@ -425,14 +450,9 @@
         data-author-image="{{:author.profileImage}}"
         data-author-name="{{:author.name}}"
         data-post-date="{{:date}}"
-        data-title="{{:title}}"
         data-content="{{:content}}"
-        data-new-post-image='{{:~toJSON(new_post_image)}}'
-        data-post-audio='{{:~toJSON(post_audio)}}'
-        data-post-video='{{:~toJSON(post_video)}}'
-        data-type-image="{{:type_image}}"
-        data-type-audio="{{:type_audio}}"
-        data-type-video="{{:type_video}}"
+        data-file-content='{{:~toJSON(file_content)}}'
+        data-file-tpe="{{:file_tpe}}"  
         data-vote-count="{{:PostVotesCount}}"
         data-comment-count="{{:PostCommentCount}}">
 
@@ -488,33 +508,84 @@
             </div>
             <div class="post-content flex flex-col gap-4 w-full max-h-max overflow-auto">
                 <div class="p2 text-white !font-[350] post-copy-content mb-4">{{:content}}</div>
-                {{if type_image && new_post_image}}
+                {{if file_tpe === "Image" && file_content}}
                 <div class="post-image-wrapper mb-4">
-                    <img src="{{:new_post_image.link}}" alt="Post Image" class="size-full object-contain">
+                  <img src="{{:file_content.link}}" alt="Post Image" class="size-full object-contain">
                 </div>
-                {{/if}}
-                
-                <!-- Render audio if type_audio is true and there is file data -->
-                {{if type_audio && post_audio}}
-                <div class = "text-white o1">Click on play button to play the audio</div>
-                <div class="post-audio-wrapper mb-4">
-                    <audio controls>
-                        <source src="{{:post_audio.link}}" type="{{:post_audio.type}}">
-                        Your browser does not support the audio element.
+              {{/if}}
+
+              {{if file_tpe === "Audio" && file_content}}
+              <div class="post-audio-wrapper mb-4">
+                <!-- Initialize an Alpine component using x-data and x-init -->
+                <div class="audio-player bg-primary p-5 rounded-[12px] w-full text-center" id = "audio-{{:id}}" data-audio-player = "{{:id}}">
+                  
+                  <!-- Audio header -->
+                  <div class="audio-header flex items-center gap-[10px]">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" 
+                         xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8.24421 9.66634C9.64153 9.66634 10.774 8.54729 10.774 7.16634V3.83301C10.774 2.45206 9.64153 1.33301 8.24421 1.33301C6.84689 1.33301 5.71445 2.45206 5.71445 3.83301V7.16634C5.71445 8.54729 6.84689 9.66634 8.24421 9.66634ZM13.1549 7.13658C13.1549 7.0711 13.1014 7.01753 13.0359 7.01753H12.143C12.0775 7.01753 12.024 7.0711 12.024 7.13658C12.024 9.22438 10.332 10.9163 8.24421 10.9163C6.15641 10.9163 4.46445 9.22438 4.46445 7.13658C4.46445 7.0711 4.41088 7.01753 4.3454 7.01753H3.45254C3.38707 7.01753 3.3335 7.0711 3.3335 7.13658C3.3335 9.647 5.21742 11.7184 7.64897 12.0116V13.5354H5.48677C5.2829 13.5354 5.11921 13.7482 5.11921 14.0116V14.5473C5.11921 14.6128 5.16088 14.6663 5.21147 14.6663H11.2769C11.3275 14.6663 11.3692 14.6128 11.3692 14.5473V14.0116C11.3692 13.7482 11.2055 13.5354 11.0017 13.5354H8.77992V12.019C11.2397 11.7512 13.1549 9.66783 13.1549 7.13658Z" fill="#C29D68"/>
+                    </svg>
+                  </div>
+                  
+                    <!-- Audio element -->
+                    <audio id="custom-audio" class = "audio">
+                        <source src="{{:file_content.link}}" type="{{:file_content.type}}">
                     </audio>
-                </div>
-                {{/if}}
+                    
+                    <!-- Controls -->
+                    <div class="controls flex justify-center gap-[15px] my-[15px]">                            
+                        <button class="bg-transparent border-none text-[#D4AF7A] cursor-pointer" id="rewind">
+                        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" 
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.1668 8.15293C15.167 9.77081 14.53 11.3237 13.3937 12.4754C12.2575 13.6271 10.7134 14.285 9.09568 14.3068H9.01299C7.44135 14.3107 5.92856 13.7092 4.78863 12.6273C4.73968 12.581 4.70033 12.5255 4.67282 12.464C4.64531 12.4025 4.63019 12.3362 4.62832 12.2688C4.62644 12.2015 4.63785 12.1344 4.66189 12.0715C4.68594 12.0085 4.72214 11.9509 4.76844 11.902C4.81474 11.853 4.87023 11.8137 4.93173 11.7862C4.99324 11.7587 5.05956 11.7435 5.12692 11.7417C5.19427 11.7398 5.26133 11.7512 5.32427 11.7752C5.38722 11.7993 5.44481 11.8355 5.49376 11.8818C6.22696 12.5732 7.14766 13.0333 8.14083 13.2046C9.134 13.3758 10.1556 13.2506 11.078 12.8447C12.0005 12.4387 12.7828 11.7699 13.3274 10.9218C13.8719 10.0738 14.1545 9.08408 14.1399 8.07636C14.1252 7.06864 13.8139 6.08758 13.2449 5.25573C12.676 4.42389 11.8745 3.77814 10.9406 3.39915C10.0068 3.02017 8.98194 2.92475 7.99417 3.12482C7.0064 3.32489 6.09948 3.81158 5.38671 4.52409C5.38148 4.52976 5.37591 4.53511 5.37004 4.54011L4.6944 5.1587L5.78414 6.24845C5.85694 6.31988 5.90678 6.41139 5.9273 6.51129C5.94782 6.61119 5.93809 6.71494 5.89935 6.80928C5.86061 6.90362 5.79461 6.98427 5.70981 7.04091C5.625 7.09756 5.52523 7.12763 5.42325 7.12729H2.34632C2.21032 7.12729 2.07988 7.07326 1.98371 6.97709C1.88753 6.88092 1.8335 6.75048 1.8335 6.61447V3.53755C1.83291 3.43585 1.86258 3.33626 1.91873 3.25146C1.97487 3.16666 2.05497 3.10047 2.14883 3.0613C2.24269 3.02214 2.34608 3.01177 2.44585 3.03151C2.54562 3.05125 2.63727 3.10021 2.70915 3.17217L3.96876 4.43499L4.67004 3.79396C5.53157 2.93578 6.62803 2.35208 7.82102 2.11655C9.01401 1.88101 10.25 2.0042 11.3731 2.47056C12.4961 2.93691 13.4558 3.72554 14.131 4.73687C14.8062 5.74821 15.1666 6.93691 15.1668 8.15293Z" fill="#C29D68"/>
+                        </svg>                                    
+                        </button>
+
+                        <div class="cursor-pointer" id="play-pause" data-audio-button="{{:id}}" 
+                        @click="playAudio($el.dataset.audioButton)">
+                            <svg class = "playedIcon" width="33" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0.5" width="32" height="32" rx="16" fill="#C29D68"/>
+                                <path d="M22.448 15.9997C22.4484 16.1738 22.4038 16.345 22.3184 16.4968C22.2331 16.6485 22.1099 16.7756 21.9609 16.8657L12.7254 22.5154C12.5697 22.6107 12.3914 22.6628 12.2088 22.6662C12.0263 22.6695 11.8461 22.6241 11.687 22.5346C11.5294 22.4465 11.3981 22.318 11.3066 22.1623C11.2151 22.0066 11.1668 21.8293 11.1665 21.6488V10.3506C11.1668 10.17 11.2151 9.99276 11.3066 9.83707C11.3981 9.68137 11.5294 9.55286 11.687 9.46473C11.8461 9.37522 12.0263 9.3298 12.2088 9.33318C12.3914 9.33656 12.5697 9.38862 12.7254 9.48396L21.9609 15.1337C22.1099 15.2237 22.2331 15.3508 22.3184 15.5026C22.4038 15.6543 22.4484 15.8256 22.448 15.9997Z" fill="#022327"/>
+                            </svg>
+                            <svg class = "pausedIcon hidden" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="32" height="32" rx="16" fill="#C29D68"/>
+                                <path d="M22.2222 10.4441V21.5552C22.2222 21.8499 22.1052 22.1325 21.8968 22.3409C21.6884 22.5493 21.4058 22.6663 21.1111 22.6663H18.3333C18.0386 22.6663 17.756 22.5493 17.5477 22.3409C17.3393 22.1325 17.2222 21.8499 17.2222 21.5552V10.4441C17.2222 10.1494 17.3393 9.86682 17.5477 9.65844C17.756 9.45007 18.0386 9.33301 18.3333 9.33301H21.1111C21.4058 9.33301 21.6884 9.45007 21.8968 9.65844C22.1052 9.86682 22.2222 10.1494 22.2222 10.4441ZM13.8889 9.33301H11.1111C10.8164 9.33301 10.5338 9.45007 10.3254 9.65844C10.1171 9.86682 10 10.1494 10 10.4441V21.5552C10 21.8499 10.1171 22.1325 10.3254 22.3409C10.5338 22.5493 10.8164 22.6663 11.1111 22.6663H13.8889C14.1836 22.6663 14.4662 22.5493 14.6746 22.3409C14.8829 22.1325 15 21.8499 15 21.5552V10.4441C15 10.1494 14.8829 9.86682 14.6746 9.65844C14.4662 9.45007 14.1836 9.33301 13.8889 9.33301Z" fill="#022327"/>
+                            </svg>                                
+                        </div>
                 
-                <!-- Render video if type_video is true and there is file data -->
-                {{if type_video && post_video}}
-                <div class = "text-white o1">Click on play button to play the video</div>
-                <div class="post-video-wrapper mb-4">
-                    <video controls width="100%">
-                        <source src="{{:post_video.link}}" type="{{:post_video.type}}">
-                        Your browser does not support the video element.
-                    </video>
+                        <button class="bg-transparent border-none text-[#D4AF7A] cursor-pointer" id="forward">
+                        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" 
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.1668 3.53784V6.61469C15.1668 6.75069 15.1128 6.88113 15.0166 6.9773C14.9205 7.07347 14.79 7.12749 14.654 7.12749H11.5772C11.4757 7.12757 11.3765 7.09754 11.2921 7.0412C11.2077 6.98486 11.1419 6.90474 11.103 6.81099C11.0642 6.71723 11.054 6.61406 11.0738 6.51453C11.0937 6.415 11.1426 6.3236 11.2144 6.25188L12.3041 5.16216L11.6278 4.54359L11.6118 4.5282C10.899 3.81572 9.99213 3.32904 9.00439 3.12897C8.01664 2.92891 6.99185 3.02432 6.05801 3.4033C5.12418 3.78227 4.32272 4.428 3.75375 5.25983C3.18477 6.09165 2.87351 7.07269 2.85885 8.08038C2.84419 9.08808 3.12677 10.0778 3.67131 10.9258C4.21584 11.7738 4.99818 12.4426 5.92059 12.8486C6.843 13.2545 7.86459 13.3797 8.85774 13.2085C9.85088 13.0372 10.7716 12.5772 11.5047 11.8857C11.5537 11.8394 11.6113 11.8032 11.6742 11.7792C11.7372 11.7551 11.8042 11.7437 11.8716 11.7456C11.9389 11.7475 12.0052 11.7626 12.0667 11.7901C12.1283 11.8176 12.1837 11.8569 12.23 11.9059C12.2763 11.9548 12.3125 12.0124 12.3366 12.0754C12.3606 12.1383 12.372 12.2054 12.3702 12.2727C12.3683 12.3401 12.3532 12.4064 12.3257 12.4679C12.2981 12.5294 12.2588 12.5849 12.2098 12.6312C11.0696 13.7109 9.55785 14.3109 7.98752 14.3068H7.90291C6.89507 14.293 5.90606 14.0318 5.02279 13.5463C4.13952 13.0607 3.38904 12.3657 2.83731 11.5222C2.28558 10.6786 1.94949 9.71253 1.85858 8.70871C1.76767 7.70489 1.92473 6.6941 2.31594 5.7652C2.70716 4.83629 3.32056 4.0177 4.10223 3.38137C4.8839 2.74504 5.80991 2.31046 6.79887 2.11583C7.78782 1.92119 8.80945 1.97245 9.77396 2.26511C10.7385 2.55777 11.6163 3.08287 12.3304 3.79425L13.031 4.43526L14.2912 3.17247C14.3631 3.10051 14.4547 3.05155 14.5545 3.03181C14.6543 3.01207 14.7576 3.02245 14.8515 3.06161C14.9454 3.10078 15.0255 3.16697 15.0816 3.25176C15.1377 3.33656 15.1674 3.43614 15.1668 3.53784Z" fill="#C29D68"/>
+                        </svg>                                    
+                        </button>
+                    </div>
+                    
+                    <!-- Progress and volume -->
+                    <div class="progress-container flex items-center gap-[10px]">
+                        <span id="current-time" class="text-[#ffffff]">0:00</span>
+                        <input class="flex-grow-1 appearance-none bg-grey-200 h-[3px] w-full" type="range" id="progress" value="0" min="0" step="0.1">
+                        <span id="total-time" class="text-[#ffffff]">-0:00</span>
+                        <button id="volume">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.4123 3.70994V20.2114C14.4144 20.3348 14.3844 20.4568 14.3254 20.5652C14.2663 20.6737 14.1801 20.765 14.0752 20.8302C13.9561 20.9011 13.8183 20.9344 13.6799 20.9258C13.5415 20.9172 13.4089 20.8671 13.2995 20.782L7.64758 16.386C7.6066 16.3536 7.57352 16.3123 7.55082 16.2653C7.52813 16.2183 7.51641 16.1667 7.51656 16.1144V7.81202C7.51672 7.75958 7.52883 7.70787 7.55199 7.66082C7.57514 7.61377 7.60872 7.57262 7.65017 7.5405L13.3021 3.14449C13.4259 3.04851 13.5788 2.99758 13.7355 3.00009C13.8921 3.0026 14.0433 3.05839 14.164 3.15828C14.2433 3.22641 14.3067 3.31114 14.3496 3.40647C14.3925 3.50181 14.4139 3.60541 14.4123 3.70994ZM5.79264 7.82581H3.37914C3.01337 7.82581 2.66258 7.97111 2.40394 8.22975C2.1453 8.48839 2 8.83918 2 9.20495V14.7215C2 15.0873 2.1453 15.4381 2.40394 15.6967C2.66258 15.9554 3.01337 16.1007 3.37914 16.1007H5.79264C5.88408 16.1007 5.97178 16.0643 6.03644 15.9997C6.1011 15.935 6.13742 15.8473 6.13742 15.7559V8.1706C6.13742 8.07915 6.1011 7.99146 6.03644 7.9268C5.97178 7.86214 5.88408 7.82581 5.79264 7.82581ZM16.7197 9.62214C16.6516 9.68198 16.596 9.75466 16.556 9.83602C16.5161 9.91738 16.4925 10.0058 16.4868 10.0963C16.481 10.1868 16.4931 10.2775 16.5224 10.3632C16.5518 10.449 16.5977 10.5282 16.6577 10.5962C16.9903 10.9739 17.1738 11.4599 17.1738 11.9632C17.1738 12.4665 16.9903 12.9526 16.6577 13.3303C16.5961 13.398 16.5486 13.4772 16.518 13.5634C16.4873 13.6495 16.4741 13.741 16.4791 13.8323C16.4842 13.9236 16.5073 14.013 16.5472 14.0953C16.5871 14.1777 16.643 14.2512 16.7116 14.3117C16.7802 14.3722 16.8602 14.4184 16.9469 14.4477C17.0335 14.477 17.1251 14.4887 17.2164 14.4823C17.3076 14.4758 17.3967 14.4513 17.4783 14.4101C17.56 14.3689 17.6326 14.3118 17.692 14.2423C18.2467 13.6126 18.5527 12.8023 18.5527 11.9632C18.5527 11.1241 18.2467 10.3138 17.692 9.6842C17.6322 9.61598 17.5595 9.56025 17.478 9.52019C17.3966 9.48014 17.308 9.45655 17.2175 9.45078C17.1269 9.44502 17.0361 9.45719 16.9502 9.48659C16.8644 9.516 16.7852 9.56206 16.7172 9.62214H16.7197ZM20.2443 7.36639C20.185 7.29547 20.112 7.2372 20.0297 7.19507C19.9474 7.15293 19.8574 7.12777 19.7652 7.1211C19.673 7.11443 19.5803 7.12637 19.4928 7.15623C19.4053 7.18608 19.3247 7.23322 19.2558 7.29487C19.1868 7.35651 19.131 7.43138 19.0916 7.51503C19.0522 7.59869 19.03 7.68941 19.0264 7.78181C19.0228 7.8742 19.0378 7.96639 19.0705 8.05287C19.1032 8.13936 19.153 8.21838 19.2168 8.28524C20.1216 9.29669 20.6219 10.6062 20.6219 11.9632C20.6219 13.3203 20.1216 14.6298 19.2168 15.6412C19.153 15.7081 19.1032 15.7871 19.0705 15.8736C19.0378 15.9601 19.0228 16.0523 19.0264 16.1447C19.03 16.2371 19.0522 16.3278 19.0916 16.4114C19.131 16.4951 19.1868 16.57 19.2558 16.6316C19.3247 16.6932 19.4053 16.7404 19.4928 16.7702C19.5803 16.8001 19.673 16.812 19.7652 16.8054C19.8574 16.7987 19.9474 16.7735 20.0297 16.7314C20.112 16.6893 20.185 16.631 20.2443 16.5601C21.3749 15.2959 22 13.6593 22 11.9632C22 10.2672 21.3749 8.63061 20.2443 7.36639Z" fill="white"/>
+                        </svg>                                    
+                        </button>
+                    </div>
+                    
+                    </div> <!-- end .audio-player -->
                 </div>
                 {{/if}}
+
+              {{if file_tpe === "Video" && file_content}}
+                <div class="post-video-wrapper mb-4">
+                  <video controls width="100%">
+                    <source src="{{:file_content.link}}" type="{{:file_content.type}}">
+                    Your browser does not support the video element.
+                  </video>
+                </div>
+              {{/if}}
             </div>
             <!-- Post Cmt Like Bookmark -->
             <div class="flex items-center justify-between w-full">
@@ -655,35 +726,22 @@
                     </div>
                 </div>
                 <!-- Add reply form -->
-                <div class="reply-form-{{:id}} reply-form reply-form-wrapper hidden flex-col gap-4 border border-gray-600 active:border-[#ffffff] focus:border-[#ffffff] flex items-center gap-3 w-full bg-primary-100 min-[500px]:rounded max-[500px]:p-4 z-[999] w-full">
-                    <div id="reply-editor-{{:id}}" class="reply-editor h-[80px] editor comment-editor text-white p-2 w-full h-10 !border-none !focus-visible:border-none rounded" contenteditable="true" data-comment-id="{{:id}}"></div>
-                    <div class="flex items-center justify-between w-full p-2">
-                        <div class="flex items-center gap-3">
-                            <button class="icon-button" type="button">
-                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M13.5 3H2.5C2.23478 3 1.98043 3.10536 1.79289 3.29289C1.60536 3.48043 1.5 3.73478 1.5 4V13C1.5 13.2652 1.60536 13.5196 1.79289 13.7071C1.98043 13.8946 2.23478 14 2.5 14H13.5C13.7652 14 14.0196 13.8946 14.2071 13.7071C14.3946 13.5196 14.5 13.2652 14.5 13V4C14.5 3.73478 14.3946 3.48043 14.2071 3.29289C14.0196 3.10536 13.7652 3 13.5 3ZM13.5 4V10.4219L11.8706 8.79313C11.7778 8.70024 11.6675 8.62656 11.5462 8.57629C11.4248 8.52602 11.2948 8.50015 11.1634 8.50015C11.0321 8.50015 10.902 8.52602 10.7807 8.57629C10.6594 8.62656 10.5491 8.70024 10.4563 8.79313L9.20625 10.0431L6.45625 7.29313C6.26873 7.10573 6.01448 7.00046 5.74937 7.00046C5.48427 7.00046 5.23002 7.10573 5.0425 7.29313L2.5 9.83562V4H13.5ZM2.5 11.25L5.75 8L10.75 13H2.5V11.25ZM13.5 13H12.1644L9.91438 10.75L11.1644 9.5L13.5 11.8363V13ZM9 6.75C9 6.60166 9.04399 6.45666 9.1264 6.33332C9.20881 6.20999 9.32594 6.11386 9.46299 6.05709C9.60003 6.00032 9.75083 5.98547 9.89632 6.01441C10.0418 6.04335 10.1754 6.11478 10.2803 6.21967C10.3852 6.32456 10.4566 6.4582 10.4856 6.60368C10.5145 6.74917 10.4997 6.89997 10.4429 7.03701C10.3861 7.17406 10.29 7.29119 10.1667 7.3736C10.0433 7.45601 9.89834 7.5 9.75 7.5C9.55109 7.5 9.36032 7.42098 9.21967 7.28033C9.07902 7.13968 9 6.94891 9 6.75Z"
-                                        fill="#C29D68" />
-                                </svg>
-                            </button>
-                            <button class="icon-button" type="button">
-                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M8.24421 10.1663C9.64153 10.1663 10.774 9.04729 10.774 7.66634V4.33301C10.774 2.95206 9.64153 1.83301 8.24421 1.83301C6.84689 1.83301 5.71445 2.95206 5.71445 4.33301V7.66634C5.71445 9.04729 6.84689 10.1663 8.24421 10.1663ZM13.1549 7.63658C13.1549 7.5711 13.1014 7.51753 13.0359 7.51753H12.143C12.0775 7.51753 12.024 7.5711 12.024 7.63658C12.024 9.72438 10.332 11.4163 8.24421 11.4163C6.15641 11.4163 4.46445 9.72438 4.46445 7.63658C4.46445 7.5711 4.41088 7.51753 4.3454 7.51753H3.45254C3.38707 7.51753 3.3335 7.5711 3.3335 7.63658C3.3335 10.147 5.21742 12.2184 7.64897 12.5116V14.0354H5.48677C5.2829 14.0354 5.11921 14.2482 5.11921 14.5116V15.0473C5.11921 15.1128 5.16088 15.1663 5.21147 15.1663H11.2769C11.3275 15.1663 11.3692 15.1128 11.3692 15.0473V14.5116C11.3692 14.2482 11.2055 14.0354 11.0017 14.0354H8.77992V12.519C11.2397 12.2512 13.1549 10.1678 13.1549 7.63658Z"
-                                        fill="#C29D68" />
-                                </svg>
-                            </button>
-                            <button class="icon-button" type="button">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M11.1107 4.88888V11.1111C11.1107 11.3468 11.0171 11.5729 10.8504 11.7396C10.6837 11.9063 10.4576 12 10.2219 12H2.22189C1.98615 12 1.76005 11.9063 1.59336 11.7396C1.42666 11.5729 1.33301 11.3468 1.33301 11.1111V4.88888C1.33301 4.65314 1.42666 4.42705 1.59336 4.26035C1.76005 4.09365 1.98615 4 2.22189 4H10.2219C10.4576 4 10.6837 4.09365 10.8504 4.26035C11.0171 4.42705 11.1107 4.65314 11.1107 4.88888ZM14.3329 4.90277C14.2702 4.88743 14.205 4.88554 14.1415 4.89722C14.078 4.9089 14.0177 4.93389 13.9646 4.97055L12.0985 6.21443C12.0681 6.23474 12.0431 6.26226 12.0259 6.29453C12.0086 6.3268 11.9996 6.36284 11.9996 6.39943V9.60053C11.9996 9.63712 12.0086 9.67316 12.0259 9.70543C12.0431 9.7377 12.0681 9.76522 12.0985 9.78553L13.9752 11.0366C14.0454 11.0835 14.1276 11.1094 14.212 11.1112C14.2964 11.1131 14.3796 11.0909 14.4518 11.0472C14.5187 11.0047 14.5735 10.9458 14.611 10.876C14.6486 10.8063 14.6676 10.7281 14.6663 10.6489V5.33333C14.6663 5.23476 14.6336 5.13897 14.5733 5.06103C14.5129 4.98309 14.4284 4.92742 14.3329 4.90277Z"
-                                        fill="#C29D68" />
-                                </svg>
-                            </button>
-                        </div>
-                        <button class="submit-reply w-fit bg-secondary text-white px-4 py-2 rounded hover:bg-secondary-200 transition-colors flex items-center gap-2" data-comment-id="{{:id}}">
+                <div class="reply-form-{{:id}} hidden gap-2">
+                    <div class="author-image-container"><img class="w-[32px] h-[32px] rounded-full" src="https://i.ontraport.com/22612.7af9e9baa3d56ef7636bd6db2600bc6f.PNG" /></div>
+                    <div
+                        class="reply-form reply-form-wrapper p-2 rounded-[12px] flex-col gap-4 border border-gray-600 active:border-[#ffffff] focus:border-[#ffffff] flex items-center gap-3 w-full bg-primary-100 max-[500px]:p-4 z-[999] w-full">
+                        <div id="reply-editor-{{:id}}"
+                            class="reply-editor h-[40px] editor comment-editor text-white p-2 w-full !border-none !focus-visible:border-none"
+                            contenteditable="true" data-comment-id="{{:id}}"></div>
+                        <button
+                            class="ml-auto submit-reply bg-secondary text-white px-4 py-2 rounded hover:bg-secondary-200 transition-colors flex items-center gap-2"
+                            data-comment-id="{{:id}}">
                             <span>Reply</span>
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.1662 5.99246C11.1666 6.14096 11.1273 6.28687 11.0524 6.41509C10.9775 6.54331 10.8697 6.64919 10.7401 6.72177L1.99252 11.7233C1.86699 11.7944 1.72527 11.8321 1.58098 11.8327C1.44803 11.832 1.31719 11.7995 1.19936 11.7379C1.08154 11.6763 0.980152 11.5874 0.903674 11.4787C0.827196 11.3699 0.777842 11.2444 0.759734 11.1127C0.741625 10.981 0.755286 10.8469 0.799577 10.7215L2.20611 6.55663C2.21985 6.51591 2.24585 6.48044 2.28055 6.45507C2.31524 6.42971 2.35693 6.41569 2.3999 6.41494H6.16523C6.22236 6.41506 6.27891 6.40344 6.33136 6.38079C6.38381 6.35814 6.43104 6.32495 6.47012 6.28328C6.50921 6.24161 6.5393 6.19235 6.55855 6.13855C6.57779 6.08476 6.58576 6.02758 6.58198 5.97058C6.57253 5.86341 6.52294 5.76377 6.44315 5.69162C6.36336 5.61946 6.25926 5.5801 6.15168 5.58144H2.40094C2.35734 5.58144 2.31484 5.56777 2.27943 5.54235C2.24401 5.51693 2.21745 5.48105 2.2035 5.43974L0.796973 1.27537C0.74099 1.11575 0.734897 0.942879 0.779504 0.779715C0.82411 0.616551 0.917305 0.470821 1.04671 0.361883C1.17611 0.252946 1.33559 0.185958 1.50397 0.169819C1.67235 0.15368 1.84166 0.189153 1.9894 0.271527L10.7411 5.26679C10.87 5.3392 10.9772 5.44457 11.0519 5.57208C11.1266 5.69959 11.1661 5.84468 11.1662 5.99246Z"fill="#ffffff" /></svg>
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M11.1662 5.99246C11.1666 6.14096 11.1273 6.28687 11.0524 6.41509C10.9775 6.54331 10.8697 6.64919 10.7401 6.72177L1.99252 11.7233C1.86699 11.7944 1.72527 11.8321 1.58098 11.8327C1.44803 11.832 1.31719 11.7995 1.19936 11.7379C1.08154 11.6763 0.980152 11.5874 0.903674 11.4787C0.827196 11.3699 0.777842 11.2444 0.759734 11.1127C0.741625 10.981 0.755286 10.8469 0.799577 10.7215L2.20611 6.55663C2.21985 6.51591 2.24585 6.48044 2.28055 6.45507C2.31524 6.42971 2.35693 6.41569 2.3999 6.41494H6.16523C6.22236 6.41506 6.27891 6.40344 6.33136 6.38079C6.38381 6.35814 6.43104 6.32495 6.47012 6.28328C6.50921 6.24161 6.5393 6.19235 6.55855 6.13855C6.57779 6.08476 6.58576 6.02758 6.58198 5.97058C6.57253 5.86341 6.52294 5.76377 6.44315 5.69162C6.36336 5.61946 6.25926 5.5801 6.15168 5.58144H2.40094C2.35734 5.58144 2.31484 5.56777 2.27943 5.54235C2.24401 5.51693 2.21745 5.48105 2.2035 5.43974L0.796973 1.27537C0.74099 1.11575 0.734897 0.942879 0.779504 0.779715C0.82411 0.616551 0.917305 0.470821 1.04671 0.361883C1.17611 0.252946 1.33559 0.185958 1.50397 0.169819C1.67235 0.15368 1.84166 0.189153 1.9894 0.271527L10.7411 5.26679C10.87 5.3392 10.9772 5.44457 11.0519 5.57208C11.1266 5.69959 11.1661 5.84468 11.1662 5.99246Z"
+                                    fill="#ffffff" />
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -721,8 +779,7 @@
                         </div>
                     </div>
                     <div class="p3 text-white">{{:content}}</div>
-                    <div class="flex w-full items-center justify-between">
-                        <div class="flex items-center gap-6 max-[500px]:gap-3">
+                        <div class="w-full flex items-center justify-between">
                             <div class="flex cursor-pointer items-center gap-2">
                                 <button class="vote-button" data-reply-id="{{:id}}">
                                     {{if isReplyVoted}}
@@ -746,10 +803,62 @@
                             </div>
                             <div class="o3 text-white">{{:date}}</div>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
+    </script>
+
+    <script>
+        function playAudio(id) {
+            let player = document.querySelector(`[data-audio-player="${id}"]`);
+            const audio = player.querySelector(`.audio`);
+            const playPauseBtn = player.querySelector(`#play-pause`);
+            const rewindBtn = player.querySelector(`#rewind`);
+            const forwardBtn = player.querySelector(`#forward`);
+            const progressBar = player.querySelector(`#progress`);
+            const currentTimeDisplay = player.querySelector(`#current-time`);
+            const totalTimeDisplay = player.querySelector(`#total-time`);
+
+
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.querySelector(".pausedIcon").classList.remove("hidden");
+                playPauseBtn.querySelector(".playedIcon").classList.add("hidden");
+            } else {
+                audio.pause();
+                playPauseBtn.querySelector(".pausedIcon").classList.add("hidden");
+                playPauseBtn.querySelector(".playedIcon").classList.remove("hidden");
+            }
+
+
+            rewindBtn.addEventListener(`click`, () => {
+                audio.currentTime -= 10;
+            });
+
+            forwardBtn.addEventListener(`click`, () => {
+                audio.currentTime += 10;
+            });
+
+            audio.addEventListener(`timeupdate`, () => {
+                progressBar.value = (audio.currentTime / audio.duration) * 100;
+                currentTimeDisplay.textContent = formatTime(audio.currentTime);
+                totalTimeDisplay.textContent = `-` + formatTime(audio.duration - audio.currentTime);
+            });
+
+            progressBar.addEventListener(`input`, () => {
+                audio.currentTime = (progressBar.value / 100) * audio.duration;
+            });
+
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? "0" : ``}${secs}`;
+            }
+
+            audio.addEventListener(`loadedmetadata`, () => {
+                totalTimeDisplay.textContent = "-" + formatTime(audio.duration);
+            });
+        }
     </script>
 
     <script>
@@ -761,6 +870,7 @@
         const DEFAUL_AVATAR = "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA";
         const GRAPHQL_ENDPOINT = "https://priestess.vitalstats.app/api/v1/graphql";
         const GRAPHQL_API_KEY = "U6F6ofQc_Oes9BimgiEs5";
+
         // Configuration Constants
         const CONFIG = {
             api: {
@@ -790,6 +900,7 @@
                 document.querySelector(".announcements").classList.add("hidden");
             }
         });
+
 
     </script>
 

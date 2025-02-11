@@ -86,7 +86,7 @@ class ForumManager {
         return;
       }
 
-      // Map each returned post to include file type and file data fields
+      // Map each returned post to include the unified file fields
       const posts = data.calcForumPosts.map((post) => {
         const postId = String(post.ID);
         return {
@@ -95,22 +95,12 @@ class ForumManager {
           isVoted: this.votedPostIds.has(postId),
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
-          // Parse the file fields (if they are strings)
-          type_audio: post.Type_Audio,
-          type_video: post.Type_Video,
-          type_image: post.Type_Image,
-          post_video:
-            typeof post.Post_Video === "string"
-              ? JSON.parse(post.Post_Video)
-              : post.Post_Video,
-          post_audio:
-            typeof post.Post_Audio === "string"
-              ? JSON.parse(post.Post_Audio)
-              : post.Post_Audio,
-          new_post_image:
-            typeof post.New_Post_Image === "string"
-              ? JSON.parse(post.New_Post_Image)
-              : post.New_Post_Image,
+          // NEW: Use the unified file fields
+          file_tpe: post.File_Tpe, // from your GraphQL response
+          file_content:
+            typeof post.File_Content === "string"
+              ? JSON.parse(post.File_Content)
+              : post.File_Content,
           defaultAuthorImage: CONFIG.api.defaultAuthorImage,
           PostVotesCount: post.Member_Post_Upvotes_DataTotal_Count,
           PostCommentCount: post.ForumCommentsTotalCount,
@@ -153,17 +143,15 @@ class ForumManager {
   buildQuery() {
     const filterCondition = this.buildFilterCondition();
     const sortCondition = this.buildSortCondition();
-
+  
     let args = [];
     if (filterCondition) args.push(filterCondition);
     args.push(`limit: $limit`, `offset: $offset`);
     if (sortCondition) args.push(sortCondition);
-
+  
     const argsString = args.join(", ");
-
-    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
-      this.needsUserId() ? ", $id: PriestessContactID" : ""
-    }) {
+  
+    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${this.needsUserId() ? ", $id: PriestessContactID" : ""}) {
         calcForumPosts(
            ${argsString}
         ) {
@@ -179,40 +167,50 @@ class ForumManager {
           ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
           Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
           ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
-          Type_Audio: field(arg: ["type_audio"])
-          Type_Image: field(arg: ["type_image"])
-          Type_Video: field(arg: ["type_video"])
-          Post_Video: field(arg: ["post_video"])
-          Post_Audio: field(arg: ["post_audio"])
-          New_Post_Image: field(arg: ["new_post_image"])
+          File_Tpe: field(arg: ["file_tpe"])
+          File_Content: field(arg: ["file_content"])
         }
       }
     `;
-
+  
     let variables = {
       limit: this.postsLimit,
       offset: this.postsOffset,
     };
-
+  
     if (this.needsUserId()) {
       variables.id = this.userId;
     }
-
+  
     return { query, variables };
   }
-
+  
   buildFilterCondition() {
     switch (this.currentFilter) {
+      // Existing filters:
       case "saved":
         return `query: [{ where: { Contacts: [{ where: { id: $id } }] } }]`;
       case "featured":
         return `query: [{ where: { featured_post: true } }]`;
       case "my":
         return `query: [{ where: { Author: [{ where: { id: $id } }] } }]`;
+        
+      // New file–type filters:
+      case "Image":
+        return `query: [{ where: { file_tpe: "Image" } }]`;
+      case "Audio":
+        return `query: [{ where: { file_tpe: "Audio" } }]`;
+      case "Video":
+        return `query: [{ where: { file_tpe: "Video" } }]`;
+      case "Text":
+        // Posts with no file; assuming your API returns null for file_tpe when there’s no file.
+        return `query: [{ where: { file_tpe: null } }]`;
+      case "All":
       default:
         return "";
     }
   }
+  
 
   buildSortCondition() {
     switch (this.currentSort) {
@@ -235,10 +233,11 @@ class ForumManager {
     this.currentFilter = filterType;
     this.refreshPosts().then(() => {
       if (filterType === "saved") {
-        this.updateBookmarkIcons(); // ✅ Update icons when switching to Saved Posts
+        this.updateBookmarkIcons();
       }
     });
   }
+  
 
   async deletePost(postId) {
     const postElement = document.querySelector(`[data-post-id="${postId}"]`);
@@ -1476,15 +1475,21 @@ class ForumManager {
           const date = postElement.dataset.postDate;
           const title = postElement.dataset.title;
           const content = postElement.dataset.content;
-          // These are now valid JSON strings
-          const newPostImage = postElement.dataset.newPostImage;
-          const postAudio = postElement.dataset.postAudio;
-          const postVideo = postElement.dataset.postVideo;
-          const typeImage = postElement.dataset.typeImage;
-          const typeAudio = postElement.dataset.typeAudio;
-          const typeVideo = postElement.dataset.typeVideo;
+          // NEW unified file fields:
+          const fileTpe = postElement.dataset.fileTpe;
+          const fileContentRaw = postElement.dataset.fileContent;
           const voteCount = postElement.dataset.voteCount;
           const commentCount = postElement.dataset.commentCount;
+
+          // Parse fileContent (if it exists)
+          let fileContent = null;
+          if (fileContentRaw) {
+            try {
+              fileContent = JSON.parse(fileContentRaw);
+            } catch (err) {
+              fileContent = fileContentRaw;
+            }
+          }
 
           const post = {
             id: postId,
@@ -1493,12 +1498,8 @@ class ForumManager {
             date,
             title,
             content,
-            new_post_image: newPostImage,
-            post_audio: postAudio,
-            post_video: postVideo,
-            type_image: typeImage,
-            type_audio: typeAudio,
-            type_video: typeVideo,
+            file_tpe: fileTpe,
+            file_content: fileContent,
             PostVotesCount: voteCount,
             PostCommentCount: commentCount,
           };

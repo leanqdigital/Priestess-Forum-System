@@ -113,6 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
       // Remove active state from all buttons
+      const filterType = button.dataset.filter;
+      forumManager.handleFilterChange(filterType);
       filterButtons.forEach((btn) => {
         btn.classList.remove("active");
         btn.setAttribute("variant", "default"); // Reset to default variant

@@ -386,7 +386,7 @@ function getS3UploadParams(awsParam, url) {
  * provided `filesToUpload` Array.
  */
 function uploadFiles(filesToUpload, s3Params, toSubmit) {
-  console.log(s3Params,"s3Params")
+  console.log(s3Params, "s3Params");
   const paramsInputs = s3Params.inputs;
   const method = s3Params.attributes.method;
   const action = s3Params.attributes.action;
@@ -477,6 +477,7 @@ function uploadFiles(filesToUpload, s3Params, toSubmit) {
  * a `failures` Array, which will contain the entries
  * from `filesToUpload` that failed to upload.
  */
+
 function processFileFields(toSubmit, filesToUpload, awsParamHash, awsParamUrl) {
   let awsParam;
   if (!awsParamHash) {
@@ -510,122 +511,222 @@ function processFileFields(toSubmit, filesToUpload, awsParamHash, awsParamUrl) {
   });
 }
 
-
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", () => MentionManager.init());
 
 // Trigger file inputs when the corresponding button is clicked
-document.getElementById('upload-image-button').addEventListener('click', () => {
-  document.getElementById('post-image-upload').click();
+document.getElementById("upload-image-button").addEventListener("click", () => {
+  document.getElementById("post-image-upload").click();
 });
-document.getElementById('upload-audio-button').addEventListener('click', () => {
-  document.getElementById('post-audio-upload').click();
+document.getElementById("upload-audio-button").addEventListener("click", () => {
+  document.getElementById("post-audio-upload").click();
 });
-document.getElementById('upload-video-button').addEventListener('click', () => {
-  document.getElementById('post-video-upload').click();
+document.getElementById("upload-video-button").addEventListener("click", () => {
+  document.getElementById("post-video-upload").click();
 });
 
-// Helper function to create a "Clear" button
-function createClearButton(fileInputId, wrapper) {
-  const clearBtn = document.createElement('button');
-  clearBtn.textContent = 'Clear';
-  clearBtn.classList.add('clear-preview-btn'); // Add a class for styling if desired
-  clearBtn.addEventListener('click', () => {
-    document.getElementById(fileInputId).value = '';
-    wrapper.innerHTML = '';
-  });
-  return clearBtn;
+// Global variable to track which file type was uploaded ("image", "audio", or "video")
+let currentFileType = null;
+
+/**
+ * Helper: Shows the refresh and clear controls and hides the three upload buttons.
+ * @param {string} fileType - "image", "audio", or "video"
+ */
+function showFileControls(fileType) {
+  currentFileType = fileType;
+  // Hide the three separate upload buttons
+  document.getElementById("upload-image-button").classList.add("hidden");
+  document.getElementById("upload-audio-button").classList.add("hidden");
+  document.getElementById("upload-video-button").classList.add("hidden");
+  // Show the controls container (refresh & clear)
+  document.getElementById("file-controls").classList.remove("hidden");
 }
 
-// Image preview with clear option
-document.getElementById('post-image-upload').addEventListener('change', function (e) {
-  const file = e.target.files[0];
-  const wrapper = document.getElementById('image-preview-wrapper');
-  wrapper.innerHTML = ''; // Clear previous preview
-  if (file) {
-    const imageURL = URL.createObjectURL(file);
-    const img = document.createElement('img');
-    img.src = imageURL;
-    img.alt = 'Image Preview';
-    img.classList.add('w-full', 'object-contain', 'rounded'); // Customize classes as needed
-    wrapper.appendChild(img);
-    // Append clear button
-    wrapper.appendChild(createClearButton('post-image-upload', wrapper));
-  }
-});
+// -------------------------
+// File Input Event Listeners
+// -------------------------
 
-// Audio preview with clear option
-document.getElementById('post-audio-upload').addEventListener('change', function (e) {
-  const file = e.target.files[0];
-  const wrapper = document.getElementById('audio-preview-wrapper');
-  wrapper.innerHTML = '';
-  if (file) {
-    const audioURL = URL.createObjectURL(file);
-    const audio = document.createElement('audio');
-    audio.controls = true;
-    audio.classList.add('w-full');
-    const source = document.createElement('source');
-    source.src = audioURL;
-    source.type = file.type;
-    audio.appendChild(source);
-    wrapper.appendChild(audio);
-    // Append clear button
-    wrapper.appendChild(createClearButton('post-audio-upload', wrapper));
-  }
-});
+// IMAGE file input
+document
+  .getElementById("post-image-upload")
+  .addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    const wrapper = document.getElementById("image-preview-wrapper");
+    wrapper.innerHTML = ""; // Clear previous preview if any
 
-// Video preview with clear option
-document.getElementById('post-video-upload').addEventListener('change', function (e) {
-  const file = e.target.files[0];
-  const wrapper = document.getElementById('video-preview-wrapper');
-  wrapper.innerHTML = '';
-  if (file) {
-    const videoURL = URL.createObjectURL(file);
-    const video = document.createElement('video');
-    video.controls = true;
-    video.width = 300; // Adjust as needed
-    video.classList.add('rounded');
-    const source = document.createElement('source');
-    source.src = videoURL;
-    source.type = file.type;
-    video.appendChild(source);
-    wrapper.appendChild(video);
-    // Append clear button
-    wrapper.appendChild(createClearButton('post-video-upload', wrapper));
-  }
-});
+    if (file) {
+      // Clear the other file inputs and their previews
+      document.getElementById("post-audio-upload").value = "";
+      document.getElementById("audio-preview-wrapper").innerHTML = "";
+      document.getElementById("post-video-upload").value = "";
+      document.getElementById("video-preview-wrapper").innerHTML = "";
 
+      // Create and show the image preview
+      const imageURL = URL.createObjectURL(file);
+      const img = document.createElement("img");
+      img.src = imageURL;
+      img.alt = "Image Preview";
+      img.classList.add("w-full", "object-contain", "rounded");
+      wrapper.appendChild(img);
+
+      // Show refresh/clear controls for images
+      showFileControls("image");
+    }
+  });
+
+// AUDIO file input
+document
+  .getElementById("post-audio-upload")
+  .addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    const wrapper = document.getElementById("audio-preview-wrapper");
+    wrapper.innerHTML = "";
+
+    if (file) {
+      // Clear image and video inputs and their previews
+      document.getElementById("post-image-upload").value = "";
+      document.getElementById("image-preview-wrapper").innerHTML = "";
+      document.getElementById("post-video-upload").value = "";
+      document.getElementById("video-preview-wrapper").innerHTML = "";
+
+      // Create and show the audio preview
+      const audioURL = URL.createObjectURL(file);
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.classList.add("w-full");
+      const source = document.createElement("source");
+      source.src = audioURL;
+      source.type = file.type;
+      audio.appendChild(source);
+      wrapper.appendChild(audio);
+
+      // Show refresh/clear controls for audio
+      showFileControls("audio");
+    }
+  });
+
+// VIDEO file input
+document
+  .getElementById("post-video-upload")
+  .addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    const wrapper = document.getElementById("video-preview-wrapper");
+    wrapper.innerHTML = "";
+
+    if (file) {
+      // Clear image and audio inputs and their previews
+      document.getElementById("post-image-upload").value = "";
+      document.getElementById("image-preview-wrapper").innerHTML = "";
+      document.getElementById("post-audio-upload").value = "";
+      document.getElementById("audio-preview-wrapper").innerHTML = "";
+
+      // Create and show the video preview
+      const videoURL = URL.createObjectURL(file);
+      const video = document.createElement("video");
+      video.controls = true;
+      video.width = 300; // adjust as needed
+      video.classList.add("rounded");
+      const source = document.createElement("source");
+      source.src = videoURL;
+      source.type = file.type;
+      video.appendChild(source);
+      wrapper.appendChild(video);
+
+      // Show refresh/clear controls for video
+      showFileControls("video");
+    }
+  });
+
+// -------------------------
+// Refresh and Clear Button Handlers
+// -------------------------
+
+// Refresh: Clears the current preview and re-opens the same file input so the user can re-upload a file of that type.
+document
+  .getElementById("refresh-upload")
+  .addEventListener("click", function () {
+    if (currentFileType === "image") {
+      document.getElementById("image-preview-wrapper").innerHTML = "";
+      document.getElementById("post-image-upload").value = "";
+      // Trigger file selection dialog (since the user clicked refresh, which is a user gesture)
+      document.getElementById("post-image-upload").click();
+    } else if (currentFileType === "audio") {
+      document.getElementById("audio-preview-wrapper").innerHTML = "";
+      document.getElementById("post-audio-upload").value = "";
+      document.getElementById("post-audio-upload").click();
+    } else if (currentFileType === "video") {
+      document.getElementById("video-preview-wrapper").innerHTML = "";
+      document.getElementById("post-video-upload").value = "";
+      document.getElementById("post-video-upload").click();
+    }
+  });
+
+// Clear (Delete): Clears the current preview and resets the UI so the three file upload buttons appear again.
+document.getElementById("delete-upload").addEventListener("click", function () {
+  if (currentFileType === "image") {
+    document.getElementById("image-preview-wrapper").innerHTML = "";
+    document.getElementById("post-image-upload").value = "";
+  } else if (currentFileType === "audio") {
+    document.getElementById("audio-preview-wrapper").innerHTML = "";
+    document.getElementById("post-audio-upload").value = "";
+  } else if (currentFileType === "video") {
+    document.getElementById("video-preview-wrapper").innerHTML = "";
+    document.getElementById("post-video-upload").value = "";
+  }
+  // Reset state
+  currentFileType = null;
+  // Hide the refresh/clear controls
+  document.getElementById("file-controls").classList.add("hidden");
+  // Show all three upload buttons so the user may pick any file type
+  document.getElementById("upload-image-button").classList.remove("hidden");
+  document.getElementById("upload-audio-button").classList.remove("hidden");
+  document.getElementById("upload-video-button").classList.remove("hidden");
+});
 
 document.getElementById("submit-post").addEventListener("click", async (e) => {
   e.preventDefault();
 
-  // AWS parameters (adjust these as needed)
+  // AWS parameters remain the same
   const awsParam = "e8ad43b6ddadf5883ee7ec0a98a5450d";
   const awsParamUrl = "https://library.priestesspresence.com/s/aws";
 
-  // Get the post content and file inputs
+  // Get the post content from the editor
   const editor = document.getElementById("post-editor");
   const textContent = editor.innerText.trim();
 
-  // Get all file inputs:
+  // Get file inputs (the three remain in the DOM)
   const imageInput = document.getElementById("post-image-upload");
   const audioInput = document.getElementById("post-audio-upload");
   const videoInput = document.getElementById("post-video-upload");
 
+  // Determine which file is uploaded – only one is allowed
   const imageFile = imageInput.files[0];
   const audioFile = audioInput.files[0];
   const videoFile = videoInput.files[0];
 
-  // At least one content type is required
-  if (!textContent && !imageFile && !audioFile && !videoFile) {
-    UIManager.showError("Post content or at least one file is required.");
+  let uploadedFile = null;
+  let fileType = null;
+  if (imageFile) {
+    uploadedFile = imageFile;
+    fileType = "Image";
+  } else if (audioFile) {
+    uploadedFile = audioFile;
+    fileType = "Audio";
+  } else if (videoFile) {
+    uploadedFile = videoFile;
+    fileType = "Video";
+  }
+
+  // At least one (text or file) is required
+  if (!textContent && !uploadedFile) {
+    UIManager.showError("Post content or a file is required.");
     return;
   }
 
-  // Hide the modal (adjust based on your modal library)
+  // Hide the modal (your modal hide logic remains)
   document.getElementById("postNewModal").hide();
 
-  // Extract mentioned contact IDs from elements with the "mention" class
+  // Extract mentioned IDs
   const mentionedIds = [];
   editor.querySelectorAll(".mention").forEach((mention) => {
     const id = mention.dataset.contactId;
@@ -634,17 +735,15 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     }
   });
 
-  // Create a temporary post for an optimistic UI update
+  // Create a temporary post using the new fields:
   const tempPost = {
     id: `temp-${Date.now()}`,
     author_id: forumManager.userId,
-    // Provide preview URLs (if available)
-    new_post_image: imageFile ? { link: URL.createObjectURL(imageFile) } : null,
-    post_audio: audioFile ? { link: URL.createObjectURL(audioFile) } : null,
-    post_video: videoFile ? { link: URL.createObjectURL(videoFile) } : null,
-    type_image: !!imageFile,
-    type_audio: !!audioFile,
-    type_video: !!videoFile,
+    // NEW: Use file_content (preview URL) and file_tpe (the file type)
+    file_content: uploadedFile
+      ? { link: URL.createObjectURL(uploadedFile) }
+      : null,
+    file_tpe: uploadedFile ? fileType : null,
     author: {
       name: forumManager.fullName,
       profileImage: forumManager.defaultAuthorImage,
@@ -659,34 +758,17 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
   const postElement = postContainer.firstElementChild;
   postElement.classList.add("state-disabled");
 
-  // Prepare to process file uploads for all types
-  let postImageData = null,
-    postAudioData = null,
-    postVideoData = null;
-
-  // Build an array of file fields (using new field names)
+  // Process file upload (only one file field is needed)
+  let fileData = null;
   const fileFields = [];
-  if (imageFile) {
+  if (uploadedFile) {
     fileFields.push({
-      fieldName: "f5236", // new image field name
-      file: imageFile,
-    });
-  }
-  if (audioFile) {
-    fileFields.push({
-      fieldName: "f4989", // audio field name
-      file: audioFile,
-    });
-  }
-  if (videoFile) {
-    fileFields.push({
-      fieldName: "f5232", // video field name
-      file: videoFile,
+      fieldName: "file_content", // NEW: single file field name
+      file: uploadedFile,
     });
   }
 
   try {
-    // Process the file uploads if any files are present
     if (fileFields.length > 0) {
       const toSubmitFields = {};
       await processFileFields(
@@ -695,107 +777,71 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
         awsParam,
         awsParamUrl
       );
-
-      if (imageFile) {
-        postImageData =
-          typeof toSubmitFields.f5236 === "string"
-            ? JSON.parse(toSubmitFields.f5236)
-            : toSubmitFields.f5236;
-        // Fallback properties if missing:
-        postImageData.name = postImageData.name || imageFile.name;
-        postImageData.size = postImageData.size || imageFile.size;
-        postImageData.type = postImageData.type || imageFile.type;
-      }
-      if (audioFile) {
-        postAudioData =
-          typeof toSubmitFields.f4989 === "string"
-            ? JSON.parse(toSubmitFields.f4989)
-            : toSubmitFields.f4989;
-        postAudioData.name = postAudioData.name || audioFile.name;
-        postAudioData.size = postAudioData.size || audioFile.size;
-        postAudioData.type = postAudioData.type || audioFile.type;
-      }
-      if (videoFile) {
-        postVideoData =
-          typeof toSubmitFields.f5232 === "string"
-            ? JSON.parse(toSubmitFields.f5232)
-            : toSubmitFields.f5232;
-        postVideoData.name = postVideoData.name || videoFile.name;
-        postVideoData.size = postVideoData.size || videoFile.size;
-        postVideoData.type = postVideoData.type || videoFile.type;
-      }
+      fileData =
+        typeof toSubmitFields.file_content === "string"
+          ? JSON.parse(toSubmitFields.file_content)
+          : toSubmitFields.file_content;
+      fileData.name = fileData.name || uploadedFile.name;
+      fileData.size = fileData.size || uploadedFile.size;
+      fileData.type = fileData.type || uploadedFile.type;
     }
 
-    // Send the create post mutation with the proper fields and file data
+    // Send the create post mutation using the new file fields
     const response = await ApiService.query(
       `
-      mutation createForumPost($payload: ForumPostCreateInput!) {
-        createForumPost(payload: $payload) {
-          id
-          author_id
-          post_copy
-          type_audio
-          type_image
-          type_video
-          post_video
-          post_audio
-          new_post_image
-          Mentioned_Users {
+        mutation createForumPost($payload: ForumPostCreateInput!) {
+          createForumPost(payload: $payload) {
             id
+            author_id
+            post_copy
+            file_tpe
+            file_content
+            Mentioned_Users {
+              id
+            }
           }
         }
-      }
-      `,
+        `,
       {
         payload: {
           author_id: forumManager.userId,
           post_copy: textContent,
           Mentioned_Users: mentionedIds.map((id) => ({ id: Number(id) })),
-          type_image: !!imageFile,
-          type_audio: !!audioFile,
-          type_video: !!videoFile,
-          new_post_image: postImageData ? postImageData : null,
-          post_audio: postAudioData ? postAudioData : null,
-          post_video: postVideoData ? postVideoData : null,
+          // NEW: send the file type and file data regardless of which button was used
+          file_tpe: uploadedFile ? fileType : null,
+          file_content: fileData ? fileData : null,
         },
       }
     );
 
-    // Update the temporary post with the real post details from the response
     const newPost = response.createForumPost;
     postElement.dataset.postId = newPost.id;
 
-    // (Optional) Fetch additional post details if needed
+    // (Optional) Fetch additional details as before…
     const fetchResponse = await ApiService.query(
       `
-      query calcForumPosts($id: PriestessForumPostID) {
-        calcForumPosts(query: [{ where: { id: $id } }]) {
-          ID: field(arg: ["id"])
-          Author_ID: field(arg: ["author_id"])
-          Author_First_Name: field(arg: ["Author", "first_name"])
-          Author_Last_Name: field(arg: ["Author", "last_name"])
-          Author_Profile_Image: field(arg: ["Author", "profile_image"])
-          Date_Added: field(arg: ["created_at"])
-          Post_Copy: field(arg: ["post_copy"])
-          Featured_Post: field(arg: ["featured_post"])
-          ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
-          Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
-          Type_Audio: field(arg: ["type_audio"])
-          Type_Image: field(arg: ["type_image"])
-          Type_Video: field(arg: ["type_video"])
-          Post_Video: field(arg: ["post_video"])
-          Post_Audio: field(arg: ["post_audio"])
-          New_Post_Image: field(arg: ["new_post_image"])
+        query calcForumPosts($id: PriestessForumPostID) {
+          calcForumPosts(query: [{ where: { id: $id } }]) {
+            ID: field(arg: ["id"])
+            Author_ID: field(arg: ["author_id"])
+            Author_First_Name: field(arg: ["Author", "first_name"])
+            Author_Last_Name: field(arg: ["Author", "last_name"])
+            Author_Profile_Image: field(arg: ["Author", "profile_image"])
+            Date_Added: field(arg: ["created_at"])
+            Post_Copy: field(arg: ["post_copy"])
+            File_Tpe: field(arg: ["file_tpe"])
+            File_Content: field(arg: ["file_content"])
+            ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+          }
         }
-      }
-      `,
+        `,
       { id: newPost.id }
     );
 
     const actualPost = fetchResponse.calcForumPosts[0];
 
-    // Update DOM elements with the fetched post details as needed.
-    // (For example, update vote buttons, post copy, author image/name, etc.)
+    // Update DOM elements (update any file-related UI as needed)
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
     postElement.querySelector(".editPostModal").dataset.postId = actualPost.ID;
     postElement.querySelector(".post-author-name").textContent =
@@ -811,6 +857,13 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     postElement.querySelector(".delete-post-btn").dataset.postId =
       actualPost.ID;
     postElement.dataset.postId = actualPost.ID;
+    postElement.querySelector(".audio-player").id = "audio-" + actualPost.ID;
+    const playPauseButton = postElement.querySelector("#play-pause");
+    if (playPauseButton) {
+      playPauseButton.dataset.audioButton = actualPost.ID; // Update with actual ID
+    }
+    const audioPlayer = postElement.querySelector(".audio-player");
+    audioPlayer.dataset.audioPlayer = actualPost.ID;
   } catch (error) {
     console.error("Error during post creation:", error);
     UIManager.showError("Failed to post. Please try again.");

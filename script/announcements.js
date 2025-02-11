@@ -2,13 +2,49 @@
 const API_KEY = "U6F6ofQc_Oes9BimgiEs5";
 const WS_ENDPOINT = `wss://priestess.vitalstats.app/api/v1/graphql?apiKey=${API_KEY}`;
 const HTTP_ENDPOINT = `https://priestess.vitalstats.app/api/v1/graphql`;
+// Set the logged-in user's contact ID – ensure this is a number.
+const LOGGED_IN_CONTACT_ID = CONFIG.api.userId; // Example value
 
 // Subscription query for announcements (using your provided query)
 const SUBSCRIPTION_QUERY = `
-  subscription subscribeToAnnouncements {
-    subscribeToAnnouncements (
+  subscription subscribeToAnnouncements(
+    $author_id: PriestessContactID
+  ) {
+    subscribeToAnnouncements(
+      query: [
+        {
+          where: {
+            Comment: [
+              {
+                where: {
+                  Forum_Post: [
+                    {
+                      where: {
+                        author_id: $author_id
+                        _OPERATOR_: neq
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+        {
+          orWhere: {
+            Post: [
+              {
+                where: {
+                  author_id: $author_id
+                  _OPERATOR_: neq
+                }
+              }
+            ]
+          }
+        }
+      ]
       orderBy: [{ path: ["created_at"], type: desc }]
-    ){
+    ) {
       ID: id
       Title: title
       Content: content
@@ -39,9 +75,6 @@ const MARK_READ_MUTATION = `
     }
   }
 `;
-
-// Set the logged-in user's contact ID – ensure this is a number.
-const LOGGED_IN_CONTACT_ID = CONFIG.api.userId; // Example value
 
 // --------------------------------------------------------------------
 // Instead of one container, we now support multiple containers.
@@ -287,7 +320,9 @@ function fetchReadData() {
     .then((response) => response.json())
     .then((data) => {
       if (data.data && data.data.calcOReadContactReadAnnouncements) {
-        const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
+        const records = Array.isArray(
+          data.data.calcOReadContactReadAnnouncements
+        )
           ? data.data.calcOReadContactReadAnnouncements
           : [data.data.calcOReadContactReadAnnouncements];
         records.forEach((record) => {
@@ -302,7 +337,6 @@ function fetchReadData() {
       console.error("Error fetching read data:", error);
     });
 }
-
 
 // Send a KEEP_ALIVE message over the WebSocket.
 function sendKeepAlive() {
@@ -323,7 +357,10 @@ function connect() {
       JSON.stringify({
         id: "1",
         type: "GQL_START",
-        payload: { query: SUBSCRIPTION_QUERY },
+        payload: {
+          query: SUBSCRIPTION_QUERY,
+          variables: { author_id: LOGGED_IN_CONTACT_ID },
+        },
       })
     );
     // Fetch the read announcements data on page load.
