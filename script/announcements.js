@@ -134,8 +134,12 @@ function createNotificationCard(notification, isRead) {
   card.className = "notification flex justify-between gap-2 load-comments-btn";
   // Save the numeric ID as a string attribute.
   card.setAttribute("data-id", String(notification.ID));
-  card.setAttribute("x-on:click", "openCommentModal = true");
-  card.setAttribute("data-post-id", String(notification.Post_ID));
+
+  // Check if Post_ID is valid before adding event listener
+  if (notification.Post_ID !== null && notification.Post_ID !== undefined) {
+    card.setAttribute("data-post-id", String(notification.Post_ID));
+    card.setAttribute("x-on:click", "openCommentModal = true");
+  }
 
   card.innerHTML = `
     <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${
@@ -156,11 +160,45 @@ function createNotificationCard(notification, isRead) {
   // On click, mark as read if not already marked or pending.
   card.addEventListener("click", function () {
     const id = Number(card.getAttribute("data-id"));
+
+    // Check if Post_ID exists before proceeding
+    const postId = card.getAttribute("data-post-id");
+    if (!postId) {
+      console.log("No post found");
+      return;
+    }
+
     if (readAnnouncements.has(id) || pendingAnnouncements.has(id)) return;
     markAsRead(id);
   });
 
   return card;
+}
+
+function updateNoNotificationsMessage() {
+  const notificationContainers = document.querySelectorAll(
+    "#parentNotificationTemplatesInNavbar, #parentNotificationTemplatesInBody"
+  );
+
+  notificationContainers.forEach((container) => {
+    let messageDiv = container.querySelector(".no-notifications-message");
+
+    // If no notifications exist, show the message
+    if (displayedNotifications.size === 0) {
+      if (!messageDiv) {
+        messageDiv = document.createElement("div");
+        messageDiv.className =
+          "no-notifications-message text-white text-center p-2";
+        messageDiv.textContent = "No notifications";
+        container.appendChild(messageDiv);
+      }
+      messageDiv.style.display = "block";
+    } else {
+      if (messageDiv) {
+        messageDiv.style.display = "none";
+      }
+    }
+  });
 }
 
 // Process a single announcement notification.
@@ -177,6 +215,9 @@ function processNotification(notification) {
     cards.push(card);
   });
   cardMap.set(id, cards);
+  
+  // Update message visibility
+  updateNoNotificationsMessage();
 }
 
 // Update styling of each rendered notification based on read status.
@@ -193,8 +234,9 @@ function updateNotificationReadStatus() {
       }
     });
   });
-  // Update the red dot visibility after notifications update.
+
   updateRedDot();
+  updateNoNotificationsMessage(); // Check for empty state
 }
 
 function updateRedDot() {
@@ -325,12 +367,15 @@ function fetchReadData() {
         )
           ? data.data.calcOReadContactReadAnnouncements
           : [data.data.calcOReadContactReadAnnouncements];
+
         records.forEach((record) => {
           if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
             readAnnouncements.add(Number(record.Read_Announcement_ID));
           }
         });
+
         updateNotificationReadStatus();
+        updateNoNotificationsMessage(); // Check after fetching
       }
     })
     .catch((error) => {
