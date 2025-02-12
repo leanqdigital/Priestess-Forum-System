@@ -143,15 +143,17 @@ class ForumManager {
   buildQuery() {
     const filterCondition = this.buildFilterCondition();
     const sortCondition = this.buildSortCondition();
-  
+
     let args = [];
     if (filterCondition) args.push(filterCondition);
     args.push(`limit: $limit`, `offset: $offset`);
     if (sortCondition) args.push(sortCondition);
-  
+
     const argsString = args.join(", ");
-  
-    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${this.needsUserId() ? ", $id: PriestessContactID" : ""}) {
+
+    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
+      this.needsUserId() ? ", $id: PriestessContactID" : ""
+    }) {
         calcForumPosts(
            ${argsString}
         ) {
@@ -172,19 +174,19 @@ class ForumManager {
         }
       }
     `;
-  
+
     let variables = {
       limit: this.postsLimit,
       offset: this.postsOffset,
     };
-  
+
     if (this.needsUserId()) {
       variables.id = this.userId;
     }
-  
+
     return { query, variables };
   }
-  
+
   buildFilterCondition() {
     switch (this.currentFilter) {
       // Existing filters:
@@ -194,8 +196,6 @@ class ForumManager {
         return `query: [{ where: { featured_post: true } }]`;
       case "my":
         return `query: [{ where: { Author: [{ where: { id: $id } }] } }]`;
-        
-      // New file–type filters:
       case "Image":
         return `query: [{ where: { file_tpe: "Image" } }]`;
       case "Audio":
@@ -203,14 +203,12 @@ class ForumManager {
       case "Video":
         return `query: [{ where: { file_tpe: "Video" } }]`;
       case "Text":
-        // Posts with no file; assuming your API returns null for file_tpe when there’s no file.
         return `query: [{ where: { file_tpe: null } }]`;
       case "All":
       default:
         return "";
     }
   }
-  
 
   buildSortCondition() {
     switch (this.currentSort) {
@@ -237,7 +235,6 @@ class ForumManager {
       }
     });
   }
-  
 
   async deletePost(postId) {
     const postElement = document.querySelector(`[data-post-id="${postId}"]`);
