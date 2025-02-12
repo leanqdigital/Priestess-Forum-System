@@ -1023,8 +1023,6 @@ class ForumManager {
         id
         member_comment_upvote_id
         forum_comment_upvote_id
-        file_type
-        file_content
       }
     }
   `;
