@@ -1027,7 +1027,7 @@
         const LOGGED_IN_USER_LAST_NAME = "Adikari";
         const LOGGED_IN_USER_FULL_NAME = "Dpes Adikari";
         const LOGGED_IN_USER_PROFILE_IMAGE_LINK = "https://i.ontraport.com/22612.7af9e9baa3d56ef7636bd6db2600bc6f.PNG";
-        const DEFAUL_AVATAR = "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA";
+        const DEFAULT_AVATAR = "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA";
         const GRAPHQL_ENDPOINT = "https://priestess.vitalstats.app/api/v1/graphql";
         const GRAPHQL_API_KEY = "U6F6ofQc_Oes9BimgiEs5";
 
@@ -1040,7 +1040,7 @@
                 firstName: LOGGED_IN_USER_FIRST_NAME,
                 lastName: LOGGED_IN_USER_LAST_NAME,
                 fullName: LOGGED_IN_USER_FULL_NAME,
-                defaultAuthorImage: LOGGED_IN_USER_PROFILE_IMAGE_LINK || DEFAUL_AVATAR,
+                defaultAuthorImage: LOGGED_IN_USER_PROFILE_IMAGE_LINK?.trim() ? LOGGED_IN_USER_PROFILE_IMAGE_LINK : DEFAUL_AVATAR,
             },
             pagination: {
                 postsPerPage: 5,
