@@ -690,6 +690,8 @@ class ForumManager {
           Date_Added: field(arg: ["created_at"])
           Comment: field(arg: ["comment"])
           Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
+          File_Type: field(arg: ["file_type"])
+          File_Content: field(arg: ["file_content"])
         }
       }
     `;
@@ -700,6 +702,13 @@ class ForumManager {
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
         CommentVotesCount: comment.Member_Comment_Upvotes_DataTotal_Count,
+
+        // NEW: Use the unified file fields
+        file_type: comment.File_Type, // from your GraphQL response
+        file_content:
+          typeof comment.File_Content === "string"
+            ? JSON.parse(comment.File_Content)
+            : comment.File_Content,
         author: Formatter.formatAuthor({
           firstName: comment.Author_First_Name,
           lastName: comment.Author_Last_Name,
@@ -715,21 +724,35 @@ class ForumManager {
   }
 
   // --- CREATE A COMMENT WITH OPTIMISTIC RENDERING ---
-  async createComment(postId, content, mentions) {
-    // Create a temporary comment for optimistic rendering.
+  async createComment(postId, content, mentions, fileType, uploadedFile) {
+    // Create a temporary comment ID for optimistic rendering.
     const tempCommentId = `temp-${Date.now()}`;
+
+    // If a file is provided, create a local preview URL.
+    let previewFileContent = null;
+    if (uploadedFile) {
+      // This object structure should match what your template expects.
+      previewFileContent = {
+        link: URL.createObjectURL(uploadedFile),
+        type: uploadedFile.type,
+      };
+    }
+
+    // Build a temporary comment object including the preview (if available).
     const tempComment = {
       id: tempCommentId,
-      content,
+      content: content,
       CommentVotesCount: "0",
       date: "Just now",
+      file_content: previewFileContent, // will be null if no file selected
+      file_type: fileType,
       author: {
         name: this.fullName,
         profileImage: this.defaultAuthorImage,
       },
     };
 
-    // Render the temporary comment using the comment template.
+    // Render the temporary comment using your comment template.
     const template = $.templates("#comment-template");
     const commentsContainer = document.getElementById(
       "modal-comments-container"
@@ -739,7 +762,7 @@ class ForumManager {
       template.render(tempComment)
     );
 
-    // Find and disable the temporary comment element.
+    // Find the temporary comment element and disable it.
     let commentElement = commentsContainer.querySelector(
       `[data-comment-id="${tempCommentId}"]`
     );
@@ -748,9 +771,37 @@ class ForumManager {
     }
 
     let newComment; // to hold the mutation result
+    let fileData = null;
+    const fileFields = [];
+    if (uploadedFile) {
+      fileFields.push({
+        fieldName: "file_content",
+        file: uploadedFile, // Use the correct variable here.
+      });
+    }
 
-    // ----- STEP 1: Run the Mutation -----
     try {
+      // If a file was selected, process it (for example, to upload to S3).
+      if (fileFields.length > 0) {
+        const toSubmitFields = {};
+        // processFileFields is assumed to handle the upload and populate "toSubmitFields".
+        await processFileFields(
+          toSubmitFields,
+          fileFields,
+          awsParam,
+          awsParamUrl
+        );
+        fileData =
+          typeof toSubmitFields.file_content === "string"
+            ? JSON.parse(toSubmitFields.file_content)
+            : toSubmitFields.file_content;
+        // Ensure fileData has proper metadata.
+        fileData.name = fileData.name || uploadedFile.name;
+        fileData.size = fileData.size || uploadedFile.size;
+        fileData.type = fileData.type || uploadedFile.type;
+      }
+
+      // Build and execute the mutation to create the comment.
       const mutationQuery = `
         mutation createForumComment($payload: ForumCommentCreateInput!) {
           createForumComment(payload: $payload) {
@@ -758,6 +809,8 @@ class ForumManager {
             author_id
             forum_post_id
             comment
+            file_type
+            file_content
             Comment_or_Reply_Mentions { id }
           }
         }
@@ -768,13 +821,15 @@ class ForumManager {
           comment: content,
           forum_post_id: postId,
           Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
+          file_type: fileType,
+          // Pass the processed fileData (if any); otherwise, null.
+          file_content: fileData,
         },
       };
 
       const mutationResponse = await ApiService.query(mutationQuery, variables);
       newComment = mutationResponse.createForumComment;
     } catch (error) {
-      // If the mutation fails, show an error and remove the temporary comment.
       UIManager.showError("Failed to post comment");
       if (commentElement) {
         commentElement.remove();
@@ -782,48 +837,75 @@ class ForumManager {
       return;
     }
 
-    // ----- STEP 2: Attempt to Fetch Full Comment Data -----
-    // Use a short delay to allow the backend to index the new comment.
+    // ----- STEP 2: Update the Optimistic Comment with Real Data -----
+    // ----- STEP 2: Update the Optimistic Comment with Real Data -----
     try {
+      // Delay briefly to allow backend indexing.
       await new Promise((resolve) => setTimeout(resolve, 500));
       const fetchQuery = `
-      query calcForumComments($id: PriestessForumCommentID) {
-        calcForumComments(query: [{ where: { id: $id } }]) {
-          ID: field(arg: ["id"])
-          Author_First_Name: field(arg: ["Author", "first_name"])
-          Author_Last_Name: field(arg: ["Author", "last_name"])
-          Author_Profile_Image: field(arg: ["Author", "profile_image"])
-          Date_Added: field(arg: ["created_at"])
-          Comment: field(arg: ["comment"])
-          Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
-        }
+    query calcForumComments($id: PriestessForumCommentID) {
+      calcForumComments(query: [{ where: { id: $id } }]) {
+        ID: field(arg: ["id"])
+        Author_First_Name: field(arg: ["Author", "first_name"])
+        Author_Last_Name: field(arg: ["Author", "last_name"])
+        Author_Profile_Image: field(arg: ["Author", "profile_image"])
+        Date_Added: field(arg: ["created_at"])
+        Comment: field(arg: ["comment"])
+        Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
+        File_Type: field(arg: ["file_type"])
+        File_Content: field(arg: ["file_content"])
       }
-    `;
+    }
+  `;
 
       const fetchResponse = await ApiService.query(fetchQuery, {
         id: newComment.id,
       });
       const actualComment = fetchResponse.calcForumComments[0];
 
+      // Check that the file_content returned from the API is a valid object with a link.
+      const validFileContent =
+        actualComment.File_Content &&
+        typeof actualComment.File_Content === "object" &&
+        typeof actualComment.File_Content.link === "string" &&
+        actualComment.File_Content.link.trim().length > 0;
+
+      // Use the API value if valid; otherwise, fall back to the optimistic preview.
+      const finalFileContent = validFileContent
+        ? actualComment.File_Content
+        : previewFileContent;
+
       // Prepare the updated comment object.
       const updatedComment = {
         id: actualComment.ID,
-        content: actualComment.Comment,
+        content:
+          actualComment.Comment && actualComment.Comment.trim().length > 0
+            ? actualComment.Comment
+            : content, // fall back to the original content
         author: {
           name: `${actualComment.Author_First_Name} ${actualComment.Author_Last_Name}`,
           profileImage: actualComment.Author_Profile_Image,
         },
         CommentVotesCount: actualComment.Member_Comment_Upvotes_DataTotal_Count,
+        file_content: finalFileContent, // use our valid file content (or preview)
+        file_type: actualComment.File_Type,
+        date: Formatter.formatTimestamp(actualComment.Date_Added),
       };
 
       // Re-render the comment with complete data.
       commentElement.outerHTML = template.render(updatedComment);
-      commentElement.querySelector(".vote-button").dataset.commentId =
-        newComment.id;
+      // Update any data attributes (e.g., for voting) with the real comment ID.
+      const updatedEl = document.querySelector(
+        `[data-comment-id="${updatedComment.id}"]`
+      );
+      if (updatedEl) {
+        const voteButton = updatedEl.querySelector(".vote-button");
+        if (voteButton) {
+          voteButton.dataset.commentId = newComment.id;
+        }
+      }
     } catch (fetchError) {
-      // If fetching updated data fails, simply update the comment element:
-      // • Set the real comment ID.
-      // • Remove the disabled state so the comment remains visible.
+      // If fetching updated data fails, update the comment element minimally.
       commentElement.dataset.commentId = newComment.id;
       commentElement.classList.remove("state-disabled");
       console.error(
@@ -934,6 +1016,8 @@ class ForumManager {
         id
         member_comment_upvote_id
         forum_comment_upvote_id
+        file_type
+        file_content
       }
     }
   `;
@@ -1049,7 +1133,9 @@ class ForumManager {
     try {
       const query = `
         query {
-          calcForumComments(query: [{
+          calcForumComments(
+          orderBy: [{ path: ["created_at"], type: desc }]
+          query: [{
             where: { Parent_Comment: [{ where: { id: "${commentId}" } }] }
           }]) {
             ID: field(arg: ["id"])
@@ -1059,6 +1145,8 @@ class ForumManager {
             Date_Added: field(arg: ["created_at"])
             Comment: field(arg: ["comment"]) 
             Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }]) 
+            File_Type: field(arg: ["file_type"])
+            File_Content: field(arg: ["file_content"])
           }
         }
       `;
@@ -1069,6 +1157,12 @@ class ForumManager {
           content: reply.Comment,
           date: Formatter.formatTimestamp(reply.Date_Added),
           ReplyVoteCount: reply.Member_Comment_Upvotes_DataTotal_Count,
+          // NEW: Use the unified file fields
+          file_type: reply.File_Type, // from your GraphQL response
+          file_content:
+            typeof reply.File_Content === "string"
+              ? JSON.parse(reply.File_Content)
+              : reply.File_Content,
           author: Formatter.formatAuthor({
             firstName: reply.Author_First_Name,
             lastName: reply.Author_Last_Name,
@@ -1082,87 +1176,123 @@ class ForumManager {
     }
   }
 
-  async createReply(commentId, content, mentions) {
-    try {
-      const tempReplyId = `temp-${Date.now()}`;
-      const tempReply = {
-        id: tempReplyId,
-        content,
-        date: "Just now",
-        author: {
-          name: this.fullName, // Replace with actual user data if available.
-          profileImage: this.defaultAuthorImage,
-        },
-        defaultAuthorImage: this.defaultAuthorImage,
+  async createReply(commentId, content, mentions, fileType, uploadedFile) {
+    // Generate a temporary reply ID for optimistic rendering.
+    const tempReplyId = `temp-${Date.now()}`;
+
+    // If a file is provided, create a local preview URL.
+    let previewFileContent = null;
+    if (uploadedFile) {
+      previewFileContent = {
+        link: URL.createObjectURL(uploadedFile),
+        type: uploadedFile.type,
       };
+    }
 
-      // Locate the replies container within the specific comment.
-      const repliesContainer = document.querySelector(
-        `[data-comment-id="${commentId}"] .replies-container`
+    // Build the optimistic reply object.
+    const tempReply = {
+      id: tempReplyId,
+      content: content,
+      date: "Just now",
+      file_type: fileType,
+      file_content: previewFileContent, // may be null if no file attached
+      author: {
+        name: this.fullName,
+        profileImage: this.defaultAuthorImage,
+      },
+    };
+
+    // Locate the replies container inside the comment element.
+    const repliesContainer = document.querySelector(
+      `[data-comment-id="${commentId}"] .replies-container`
+    );
+    if (!repliesContainer) {
+      throw new Error("Replies container not found for comment: " + commentId);
+    }
+
+    // Render the temporary reply using the reply template.
+    const template = $.templates("#reply-template");
+    repliesContainer.insertAdjacentHTML(
+      "afterbegin",
+      template.render(tempReply)
+    );
+
+    // Find the temporary reply element and disable it.
+    const replyElement =
+      repliesContainer.querySelector(`[data-reply-id="${tempReplyId}"]`) ||
+      repliesContainer.firstElementChild;
+    replyElement.classList.add("state-disabled");
+
+    // Prepare to process the file if one was uploaded.
+    let fileData = null;
+    const fileFields = [];
+    if (uploadedFile) {
+      fileFields.push({
+        fieldName: "file_content",
+        file: uploadedFile,
+      });
+    }
+    if (fileFields.length > 0) {
+      const toSubmitFields = {};
+      // processFileFields is assumed to handle the file upload and populate toSubmitFields.
+      await processFileFields(
+        toSubmitFields,
+        fileFields,
+        awsParam,
+        awsParamUrl
       );
-      if (!repliesContainer) {
-        throw new Error(
-          "Replies container not found for comment: " + commentId
-        );
-      }
+      fileData =
+        typeof toSubmitFields.file_content === "string"
+          ? JSON.parse(toSubmitFields.file_content)
+          : toSubmitFields.file_content;
+      // Ensure fileData has the expected metadata.
+      fileData.name = fileData.name || uploadedFile.name;
+      fileData.size = fileData.size || uploadedFile.size;
+      fileData.type = fileData.type || uploadedFile.type;
+    }
 
-      // Optimistically render the temporary reply.
-      const template = $.templates("#reply-template");
-      repliesContainer.insertAdjacentHTML(
-        "afterbegin",
-        template.render(tempReply)
-      );
-
-      // Find the newly added reply and disable it
-      const replyElement =
-        repliesContainer.querySelector(`[data-reply-id="${tempReplyId}"]`) ||
-        repliesContainer.firstElementChild;
-      replyElement.classList.add("state-disabled"); // Add disabled class
-
-      // Prepare the GraphQL mutation for creating a reply.
-      const query = `
-        mutation createForumComment($payload: ForumCommentCreateInput!) {
-          createForumComment(payload: $payload) {
-            id
-            comment
-            parent_comment_id
-          }
+    // Build the mutation query for creating the reply.
+    const mutationQuery = `
+      mutation createForumComment($payload: ForumCommentCreateInput!) {
+        createForumComment(payload: $payload) {
+          id
+          comment
+          parent_comment_id
+          file_type
+          file_content
         }
-      `;
-      const variables = {
-        payload: {
-          author_id: this.userId,
-          comment: content,
-          parent_comment_id: commentId,
-          Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
-        },
-      };
+      }
+    `;
+    const variables = {
+      payload: {
+        author_id: this.userId,
+        comment: content,
+        parent_comment_id: commentId,
+        Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
+        file_type: fileType,
+        file_content: fileData, // will be null if no file was attached
+      },
+    };
 
-      // Execute the API call.
-      const response = await ApiService.query(query, variables);
+    try {
+      // Execute the GraphQL mutation.
+      const response = await ApiService.query(mutationQuery, variables);
       const newReply = response.createForumComment;
 
-      // Update the temporary reply with the real reply ID.
+      // Update the temporary reply element with the new reply's real ID.
       replyElement.dataset.replyId = newReply.id;
-      let replyVoteButton = replyElement.querySelector(".vote-button");
-      let replyDeleteButton = replyElement.querySelector(".delete-reply-btn");
-      replyDeleteButton.dataset.replyId = newReply.id;
-      replyVoteButton.dataset.replyId = newReply.id;
-      replyElement.classList.remove("state-disabled"); // Enable reply
+      // Update any vote or delete button data attributes.
+      const voteButton = replyElement.querySelector(".vote-button");
+      const deleteButton = replyElement.querySelector(".delete-reply-btn");
+      if (voteButton) voteButton.dataset.replyId = newReply.id;
+      if (deleteButton) deleteButton.dataset.replyId = newReply.id;
+      replyElement.classList.remove("state-disabled");
 
-      // Optionally, refresh the replies for this comment here.
+      // (Optional) You might re-fetch full reply details here to update the optimistic reply.
     } catch (error) {
       UIManager.showError("Failed to post reply");
-      // Remove the optimistic reply if an error occurs.
-      const repliesContainer = document.querySelector(
-        `[data-comment-id="${commentId}"] .replies-container`
-      );
-      const tempReplyElement =
-        repliesContainer.querySelector(`[data-reply-id="${tempReplyId}"]`) ||
-        repliesContainer.firstElementChild;
-      if (tempReplyElement) {
-        tempReplyElement.remove(); // Remove temp reply on failure
-      }
+      // Remove the optimistic reply element if an error occurs.
+      replyElement.remove();
     }
   }
 
