@@ -77,7 +77,7 @@ class ForumManager {
           postContainer.innerHTML = `
             <div class="flex flex-col gap-6 items-center justify-center">
               <div class="size-[200px]">
-                <img src="./assets/emptyPost.svg" alt="Empty Post" class="size-full object-contain">
+                <img src="https://file.ontraport.com/media/815e881804d34ab797e0164d3147eac6.phpi2i7d9?Expires=4892956060&Signature=RWwlqEq5aGHRwoY5Qj6PRr1OrwGrpGx52h8-xquN4k3wcESh0eUUs2pz3zaRcSqMKKoFKQuERA58BSwA0VNAqAvNc4NMSTX3odMiC3J2VKgZ99qQCtIMm182soWKlYhjYdlY4iNvqi9M4WXRYQTm8yZtS1ShkUJd79zHKc~N1jRMLUUaPlKSwum7yUT1AAl4oK-emB11oUe--F9bom4dM~QWQUGNIMvI9rD~DT0EYElQraQFU9wopWMvMmLyqEHQPFhsAM~OmIyjH8O7q3mTT629fkQWKGFM-X6~rprLOf8h~CUq45CNSHsAe8UdNRC2r42OaSU-xkC2uQdCe1lnMQ__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA" alt="Empty Post" class="size-full object-contain">
               </div>
               <div class="p2 text-white">No posts available.</div>
             </div>
