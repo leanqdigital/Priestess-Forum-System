@@ -325,7 +325,7 @@ class PostModalManager {
                       <div id="video-preview-wrapper-comment" class = "w-[200px]"></div>
 
                       <!-- New file control buttons: Refresh (to re-upload the same type) and Clear (to reset) -->
-                      <div id="file-controls-comment" class="hidden flex gap-2 items-center justify-end">
+                      <div id="file-controls-comment" class="hidden flex gap-2 items-center justify-end mb-2">
                           <button id="refresh-upload-comment" class="icon-button" type="button">
                               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path
