@@ -285,6 +285,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
             post_copy
             file_tpe
             file_content
+            related_course_id
             Mentioned_Users {
               id
             }
@@ -296,7 +297,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           author_id: forumManager.userId,
           post_copy: textContent,
           Mentioned_Users: mentionedIds.map((id) => ({ id: Number(id) })),
-          // NEW: send the file type and file data regardless of which button was used
+          related_course_id: courseID,
           file_tpe: uploadedFile ? fileType : null,
           file_content: fileData ? fileData : null,
         },

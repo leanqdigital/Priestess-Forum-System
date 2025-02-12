@@ -141,69 +141,76 @@ class ForumManager {
   }
 
   buildQuery() {
-    const filterCondition = this.buildFilterCondition();
     const sortCondition = this.buildSortCondition();
+    const dynamicFilter = this.buildFilterCondition(); // e.g. `{ file_tpe: "Video" }` or empty string
 
+    // Build the filter array with proper chaining.
+    // If a dynamic filter exists, use it as the first (using 'where') and then chain the course condition with 'andWhere'
+    // Otherwise, only use the course condition (with 'where').
+    let queryFilters = "";
+    if (dynamicFilter) {
+      queryFilters = `[ { where: ${dynamicFilter} }, { andWhere: { Related_Course: [{ where: { id: "${courseID}" } }] } } ]`;
+    } else {
+      queryFilters = `[ { where: { Related_Course: [{ where: { id: "${courseID}" } }] } } ]`;
+    }
+
+    // Build the rest of the arguments
     let args = [];
-    if (filterCondition) args.push(filterCondition);
+    args.push(`query: ${queryFilters}`);
     args.push(`limit: $limit`, `offset: $offset`);
     if (sortCondition) args.push(sortCondition);
-
     const argsString = args.join(", ");
 
+    // Construct the final query string.
     let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
       this.needsUserId() ? ", $id: PriestessContactID" : ""
     }) {
         calcForumPosts(
            ${argsString}
         ) {
-          ID: field(arg: ["id"])
-          Author_ID: field(arg: ["author_id"])
-          Author_First_Name: field(arg: ["Author", "first_name"])
-          Author_Last_Name: field(arg: ["Author", "last_name"])
-          Author_Profile_Image: field(arg: ["Author", "profile_image"])
-          Date_Added: field(arg: ["created_at"])
-          Post_Title: field(arg: ["post_title"])
-          Post_Copy: field(arg: ["post_copy"])
-          Featured_Post: field(arg: ["featured_post"])
-          ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
-          Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
-          ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
-          File_Tpe: field(arg: ["file_tpe"])
-          File_Content: field(arg: ["file_content"])
+            ID: field(arg: ["id"])
+            Author_ID: field(arg: ["author_id"])
+            Author_First_Name: field(arg: ["Author", "first_name"])
+            Author_Last_Name: field(arg: ["Author", "last_name"])
+            Author_Profile_Image: field(arg: ["Author", "profile_image"])
+            Date_Added: field(arg: ["created_at"])
+            Post_Title: field(arg: ["post_title"])
+            Post_Copy: field(arg: ["post_copy"])
+            Featured_Post: field(arg: ["featured_post"])
+            ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+            ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
+            File_Tpe: field(arg: ["file_tpe"])
+            File_Content: field(arg: ["file_content"])
         }
-      }
-    `;
+    }`;
 
     let variables = {
       limit: this.postsLimit,
       offset: this.postsOffset,
     };
-
     if (this.needsUserId()) {
       variables.id = this.userId;
     }
-
     return { query, variables };
   }
 
   buildFilterCondition() {
     switch (this.currentFilter) {
-      // Existing filters:
       case "saved":
-        return `query: [{ where: { Contacts: [{ where: { id: $id } }] } }]`;
+        return `{ Contacts: [{ where: { id: $id } }] }`;
       case "featured":
-        return `query: [{ where: { featured_post: true } }]`;
+        return `{ featured_post: true }`;
       case "my":
-        return `query: [{ where: { Author: [{ where: { id: $id } }] } }]`;
+        return `{ Author: [{ where: { id: $id } }] }`;
       case "Image":
-        return `query: [{ where: { file_tpe: "Image" } }]`;
+        return `{ file_tpe: "Image" }`;
       case "Audio":
-        return `query: [{ where: { file_tpe: "Audio" } }]`;
+        return `{ file_tpe: "Audio" }`;
       case "Video":
-        return `query: [{ where: { file_tpe: "Video" } }]`;
+        return `{ file_tpe: "Video" }`;
       case "Text":
-        return `query: [{ where: { file_tpe: null } }]`;
+        return `{ file_tpe: null }`;
       case "All":
       default:
         return "";
