@@ -40,7 +40,8 @@ class MentionManager {
 
   static async fetchMentionContacts(text, cb) {
     try {
-      const contacts = await ContactService.fetchContacts();
+      console.log("Course id is", courseID);
+      const contacts = await ContactService.fetchContacts(courseID);
       cb(
         contacts.map((contact) => ({
           key: contact.name,
