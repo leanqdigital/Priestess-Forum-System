@@ -1060,6 +1060,18 @@
                 document.querySelector(".announcements").classList.add("hidden");
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('postNewModal');
+            const editor = document.getElementById('post-editor');
+
+            modal.addEventListener('sl-show', () => {
+                setTimeout(() => {
+                    editor.focus(); // Ensure the editor gains focus when modal opens
+                }, 100); // Delay to allow modal rendering
+            });
+        });
+
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1094,4 +1106,5 @@
 
 
 </body>
+
 </html>
