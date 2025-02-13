@@ -225,10 +225,10 @@ class PostModalManager {
 
                         <!-- Progress and volume -->
                         <div class="progress-container flex items-center gap-[10px]">
-                            <span id="current-time" class="text-[#ffffff]">0:00</span>
+                            <span id="current-time" class="page-text text-nowrap">0:00</span>
                             <input class="flex-grow-1 appearance-none bg-grey-200 h-[3px] w-full" type="range"
                                 id="progress" value="0" min="0" step="0.1">
-                            <span id="total-time" class="text-[#ffffff]">-0:00</span>
+                            <span id="total-time" class="page-text text-nowrap">-0:00</span>
                             <button id="volume">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
