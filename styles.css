@@ -1,233 +1,126 @@
-/* Import Fonts */
+/*Fonts import*/
+/* This was copied and pasted from the existing dynamic templated named "Library - RMMS Course Forum - Anam Cara" from the priestess account in ontraport */
 @font-face {
-  font-family: "AvenirBook";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2045%20Book.otf")
-    format("opentype");
+  font-family: "The Seasons-Reg";
+  src: url("https://file.ontraport.com/media/5535b9cde12a4c45a13f5421ad7d34ab.php1mjxax?Expires=4883331610&Signature=KWnqt3IvQJIGqtCufWE7LAJY-TiQWcla80SPwyAZZ6YQlabmUDFgikpJyWWO0jCXG-MC25nd2O1rZL61MLDouP76L6UMBAFU0vf0SevtrMmyF2dx-Sx9vaQTEbhBYIPqN5BWXfIo9OQmrGzGb7BhCu1ftcpdmwwRt6h-qGsFwxlb0FoLfbD~wNabomtitOHAZqZ4tRDFhweFQGqinry~YYWvu8X~PFaRHVqsVolDtyNNCyvnsRSzwu~gVQ17hs1XqC~bYxk6ZukSs5tzhu09FfTDpNN7XKeLSSqdxUwbYmie-aD~hNESTyxMzS8WQjksD~axNILcvVvzqxy6y3Gyjg__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA");
+  src: url("https://file.ontraport.com/media/eb73bbe5cde542d09dd115d111a1dde6.phpautogv?Expires=4883331660&Signature=JGaXf61V8tnJQoDxhCAJ8VisyKM-MoKyl~tUgCivxzmo8IQBN4o4RHarS1Q8g3A31TW36RlEyzDAQ06vYlWDG5C0wNLeBjl9wgoAXUiybdCn3xmghPfXPqmsffXZlw-HTUtRuPwi~~zS~ekP0gw2cWRMmYV9e-ONu~6AvJ~m3hzZXpW83anDEZ-xdTxGqhC0eGfuhmmtbcmbWP1exCcJ8wQsRwDCujcvmZmF0lj4mXFsK6W8MtjJaJcLdzcI6qw~1RCAdk38fRccPWzBMglTn72yTtDqB3~ZE4RQqHaW2Mu~wnsPCvn1CcU1-jAmVQiD3qzGkOhjvqLK1y4djsYqYw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("embedded-opentype"),
+    url("https://file.ontraport.com/media/e10575ea6d9c4dce82a4bf4baa3acad5.phpd98xi1?Expires=4883330578&Signature=IdP9359FOB1MeskAddqvws3Y3WaoOtxbj6y36CY1c5spuFpfdVvhfh6MaNLP2tQsbfbY~cFVZUv~3xBdIS2af-jPc-fjhZBGBz2RPn2SJfspobTugIRCBY55DXjwNZkmiucRy7XckB4m2Vsz8X5NwMEPvxyHBglaCnCT2HVSCkT5fg2jopTMPvHh6CGpNHCvFPOy~Bl0qrSruJs3g2c59861U2kfL9-egYiZTW-7cyYUqaShKYPEXK7J56a8dVghVYcVFq1BzmGW72qeLtfkHa8GCrCZqbZjyzIR01rtzBcpISaYBeJRDUsqvzpizCPfaWz-VvtiUZZkRcG~25CueA__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("woff2"),
+    url("https://file.ontraport.com/media/5535b9cde12a4c45a13f5421ad7d34ab.php1mjxax?Expires=4883331610&Signature=KWnqt3IvQJIGqtCufWE7LAJY-TiQWcla80SPwyAZZ6YQlabmUDFgikpJyWWO0jCXG-MC25nd2O1rZL61MLDouP76L6UMBAFU0vf0SevtrMmyF2dx-Sx9vaQTEbhBYIPqN5BWXfIo9OQmrGzGb7BhCu1ftcpdmwwRt6h-qGsFwxlb0FoLfbD~wNabomtitOHAZqZ4tRDFhweFQGqinry~YYWvu8X~PFaRHVqsVolDtyNNCyvnsRSzwu~gVQ17hs1XqC~bYxk6ZukSs5tzhu09FfTDpNN7XKeLSSqdxUwbYmie-aD~hNESTyxMzS8WQjksD~axNILcvVvzqxy6y3Gyjg__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("woff"),
+    url("https://file.ontraport.com/media/f3339e04d5e3487db0b851f65a574009.phpl5yfx2?Expires=4883331625&Signature=gg9jmIXSKGHrChQzvyq6HcrXWHNnRcoqn~Fp69WG~wsu1PoLUKd4rC4CoASgeE-DDeQTY2I7rkHDc14OLjOUgFrlWdZL5vELVqKDGEwh7hpEW03b9EQTFHP0snYaoGA9UbZhF33pEMURPyTlv-vnrejeCAjm83Vr41sxqibdQKSkmJEQ~qSX0nVlYNtG2xDKREnd8t7T5buim~yhVmSbxmxUJHdhlE9MEKanFmkwjOhQYzRuDZMcyhanStD8mIdsffEpjWvzDqqmgnK7X3E2w0l6-PIRJCNyHC6W7iGOdmJCkvWtEggzPq5PeA9fNJe2ILxATWCAZ5WD52tAux~B3g__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("truetype"),
+    url("https://file.ontraport.com/media/38f12948c6cd4f0eb7b33933bd07676a.phpepuzax?Expires=4883331644&Signature=CwegwMCPm6D4FullJrf1jmfLDxVv9h6TIAsvMwHCAjezbosntnlq29MpPwg3g6rE1uuV5XWJav9hSvDE4BG2rAPgHGtnlaLdoJ1bPuT0RpZ7pX6hNmoqmkhaa2ZUoEicCnZgmZxL6UwMymGr~DDHAuZ7JYGr4MSdhhClkAYoBwBi1fj7HfoVY2OxPc6vDBGsRWUGRa90Oahj5KJrVdPJBy5yf0K8t7kFBjfqc-~fVWHqSSIbQOdALtKnr4bLLFZI73qTM3IrprgynmoA5Fm4TNwkleLuN9qmtxXAuhGAW1ISALmPHLH5x06WxO4BGe2KK-2jcoxocmF2J8BIDLLxxA__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: "AvenirMedium";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Avenir%20LT%20Std%2065%20Medium.otf")
-    format("opentype");
+  font-family: "AvenirLTStd-Roman";
+  src: url("https://file.ontraport.com/media/d8306fd99f16423381c609c8f5365cc8.phpmvlcb5?Expires=4883331015&Signature=Nq~wSD5oc1yRx6DWftsc4EQow3LXE7XMc6iNAP2IdnBa4cmsW5wVQLUTBOL-m--eWrCyTdP8xKtlsiUKGJ-j6IhcIvZCJbYnOTu5G~YtZrxGty5WyucW9Ud0JKPV5p4KZxoc7Cmrm16MC1baNPg7lFbISPTQvzwUM3f-scAx1Wm~3fw-~HTPKp2vKHoiSG7ErOZK1TTDRQ0GFit24KZg56SVu1Mhmgk09jANn8NpRwkzDrGf3hQ5Zfk3E6W4-PSafRjRUiEkxyzmZAVz9qyQrBlCa3JLwwTn9zlmaB976NPD6bBahSU2UeCHaaLsHM5ZKT-nDyhq6g9mWORHmBr2UQ__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA"); /* IE9+ Compat Modes */
+  src: url("https://file.ontraport.com/media/f2c022fb214b41a6865d760edbe6417b.phpwvponl?Expires=4883331756&Signature=HruIbhqgbojYF5tj2DABhQiu5K009lAkpAAM3us6JTXPen7KCkL5JVog8MCDkhIoLBb5KfNkzwH8l38bnFYRfqC02hv9S5WGyeUNDoTjh7An8FEOqXkJfJ4itAmqVo2cfCZyX~4pvANNYsRmuyhUjGZJYpX8uysDD-v1HfqbTsF565wu7PjrajEaLXYb9FKTjx7OpXA7uroz6hSDzSb2elyBI8OErKAuVX58xR2~eWwN1qwR~4frfCei5zI5ok6zMZsPVnx8ytzDSTWR4hbfbVysahQumyrMhkzpDY9zhbGUsk3K7jh6cLlsWzxT~bh25gIWrZSkRW7CBB5y3qIizg__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("embedded-opentype"),
+    /* IE6-IE8 */
+      url("https://file.ontraport.com/media/be873964fcc7429bb57631c9f048e8b3.phpkvh8gm?Expires=4883331687&Signature=evuPvk8ue0dvpvexnthZcV-OyK22athhVO7tyJOK~nc6HJsji0jhR0D5X~cmv5k75rfZ0NIJNQJT4nz~7IbE-tiE4WXEJyrkBuz0z7b~Y~ITUVNySwtn~OOk~dcLy1PDrnphj~vwt6TrOrGL~XArNZEI0W6PLr~dvooWlFMRn0hKuynZw7g79rGjX9C5CZyW7eZ7uk70P0q9nM~gu~7xUCxTJ0MhTFWWKcm~3mAlN1ejTA7qMEp028-eZCuaSmH7QDYIbRF8nW1FVELgeWqfxoOQpmxKO9hAlGPhbbHBkpnROyMdJGpEqYbfySSgZT5XKG1E3DJw8pjMvUQ1D5oslg__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("woff2"),
+    /* Super modern browsers */
+      url("https://file.ontraport.com/media/d8306fd99f16423381c609c8f5365cc8.phpmvlcb5?Expires=4883331015&Signature=Nq~wSD5oc1yRx6DWftsc4EQow3LXE7XMc6iNAP2IdnBa4cmsW5wVQLUTBOL-m--eWrCyTdP8xKtlsiUKGJ-j6IhcIvZCJbYnOTu5G~YtZrxGty5WyucW9Ud0JKPV5p4KZxoc7Cmrm16MC1baNPg7lFbISPTQvzwUM3f-scAx1Wm~3fw-~HTPKp2vKHoiSG7ErOZK1TTDRQ0GFit24KZg56SVu1Mhmgk09jANn8NpRwkzDrGf3hQ5Zfk3E6W4-PSafRjRUiEkxyzmZAVz9qyQrBlCa3JLwwTn9zlmaB976NPD6bBahSU2UeCHaaLsHM5ZKT-nDyhq6g9mWORHmBr2UQ__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("woff"),
+    /* Modern browsers */
+      url("https://file.ontraport.com/media/b89cd6c7431445f7bd061460a9b8ff63.phpsstfgf?Expires=4883331733&Signature=M5vbTAPtd30Uj0t9pEMHr6ixLuRNRWrowdx6Bnv95NMTfCl3ba-Lsea0Gu4z7ozU8OPnDt7s5K2Sj1eYCRGALXonpvIZxmIViPWPmhjwrHMw~79OgS4GvKVCVKRh5fuyaqRaEgZ7DMaHj9Q8YmVGLHnqHlvwnqpgLxsguj25rlToM6Rlc0wke8izg4r2R8XM-DQAg4RWD-b~fNL1VInknePjsCX~Z1Ci8oaJysNOO-9PFd299Rw-AfS0ikUOo8jay9ybWcjnSA1lzKWaYaX-mH~PTClbdrvDUyLIxsburBB9x7G2I1heqXcmPfWRwajmF-mxRHNHJEzFHLVGbAliDA__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("truetype"),
+    /* Safari, Android, iOS */
+      url("https://file.ontraport.com/media/d213352142d144fa98ec32611a79adc0.phpn3dpst?Expires=4883331745&Signature=CyahF9QGtsakqe-1KaSO6JRuxmDUDny5Numkc9j7VdcXznBefRHiEh5qDCMScjRHLxxySf0VaZBjqP4uwwOC3-cq3Hl4w1T46wOxZQvb6h1qGbBApsxz9gRM1KXKpldWsG4-g1NaP0Ypr7llwMAQ1G9MEXjpmN7kk36-2X--xA2Tq~EAlP8WRYgvmvTm6jQfNXT4qIOlude-VLusGYKT~yRIjPwQxbrr~xHNqETtfweFAkEQ-BAvz9SGlPkgMGjGT3NHnN5PIZ2iryK8zOMaokUggBHAyhQVC~cAZQr5UWBJq8-AxfiXT5FRWzDMnO00n1qix8b7VFJvVfpuRAUvqQ__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA")
+      format("svg"); /* Legacy iOS */
 }
 
-@font-face {
-  font-family: "SeasonsBold";
-  src: url("https://cdn.jsdelivr.net/gh/uttamaPrh/-Priestess-Presence-LLC@main/Fontspring-DEMO-theseasons-bd.otf")
-    format("opentype");
-}
-
-:root {
-  /* Primary Colors */
-  --secondary: #c29d68;
-  --secondary-100: #9c8661;
-  --secondary-200: #d0b48b;
-  --secondary-300: #e9e2da;
-
-  /* Secondary Colors */
-  --primary: #044047;
-  --primary-100: #022327;
-  --primary-200: #358d97;
-  --primary-300: #d9eaec;
-
-  /* Grey Colors */
-  --grey: #fef5f1;
-  --grey-100: #737373;
-  --grey-200: #d9d9d9;
-  --grey-300: #f4f1f1;
-  /* Danger Shades */
-  --danger-100: #ab0707;
-  --danger-200: #dc0a0a;
-  --danger-300: #fdd0d1;
-
-  /* Success Shades */
-  --success-100: #035933;
-  --success-200: #059e5a;
-  --success-300: #a6fcd6;
-
-  /* Warning Shades */
-  --warning-100: #594203;
-  --warning-200: #bb8b06;
-  --warning-300: #fce5a6;
-  /* Other Colors */
-  --black: #0e0e0e;
-  --white: #fef5f1;
-}
-/* Hide Scrollbar */
-* {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-}
-/* Hide scrollbar in Chrome, Safari, and Edge */
-::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
-  display: none;
-}
-/* Hide scrollbar inside the Shoelace modal */
-sl-dialog::part(panel) {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* Internet Explorer and Edge */
-}
-sl-dialog::part(body) {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* Internet Explorer and Edge */
-}
-/* Hide scrollbar in WebKit browsers (Chrome, Safari, Edge) */
-sl-dialog::part(panel)::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
-  display: none;
-}
-/* Disabling margins or header */
+/* Basic override. Please ignore */
+/* Basic reset on heading tags */
 h1,
 h2,
 h3,
 h4 {
   all: unset;
 }
-/* Tab Buttons */
-.tab-Button {
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-}
 
-.tab-Active {
-  color: var(--secondary);
-  border-bottom: 2px solid var(--secondary);
-  svg {
-    path {
-      fill: var(--secondary);
-    }
-  }
-}
-.tab-Inactive {
-  color: white;
-  background: transparent;
-  border-radius: 0px;
-  border-bottom: 2px solid transparent;
+/* Change the styling starting here */
+/* ---------------------------------------------------- */
+/* ---------------------------------------------------- */
+/* ---------------------------------------------------- */
+/* Note: The !important flag is to prioritize the custom styling. Do not remove unless ontraport default styling is preferred */
+/* Change the color settings*/
+/* Changing the color in these variables will take effect globally. If you want to style each component individually, change it in the below section.
+The section is named individual component styling */
+/* Color variables */
+:root {
+  /* Primary Colors */
+  --secondary: #c29d68 !important;
+  --secondary-100: #9c8661 !important;
+  --secondary-200: #d0b48b !important;
+  --secondary-300: #e9e2da !important;
 
-  svg {
-    path {
-      fill: white;
-    }
-  }
-}
+  /* Secondary Colors */
+  --primary: #044047 !important;
+  --primary-100: #022327 !important;
+  --primary-200: #358d97 !important;
+  --primary-300: #d9eaec !important;
 
-/* Modal Styling */
-sl-dialog::part(overlay),
-.modal-overlay {
-  background: #286d7580;
-  backdrop-filter: blur(4px);
-}
-sl-dialog::part(panel),
-.modal-background {
-  width: 656px;
-  background: var(--primary-100);
-}
-sl-dialog::part(close-button) {
-  color: white;
-}
-sl-dialog::part(base) {
-  top: 50px;
-  align-items: start;
-  transform: none;
-}
-sl-dialog::part(title) {
-  color: white !important;
-}
+  /* Grey Colors */
+  --grey: #fef5f1 !important;
+  --grey-100: #737373 !important;
+  --grey-200: #d9d9d9 !important;
+  --grey-300: #f4f1f1 !important;
 
-/* Icon Only Button Styling */
-.icon-button {
-  padding: 12px;
-  border-radius: 4px;
-  transition: all 0.3s;
-  background: #042f34;
-  svg {
-    path {
-      fill: var(--secondary);
-      transition: all 0.3s;
-    }
-  }
-}
+  /* Danger Shades */
+  --danger-100: #ab0707 !important;
+  --danger-200: #dc0a0a !important;
+  --danger-300: #fdd0d1 !important;
 
-.icon-button:focus,
-.icon-button:hover,
-.icon-button:active {
-  background: var(--secondary);
-  svg {
-    path {
-      fill: black;
-    }
-  }
-}
-/* Mention Text */
-.mention-button {
-  padding: 4px 6px;
-  background: var(--secondary-300);
-  color: var(--primary);
-  font-family: "AvenirBook", sans-serif;
-  font-size: 16px;
-  font-weight: 350;
-  line-height: 16px;
-  border-radius: 4px;
-}
+  /* Success Shades */
+  --success-100: #035933 !important;
+  --success-200: #059e5a !important;
+  --success-300: #a6fcd6 !important;
 
-.button {
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 4px;
-}
-.submit-button {
-  background-color: var(--secondary);
-  color: black;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 4px;
-  transition: all 0.3s;
-  cursor: pointer;
-}
+  /* Warning Shades */
+  --warning-100: #594203 !important;
+  --warning-200: #bb8b06 !important;
+  --warning-300: #fce5a6 !important;
 
-.submit-button:hover {
-  background-color: var(--secondary-100);
+  /* Other Colors */
+  --black: #0e0e0e !important;
+  --white: #fef5f1 !important;
 }
 
 /* Headings */
 h1 {
-  font-family: "SeasonsBold", sans-serif;
-  font-size: 32px;
-  font-weight: 500;
-  line-height: 38px;
+  font-family: "SeasonsBold", sans-serif !important;
+  font-size: 32px !important;
+  font-weight: 500 !important;
+  line-height: 38px !important;
 }
 
 h2 {
-  font-family: "AvenirMedium", sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 22px;
+  font-family: "AvenirMedium", sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  line-height: 22px !important;
 }
 
 h3 {
-  font-family: "AvenirMedium", sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
+  font-family: "AvenirMedium", sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 24px !important;
 }
 
 h4 {
-  font-family: "AvenirMedium", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 24px;
+  font-family: "AvenirMedium", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 24px !important;
 }
 
 /* Paragraphs */
@@ -277,56 +170,426 @@ h4 {
 /* Responsive Design for Mobile Screens */
 @media (max-width: 500px) {
   h1 {
-    font-size: 20px;
-    line-height: 22px;
+    font-size: 20px !important;
+    line-height: 22px !important;
   }
 
   h2 {
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 18px !important;
+    line-height: 22px !important;
   }
 
   h3,
   h4 {
-    font-size: 14px;
-    line-height: 24px;
+    font-size: 14px !important;
+    line-height: 24px !important;
   }
 
   .p1,
   .p2 {
-    font-size: 14px;
-    line-height: 18px;
+    font-size: 14px !important;
+    line-height: 18px !important;
   }
 
   .p3 {
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 12px !important;
+    line-height: 16px !important;
   }
 
   .o1,
   .mention-button {
-    font-size: 14px;
-    line-height: 14px;
+    font-size: 14px !important;
+    line-height: 14px !important;
   }
 
   .button {
-    padding: 12px 16px;
+    padding: 12px 16px !important;
   }
+}
+
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* Individual Component Styling Start*/
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* To change color of each components, update here */
+/* Begin with initial loader. 
+This is the spinner loader that spins until the page is fully loaded.
+You can style 3 components here, the loader background, the spinner border color and the color of partial border that 
+spins on top of full circle */
+.initial-loader-background-color {
+  background: var(--primary);
+}
+
+.loader-circle-border-color {
+  border: 4px solid var(--white); /*This is the still border and it does not move*/
+  border-top: 4px solid var(--secondary); /*This part moves around the circle*/
+}
+/*Initial loader ends*/
+
+/* Text color */
+/* This styling will change the color of every text in the page except for button texts*/
+.page-text {
+  color: var(--white);
+}
+
+/* Page background color */
+.page-background {
+  background-color: var(--primary);
+}
+
+/* This styles the start a post box*/
+.start-a-post-box {
+  background: transparent;
+  border: 1px solid var(--white);
+  border-radius: 4px;
+}
+
+/* This section styles the popup modal that allows us to create  or edit post*/
+/* This is the title of the modal. Current text in the title is Start a Post */
+sl-dialog::part(title) {
+  color: var(--white) !important; /*Change the color of the title here*/
+}
+
+/* This is the overlay behind the modal that covers the entire page */
+sl-dialog::part(overlay),
+.modal-overlay {
+  background: #286d7580; /*Change the overlay color here*/
+  backdrop-filter: blur(4px); /*Change the overlay blur*/
+}
+
+/*This is the background color of the modal*/
+sl-dialog::part(panel),
+.modal-background {
+  background: var(--primary-100); /*Change the modal background color here*/
+}
+
+/* This is the close(X) button on top right corner of modal */
+sl-dialog::part(close-button) {
+  color: var(--white); /*Change the color of the close button here*/
+}
+
+/* These are upload buttons that allow to upload either image or photo or video. This will update icon buttons across the application */
+.icon-button {
+  background: var(--primary); /*Change the background color of button here*/
+  svg {
+    path {
+      fill: var(--secondary); /*Change the icon color here*/
+      transition: all 0.3s; /*Ignore this*/
+    }
+  }
+}
+
+/* These maintain the different state of button */
+.icon-button:focus,
+.icon-button:hover,
+.icon-button:active {
+  background: var(--secondary);
+  svg {
+    path {
+      fill: var(--black);
+    }
+  }
+}
+
+/* These are buttons that submit create or edit requests accross the application. The example of submit button is Post button in create post popup */
+.submit-button {
+  background-color: var(--secondary);
+  color: var(--white);
+}
+
+/* This is the hover state on submit buttons */
+.submit-button:hover {
+  background-color: var(--secondary-100);
+}
+
+/* Top tabs */
+/* This will style four indiviudal tabs that filter between the posts. The tabs are Recent Posts, Featured Posts, Saved Posts and My Posts */
+/* The following styling will be responsible to style button text color, the bottom border color and the icon color of the button in both active and inactive state */
+
+/* This is for when tabs are active */
+.tab-Active {
+  color: var(--secondary); /*Text color of button*/
+  border-bottom: 2px solid var(--secondary); /*Colors the bottom border*/
+  svg {
+    path {
+      fill: var(--secondary); /*Colors the icon*/
+    }
+  }
+}
+
+/* This is for when tabs are inactive */
+.tab-Inactive {
+  color: var(--white); /*Text color of button*/
+  border-radius: 0px;
+  border-bottom: 2px solid transparent; /*Colors the bottom border*/
+  svg {
+    path {
+      fill: var(--white); /*Colors the icon*/
+    }
+  }
+}
+
+/* Sort and filter buttons */
+/* These buttons allow to filter beetween different type of post like video or image posts and also allow to toggle between latest or oldest or popular ones*/
+.sort-outer-button {
+  background: transparent;
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+}
+
+.sort-outer-button:focus,
+.sort-outer-button:hover,
+.sort-outer-button:active {
+  background: var(--secondary);
+  color: var(--white);
+  svg {
+    path {
+      fill: var(--white);
+    }
+  }
+}
+
+.sort-options-wrapper {
+  background-color: var(--primary);
+}
+
+.sort-option {
+  background: transparent;
+  color: white;
+  &:hover {
+    background-color: var(--primary-100);
+  }
+}
+
+/* Following styles each post card. The post card is the list of posts */
+.postCard {
+  background: var(--primary-100);
+}
+
+/* This is smal vertical line that divided post's author name and date of post created */
+.post-card-header-divider {
+  background: var(--secondary);
+}
+
+/* This sets the color of three dot icon that opens up the option for editing or deleting the post */
+.three-dot-icon {
+  path {
+    fill: var(--white);
+  }
+}
+
+/* This wraps the edit and delete button for each post */
+.action-options-wrapper {
+  background: #084d55;
+}
+
+.action-button {
+  color: var(--white);
+}
+
+.action-button:hover {
+  background: var(--primary-100);
+}
+
+/* This styles the background color of audio player */
+.audio-player {
+  background-color: var(--primary);
+}
+
+/* This colors the all icons inside the audio player  */
+.audio-player svg path {
+  fill: var(--secondary);
+}
+
+/* This is specific to play pause icon inside audio player */
+.audio-player .audioStateIcon {
+  rect {
+    fill: var(
+      --secondary
+    ); /*This sets the background color of circle that contains play pause icon*/
+  }
+  path {
+    fill: var(--black); /*This sets the background color of play or pause icon*/
+  }
+}
+
+/* This styles the vote icon */
+.voted path {
+  fill: var(--secondary); /*This is for voted state*/
+  stroke: var(--secondary);
+}
+
+.unVoted path {
+  fill: none; /*This is for non voted state*/
+  stroke: var(--secondary);
+}
+
+/* This styles comment icon */
+.comment-icon path {
+  fill: var(--secondary);
+}
+
+/* This styles bookmark icon */
+.bookmarked path {
+  fill: var(--secondary); /*This is for voted state*/
+  stroke: var(--secondary);
+}
+
+.notBookmarked path {
+  fill: transparent; /*This is for non voted state*/
+  stroke: var(--secondary);
+}
+
+/* Post details modal styling */
+/* This is the small border on the right side of the post text content on post details modal */
+.modal-post-content-right-border {
+  background: #586a80;
+}
+
+.post-details-modal {
+  background: var(--primary-100);
+}
+
+/* This is audio player inside the post details modal */
+.audio-player-modal {
+  background-color: var(--primary);
+}
+
+.audio-player-modal svg path {
+  fill: var(--secondary);
+}
+
+/* This is specific to play pause icon inside audio player */
+.audio-player-modal .audioStateIcon {
+  rect {
+    fill: var(
+      --secondary
+    ); /*This sets the background color of circle that contains play pause icon*/
+  }
+  path {
+    fill: var(--black); /*This sets the background color of play or pause icon*/
+  }
+}
+
+.commentCard {
+  background: var(--primary);
+}
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* Individual Component Styling Start*/
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+/* ----------------------------------------------- */
+
+/* General styling. */
+.tab-Button {
+  padding: 12px 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  background: transparent !important;
+}
+
+.icon-button {
+  padding: 12px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s !important;
+}
+
+.mention-button {
+  padding: 4px 6px !important;
+  background: var(--secondary-300) !important;
+  color: var(--primary) !important;
+  font-family: "AvenirBook", sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 350 !important;
+  line-height: 16px !important;
+  border-radius: 4px !important;
+}
+
+.button {
+  cursor: pointer !important;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+}
+
+.submit-button {
+  border: none !important;
+  padding: 12px 16px !important;
+  border-radius: 4px !important;
+  transition: all 0.3s !important;
+  cursor: pointer !important;
+}
+
+/* Hide Scrollbar */
+* {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+}
+/* Hide scrollbar in Chrome, Safari, and Edge */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+
+/* Hide scrollbar inside the Shoelace modal */
+sl-dialog::part(panel) {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer and Edge */
+}
+
+sl-dialog::part(body) {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer and Edge */
+}
+
+/* Hide scrollbar in WebKit browsers (Chrome, Safari, Edge) */
+sl-dialog::part(panel)::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+
+sl-dialog::part(panel),
+.modal-background {
+  width: 656px;
+}
+
+sl-dialog::part(base) {
+  top: 50px;
+  align-items: start;
+  transform: none;
 }
 
 @media (max-width: 760px) {
   .tab-Button {
     padding: 8px 12px;
   }
+
   sl-dialog::part(panel) {
     max-height: 100%;
     max-width: 100%;
     height: 100%;
     width: 100%;
   }
+
   sl-dialog::part(base) {
     top: 0;
   }
+
   .tab-Active {
     background: var(--primary);
 
@@ -354,7 +617,7 @@ h4 {
 
 .filter-button.active {
   --sl-button-background-color: var(--sl-color-primary-500);
-  --sl-button-color: white;
+  --sl-button-color: var(--white-color);
 }
 
 .filter-button:hover {
@@ -362,7 +625,8 @@ h4 {
 }
 
 .dialog__overlay {
-  background-color: green !important;
+  background: #286d7580;
+  backdrop-filter: blur(4px);
 }
 
 .loader {
@@ -371,7 +635,6 @@ h4 {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--secondary-300);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -382,15 +645,15 @@ h4 {
   transition: opacity 1s ease;
   z-index: 999999999999 !important;
 }
+
 .spinner {
-  border: 4px solid var(--primary-200);
-  border-top: 4px solid var(--primary);
   border-radius: 50%;
   width: 50px;
   height: 50px;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -399,10 +662,12 @@ h4 {
     transform: rotate(360deg);
   }
 }
+
 .loader.fade-out {
   opacity: 0;
   visibility: hidden;
 }
+
 .mention {
   padding: 4px 6px;
   background-color: var(--primary);
@@ -415,11 +680,10 @@ h4 {
 }
 
 .tribute-container {
-  background: #084d55;
+  background: var(--primary);
   height: 250px;
   z-index: 999;
   padding: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: auto;
 }
@@ -428,10 +692,10 @@ h4 {
   padding: 4px 10px;
   border-radius: 4px;
   cursor: pointer;
-  color: white;
+  color: var(--white);
 }
 .tribute-container ul li .o2 {
-  color: white;
+  color: var(--white);
 }
 
 .tribute-container ul li.highlight {
@@ -457,7 +721,7 @@ h4 {
 .comment-form-wrapper:focus,
 .comment-form-wrapper:focus-visible,
 .comment-form-wrapper:hover {
-  border: 1px solid white;
+  border: 1px solid var(--white);
 }
 
 .reply-editor:focus,
@@ -479,7 +743,7 @@ h4 {
 .reply-form-wrapper:focus,
 .reply-form-wrapper:focus-visible,
 .reply-form-wrapper:hover {
-  border: 1px solid white;
+  border: 1px solid var(--white);
 }
 
 .state-disabled {
@@ -494,31 +758,53 @@ h4 {
 }
 
 .announcement-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: var(--white);
+  border: 1px solid var(--white);
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   line-height: 1.4;
   color: #333;
 }
 
 .bg-unread {
-  background-color: #022327;
+  background-color: var(--primary);
 }
 
-.clear-preview-btn {
-  margin-top: 8px;
-  background-color: transparent;
-  border: 1px solid #e53e3e;
-  color: #e53e3e;
-  padding: 4px 8px;
-  cursor: pointer;
-  border-radius: 4px;
+.load-comments-btn {
+  &:active {
+    background: transparent !important;
+  }
+  &:focus {
+    background: transparent !important;
+  }
 }
 
-.clear-preview-btn:hover {
-  background-color: #e53e3e;
-  color: #fff;
+.vote-button {
+  &:active {
+    background: transparent !important;
+  }
+  &:focus {
+    background: transparent !important;
+  }
+}
+
+.bookmark-button {
+  &:active {
+    background: transparent !important;
+  }
+  &:focus {
+    background: transparent !important;
+  }
+}
+
+.z-override {
+  z-index: 100 !important;
+}
+
+sl-dialog::part(panel) {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }

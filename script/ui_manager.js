@@ -151,3 +151,23 @@ window.addEventListener("load", function () {
     loader.classList.add("fade-out");
   }, 500);
 });
+
+document.addEventListener("click", (event) => {
+  if (event.target.closest(".bellIcon")) {
+      document.querySelector(".announcements").classList.toggle("hidden");
+  }
+  if (event.target.closest(".closeNotificationModal")) {
+      document.querySelector(".announcements").classList.add("hidden");
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const modal = document.getElementById('postNewModal');
+  const editor = document.getElementById('post-editor');
+
+  modal.addEventListener('sl-show', () => {
+      setTimeout(() => {
+          editor.focus(); 
+      }, 100); 
+  });
+});

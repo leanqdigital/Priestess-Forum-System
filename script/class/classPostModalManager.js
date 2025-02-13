@@ -76,10 +76,10 @@ class PostModalManager {
     }
 
 
-    <div class="flex flex-col gap-4 flex-1 bg-primary-100 overflow-auto relative">
+    <div class="flex flex-col gap-4 flex-1 post-details-modal overflow-auto relative">
 
-        <div class="flex items-center justify-between px-6 py-4 w-full bg-primary-100 sticky top-0 z-[99999]">
-            <h2 class="text-white">Post Details</h2>
+        <div class="flex items-center justify-between px-6 py-4 w-full post-details-modal sticky top-0 z-[99999]">
+            <h2 class="page-text">Post Details</h2>
             <svg class="cursor-pointer" @click="openCommentModal = false" width="14" height="14" viewBox="0 0 14 14"
                 fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
@@ -98,11 +98,11 @@ class PostModalManager {
                     </div>
                     <div class="author-name-container">
                         <div
-                            class="text-center text-white text-base font-semibold font-['Avenir LT Std'] leading-normal">
+                            class="text-center page-text text-base font-semibold font-['Avenir LT Std'] leading-normal">
                             ${post.author.name}</div>
                     </div>
                     <div class="h-[15px] w-[2px] bg-[#c29d68]"></div>
-                    <div class="text-center text-white text-xs font-['Avenir LT Std'] leading-3">${
+                    <div class="text-center page-text text-xs font-['Avenir LT Std'] leading-3">${
                       post.date
                     }
                     </div>
@@ -110,11 +110,11 @@ class PostModalManager {
             </div>
             <div class="flex">
                 <div class="post-content w-[90%]">
-                    <div class="text-white text-base font-['Avenir LT Std'] leading-tight">${
+                    <div class="page-text text-base font-['Avenir LT Std'] leading-tight">${
                       post.content
                     }.</div>
                 </div>
-                <div class="w-[5px] h-[auto] bg-[#586A80] ml-auto"></div>
+                <div class="w-[5px] h-[auto] modal-post-content-right-border ml-auto"></div>
             </div>
 
             <div class="flex">
@@ -167,9 +167,8 @@ class PostModalManager {
                   post.file_tpe === "Audio" && audioData
                     ? `
                 <div class="post-audio-wrapper mb-4 w-full">
-                    <!-- Initialize an Alpine component using x-data and x-init -->
-                    <div class="audio-player-modal bg-primary p-5 rounded-[12px] w-full text-center"
-                        id="audio-${post.id}" data-audio-player-modal="${post.id}">
+                    <div class="audio-player-modal p-5 rounded-[12px] w-full text-center"
+                        id="audio-${post.id}" data-audio-player-modal="${post.id}" data-audio-player="${post.id}">
 
                         <!-- Audio header -->
                         <div class="audio-header flex items-center gap-[10px]">
@@ -197,15 +196,15 @@ class PostModalManager {
                                 </svg>
                             </button>
 
-                            <div class="cursor-pointer" id="play-pause" data-audio-button="${post.id}">
-                                <svg class="playedIcon" width="33" height="32" viewBox="0 0 33 32" fill="none"
+                            <div class="cursor-pointer" id="play-pause" data-audio-button="${post.id}" onclick="playAudio(${post.id})"> 
+                                <svg class="audioStateIcon playedIcon" width="33" height="32" viewBox="0 0 33 32" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <rect x="0.5" width="32" height="32" rx="16" fill="#C29D68" />
                                     <path
                                         d="M22.448 15.9997C22.4484 16.1738 22.4038 16.345 22.3184 16.4968C22.2331 16.6485 22.1099 16.7756 21.9609 16.8657L12.7254 22.5154C12.5697 22.6107 12.3914 22.6628 12.2088 22.6662C12.0263 22.6695 11.8461 22.6241 11.687 22.5346C11.5294 22.4465 11.3981 22.318 11.3066 22.1623C11.2151 22.0066 11.1668 21.8293 11.1665 21.6488V10.3506C11.1668 10.17 11.2151 9.99276 11.3066 9.83707C11.3981 9.68137 11.5294 9.55286 11.687 9.46473C11.8461 9.37522 12.0263 9.3298 12.2088 9.33318C12.3914 9.33656 12.5697 9.38862 12.7254 9.48396L21.9609 15.1337C22.1099 15.2237 22.2331 15.3508 22.3184 15.5026C22.4038 15.6543 22.4484 15.8256 22.448 15.9997Z"
                                         fill="#022327" />
                                 </svg>
-                                <svg class="pausedIcon hidden" width="32" height="32" viewBox="0 0 32 32" fill="none"
+                                <svg class="audioStateIcon pausedIcon hidden" width="32" height="32" viewBox="0 0 32 32" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <rect width="32" height="32" rx="16" fill="#C29D68" />
                                     <path
@@ -257,7 +256,7 @@ class PostModalManager {
                                     fill="#C29D68" />
                             </svg>
                         </button>
-                        <div class="o1 text-white postVoteCount">${
+                        <div class="o1 page-text postVoteCount">${
                           post.PostVotesCount
                         }</div>
                     </div>
@@ -272,7 +271,7 @@ class PostModalManager {
                                     fill="#C29D68" />
                             </svg>
                         </button>
-                        <div class="o1 text-white postCommentCount">${
+                        <div class="o1 page-text postCommentCount">${
                           post.PostCommentCount
                         }</div>
                     </div>
@@ -312,7 +311,7 @@ class PostModalManager {
                         max-[500px]:min-h-[20px]
                         editor 
                         comment-editor 
-                        text-white 
+                        page-text 
                         p-2 
                         !border-none 
                         !focus-visible:border-none 
@@ -375,8 +374,8 @@ class PostModalManager {
                             </button>
                         </div>
                         <button id="submit-comment"
-                            class="bg-secondary hover:bg-secondary-200 flex items-center gap-2 rounded px-4 py-2 text-white transition-colors">
-                            <span class="max-[500px]:hidden">Comment</span>
+                            class="submit-button flex items-center gap-2 rounded px-4 py-2 page-text transition-colors">
+                            <span class="max-[500px]:hidden page-text">Comment</span>
                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -388,7 +387,7 @@ class PostModalManager {
                 </div>
             </div>
             <section id="modal-comments-section" class="pb-[150px]">
-                <div class="mb-4 max-[500px]:mb-2 text-white text-sm font-['Avenir LT Std'] leading-[14px]">Comments
+                <div class="mb-4 max-[500px]:mb-2 page-text text-sm font-['Avenir LT Std'] leading-[14px]">Comments
                 </div>
                 <div id="modal-comments-container" class="space-y-4 modal-comments-container-${
                   post.id
@@ -400,65 +399,9 @@ class PostModalManager {
     </div>
 </div>
 `;
-    window.playAudioModal = function (id) {
-      let player = document.querySelector(`[data-audio-player-modal="${id}"]`);
-      const audio = player.querySelector(`.audio`);
-      const playPauseBtn = player.querySelector(`#play-pause`);
-      const rewindBtn = player.querySelector(`#rewind`);
-      const forwardBtn = player.querySelector(`#forward`);
-      const progressBar = player.querySelector(`#progress`);
-      const currentTimeDisplay = player.querySelector(`#current-time`);
-      const totalTimeDisplay = player.querySelector(`#total-time`);
-
-      if (audio.paused) {
-        audio.play();
-        playPauseBtn.querySelector(".pausedIcon").classList.remove("hidden");
-        playPauseBtn.querySelector(".playedIcon").classList.add("hidden");
-      } else {
-        audio.pause();
-        playPauseBtn.querySelector(".pausedIcon").classList.add("hidden");
-        playPauseBtn.querySelector(".playedIcon").classList.remove("hidden");
-      }
-
-      rewindBtn.addEventListener(`click`, () => {
-        audio.currentTime -= 10;
-      });
-
-      forwardBtn.addEventListener(`click`, () => {
-        audio.currentTime += 10;
-      });
-
-      audio.addEventListener(`timeupdate`, () => {
-        progressBar.value = (audio.currentTime / audio.duration) * 100;
-        currentTimeDisplay.textContent = formatTime(audio.currentTime);
-        totalTimeDisplay.textContent =
-          `-` + formatTime(audio.duration - audio.currentTime);
-      });
-
-      progressBar.addEventListener(`input`, () => {
-        audio.currentTime = (progressBar.value / 100) * audio.duration;
-      });
-
-      function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? "0" : ``}${secs}`;
-      }
-
-      audio.addEventListener(`loadedmetadata`, () => {
-        totalTimeDisplay.textContent = "-" + formatTime(audio.duration);
-      });
-    };
-
-    // Remove onclick from the HTML, then after setting innerHTML:
-    const playPauseBtn = modalContent.querySelector(
-      `[data-audio-button="${post.id}"]`
-    );
-    if (playPauseBtn) {
-      playPauseBtn.addEventListener("click", () => playAudioModal(post.id));
-    }
 
     // Trigger file inputs when the corresponding button is clicked
+
     document
       .getElementById("upload-image-button-comment")
       .addEventListener("click", () => {
