@@ -794,24 +794,3 @@ document.addEventListener("click", (event) => {
     postElement.hide();
   }
 });
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const postId = urlParams.get("pid");
-
-  if (postId) {
-    // Find the button (or card) that has the matching data-post-id.
-    const loadCommentsBtn = document.querySelector(`.load-comments-btn[data-post-id="${postId}"]`);
-
-    if (loadCommentsBtn) {
-      // Trigger the same behavior as clicking the button.
-      loadCommentsBtn.click();
-    } else {
-      console.warn(`No element found for post id: ${postId}`);
-    }
-
-    // Remove the pid parameter from the URL without reloading the page.
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-});
