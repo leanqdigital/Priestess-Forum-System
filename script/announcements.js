@@ -4,54 +4,95 @@ const WS_ENDPOINT = `wss://priestess.vitalstats.app/api/v1/graphql?apiKey=${API_
 const HTTP_ENDPOINT = `https://priestess.vitalstats.app/api/v1/graphql`;
 // Set the logged-in user's contact ID – ensure this is a number.
 const LOGGED_IN_CONTACT_ID = CONFIG.api.userId; // Example value
+let courseIdToCheck = CONFIG.api.currentCourseId;
 
-// Subscription query for announcements (using your provided query)
+// NEW SUBSCRIPTION QUERY using the updated structure
 const SUBSCRIPTION_QUERY = `
-  subscription subscribeToAnnouncements(
-    $author_id: PriestessContactID
-  ) {
-    subscribeToAnnouncements(
-      query: [
-        {
-          where: {
-            Comment: [
-              {
-                where: {
-                  Forum_Post: [
-                    {
-                      where: {
-                        author_id: $author_id
-                        _OPERATOR_: neq
-                      }
+subscription subscribeToCalcAnnouncements(
+  $author_id: PriestessContactID
+) {
+  subscribeToCalcAnnouncements(
+    query: [
+      {
+        where: {
+          Comment: [
+            {
+              where: {
+                Forum_Post: [
+                  {
+                    where: {
+                      author_id: $author_id
+                      _OPERATOR_: neq
                     }
-                  ]
-                }
+                  }
+                ]
               }
-            ]
-          }
+            }
+          ]
         }
-        {
-          orWhere: {
-            Post: [
-              {
-                where: {
-                  author_id: $author_id
-                  _OPERATOR_: neq
-                }
+      }
+      {
+        orWhere: {
+          Post: [
+            {
+              where: {
+                author_id: $author_id
+                _OPERATOR_: neq
               }
-            ]
-          }
+            }
+          ]
         }
+      }
+    ]
+    orderBy: [{ path: ["created_at"], type: desc }]
+  ) {
+    ID: field(arg: ["id"])
+    Title: field(arg: ["title"])
+    Content: field(arg: ["content"])
+    Date_Added: field(arg: ["created_at"])
+    Post_ID: field(arg: ["post_id"])
+    Post_Related_Course_ID: field(
+      arg: ["Post", "related_course_id"]
+    )
+    Course_Course_name: field(
+      arg: ["Post", "Related_Course", "course_name"]
+    )
+    Comment_ID: field(arg: ["comment_id"])
+    Comment_Forum_Post_ID: field(
+      arg: ["Comment", "forum_post_id"]
+    )
+    ForumPost_Related_Course_ID: field(
+      arg: ["Comment", "Forum_Post", "related_course_id"]
+    )
+    Course_Course_name1: field(
+      arg: [
+        "Comment"
+        "Forum_Post"
+        "Related_Course"
+        "course_name"
       ]
-      orderBy: [{ path: ["created_at"], type: desc }]
-    ) {
-      ID: id
-      Title: title
-      Content: content
-      Date_Added: created_at
-      Post_ID: post_id
-    }
+    )
+    ForumComment_Forum_Post_ID: field(
+      arg: ["Comment", "Parent_Comment", "forum_post_id"]
+    )
+    ForumPost_Related_Course_ID1: field(
+      arg: [
+        "Comment"
+        "Parent_Comment"
+        "Forum_Post"
+        "related_course_id"
+      ]
+    )
+    Course_Course_name2: field(
+      arg: [
+        "Comment"
+        "Forum_Post"
+        "Related_Course"
+        "course_name"
+      ]
+    )
   }
+}
 `;
 
 // Query to fetch read status data (using your provided query)
@@ -103,6 +144,42 @@ const readAnnouncements = new Set();
 // Set to track announcements for which a "mark as read" mutation is in-flight.
 const pendingAnnouncements = new Set();
 
+// --------------------------------------------------------------------
+// UPDATED HELPER FUNCTION: getPostDetails
+// This function examines the notification (using the new field names) and returns an object with:
+// - postId: the id of the related post (whether directly, via a comment, or via a reply)
+// - courseId: the id of the course related to the post
+// - courseName: the course name (to be used in the URL)
+function getPostDetails(notification) {
+  let postId = null,
+    courseId = null,
+    courseName = null;
+  if (notification.Post_ID !== null && notification.Post_ID !== undefined) {
+    // Announcement triggered by a new post.
+    postId = notification.Post_ID;
+    courseId = notification.Post_Related_Course_ID;
+    courseName = notification.Course_Course_name;
+  } else if (
+    notification.Comment_ID !== null &&
+    notification.Comment_ID !== undefined
+  ) {
+    // Announcement triggered by a comment or a reply.
+    if (notification.ForumComment_Forum_Post_ID) {
+      // Reply scenario: using parent's forum post id.
+      postId = notification.ForumComment_Forum_Post_ID;
+      courseId = notification.ForumPost_Related_Course_ID1;
+      // Optionally, if a course name is available from the comment branch, use it.
+      courseName = notification.Course_Course_name1 || null;
+    } else if (notification.Comment_Forum_Post_ID) {
+      // Comment scenario.
+      postId = notification.Comment_Forum_Post_ID;
+      courseId = notification.ForumPost_Related_Course_ID;
+      courseName = notification.Course_Course_name1;
+    }
+  }
+  return { postId, courseId, courseName };
+}
+
 // Helper: Convert Unix timestamp (seconds) to a relative time string.
 function timeAgo(unixTimestamp) {
   const now = new Date();
@@ -135,10 +212,21 @@ function createNotificationCard(notification, isRead) {
   // Save the numeric ID as a string attribute.
   card.setAttribute("data-id", String(notification.ID));
 
-  // Check if Post_ID is valid before adding event listener
-  if (notification.Post_ID !== null && notification.Post_ID !== undefined) {
-    card.setAttribute("data-post-id", String(notification.Post_ID));
-    card.setAttribute("x-on:click", "openCommentModal = true");
+  // Get the post details using the updated helper.
+  const { postId, courseId, courseName } = getPostDetails(notification);
+  if (postId) {
+    card.setAttribute("data-post-id", String(postId));
+    if (courseId) {
+      card.setAttribute("data-course-id", String(courseId));
+      if (courseId == courseIdToCheck) {
+        card.setAttribute("x-on:click", "openCommentModal = true");
+      } else {
+        card.removeAttribute("x-on:click");
+      }
+    }
+    if (courseName) {
+      card.setAttribute("data-course-name", courseName);
+    }
   }
 
   card.innerHTML = `
@@ -157,19 +245,53 @@ function createNotificationCard(notification, isRead) {
     </div>
   `;
 
-  // On click, mark as read if not already marked or pending.
+  // Inside the createNotificationCard function's click handler:
   card.addEventListener("click", function () {
     const id = Number(card.getAttribute("data-id"));
-
-    // Check if Post_ID exists before proceeding
-    const postId = card.getAttribute("data-post-id");
-    if (!postId) {
+    const postIdAttr = card.getAttribute("data-post-id");
+    if (!postIdAttr) {
       console.log("No post found");
       return;
     }
 
-    if (readAnnouncements.has(id) || pendingAnnouncements.has(id)) return;
-    markAsRead(id);
+    // Mark as read if needed
+    if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+      markAsRead(id);
+    }
+
+    // Retrieve course details
+    const notifCourseIdRaw = card.getAttribute("data-course-id");
+    const notifCourseId = notifCourseIdRaw
+      ? Number(notifCourseIdRaw.trim())
+      : null;
+    const notifCourseName = card.getAttribute("data-course-name");
+    const currentCourseId = courseIdToCheck
+      ? Number(courseIdToCheck.trim())
+      : null;
+
+    // Debugging logs
+    console.log("Current Course ID:", currentCourseId);
+    console.log("Notification Course ID:", notifCourseId);
+    console.log("Post ID:", postIdAttr);
+
+    // Check if course IDs exist and match
+    if (
+      currentCourseId &&
+      notifCourseId !== null &&
+      currentCourseId === notifCourseId
+    ) {
+      // Course IDs match, let the x-on:click handle modal opening
+      return;
+    } else {
+      // Course IDs don't match or missing, redirect
+      const formattedCourseName = notifCourseName
+        ? notifCourseName.replace(/\s+/g, "-").toLowerCase()
+        : "course";
+      const redirectUrl = `https://library.priestesspresence.com/forum/${formattedCourseName}?pid=${postIdAttr}`;
+      console.log("Redirecting to:", redirectUrl);
+      window.location.href = redirectUrl;
+      return; // Exit to prevent further execution
+    }
   });
 
   return card;
@@ -215,7 +337,7 @@ function processNotification(notification) {
     cards.push(card);
   });
   cardMap.set(id, cards);
-  
+
   // Update message visibility
   updateNoNotificationsMessage();
 }
@@ -349,7 +471,6 @@ async function markAllAsRead() {
 }
 
 // Fetch the read announcements for the logged-in user.
-// For example, call updateRedDot() after fetching read data.
 function fetchReadData() {
   fetch(HTTP_ENDPOINT, {
     method: "POST",
@@ -397,7 +518,7 @@ function connect() {
   socket.onopen = () => {
     socket.send(JSON.stringify({ type: "connection_init" }));
     keepAliveInterval = setInterval(sendKeepAlive, 28000);
-    // Start the announcements subscription (id "1")
+    // Start the announcements subscription (id "1") using the new query and variables.
     socket.send(
       JSON.stringify({
         id: "1",
@@ -417,7 +538,7 @@ function connect() {
     console.log(data, "EventData");
     if (data.type !== "GQL_DATA") return;
     if (!data.payload || !data.payload.data) return;
-    const result = data.payload.data.subscribeToAnnouncements;
+    const result = data.payload.data.subscribeToCalcAnnouncements;
     if (!result) return;
     const notifications = Array.isArray(result) ? result : [result];
     notifications.forEach(processNotification);
