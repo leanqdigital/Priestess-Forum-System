@@ -40,39 +40,7 @@ class ForumManager {
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = "";
       this.hasMorePosts = true;
       await this.fetchAndRenderPosts(true);
-      var fullUrl = document.URL;
-      console.log(fullUrl);
-      var pid = null;
-      var queryStart = fullUrl.indexOf("?");
-      if (queryStart !== -1) {
-        var queryString = fullUrl.slice(queryStart + 1);
-        var queryParts = queryString.split("&");
-        for (var i = 0; i < queryParts.length; i++) {
-          var pair = queryParts[i].split("=");
-          if (pair[0] === "pid") {
-            pid = pair[1];
-            break;
-          }
-        }
-      }
-      if (pid) {
-        var btn = document.querySelector(
-          '.load-comments-btn[data-post-id="' + pid + '"]'
-        );
-        console.log(btn);
-        if (btn) {
-          btn.click();
-        } else {
-          console.warn("No element found for post id:", pid);
-        }
-        var newUrl = fullUrl.replace(
-          /[?&]pid=\d+(&|$)/,
-          function (match, trailing) {
-            return trailing === "&" ? "?" : "";
-          }
-        );
-        history.pushState(null, "", newUrl);
-      }
+      
     } catch (error) {
       UIManager.showError("Failed to load posts. Please try again.");
     }
@@ -478,9 +446,7 @@ class ForumManager {
 
   getBookmarkSVG(isBookmarked) {
     return `
-          <svg class = "${
-            isBookmarked ? "bookmarked" : "notBookmarked"
-          }" width="24" height="24" viewBox="0 0 24 24" 
+          <svg class = "${isBookmarked ? "bookmarked" : "notBookmarked"}" width="24" height="24" viewBox="0 0 24 24" 
                fill="" 
                stroke="">
               <path d="M17.8003 2H6.60003C6.17568 2 5.7687 2.16857 5.46864 2.46864C5.16857 2.7687 5 3.17568 5 3.60003V21.2004C5.00007 21.3432 5.03835 21.4833 5.11086 21.6063C5.18337 21.7293 5.28748 21.8306 5.41237 21.8998C5.53726 21.969 5.67839 22.0035 5.82111 21.9997C5.96384 21.996 6.10295 21.9541 6.22402 21.8784L12.2001 18.1433L18.1773 21.8784C18.2983 21.9538 18.4373 21.9955 18.5799 21.9991C18.7225 22.0027 18.8634 21.9682 18.9882 21.899C19.1129 21.8299 19.2169 21.7287 19.2893 21.6058C19.3618 21.483 19.4001 21.343 19.4003 21.2004V3.60003C19.4003 3.17568 19.2317 2.7687 18.9316 2.46864C18.6316 2.16857 18.2246 2 17.8003 2Z"/>
@@ -619,9 +585,7 @@ class ForumManager {
 
   getVoteSVG(isVoted) {
     return `
-        <svg class = "${
-          isVoted ? "voted" : "unVoted"
-        }" width="24" height="24" viewBox="0 0 24 24" 
+        <svg class = "${isVoted ? "voted" : "unVoted"}" width="24" height="24" viewBox="0 0 24 24" 
             fill="" 
             stroke="">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -1566,9 +1530,7 @@ class ForumManager {
 
   getReplyVoteSVG(isVoted) {
     return `
-      <svg class = "${
-        isVoted ? "voted" : "nonVoted"
-      }" width="24" height="24" viewBox="0 0 24 24" 
+      <svg class = "${isVoted ? "voted": "nonVoted"}" width="24" height="24" viewBox="0 0 24 24" 
            fill="" 
            stroke="#C29D68">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
