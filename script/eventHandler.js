@@ -333,8 +333,12 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     // Update DOM elements (update any file-related UI as needed)
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
     postElement.querySelector(".editPostModal").dataset.postId = actualPost.ID;
-    postElement.querySelector(".post-author-name").textContent = actualPost.Author_First_Name + " " + actualPost.Author_Last_Name;
-    postElement.querySelector(".post-author-image").src = actualPost.Author_Profile_Image?.trim() ? actualPost.Author_Profile_Image : DEFAUL_AVATAR;
+    postElement.querySelector(".post-author-name").textContent =
+      actualPost.Author_First_Name + " " + actualPost.Author_Last_Name;
+    postElement.querySelector(".post-author-image").src =
+      actualPost.Author_Profile_Image?.trim()
+        ? actualPost.Author_Profile_Image
+        : DEFAUL_AVATAR;
     postElement.querySelector(".post-copy-content").textContent =
       actualPost.Post_Copy;
     postElement.querySelector(".postCommentCount").textContent =
@@ -342,6 +346,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     postElement.querySelector(".postVoteCount").textContent =
       actualPost.Member_Post_Upvotes_DataTotal_Count;
     postElement.querySelector(".delete-post-btn").dataset.postId =
+      actualPost.ID;
+    postElement.querySelector(".load-comments-btn").dataset.postId =
       actualPost.ID;
     postElement.dataset.postId = actualPost.ID;
     // postElement.querySelector(".audio-player").id = "audio-" + actualPost.ID;
@@ -387,7 +393,9 @@ document.addEventListener("click", function (e) {
   if (e.target.matches("input[type='file']")) return;
 
   // 1. Handle clicks on any upload button
-  const uploadBtn = e.target.closest(".upload-image-button-reply, .upload-audio-button-reply, .upload-video-button-reply");
+  const uploadBtn = e.target.closest(
+    ".upload-image-button-reply, .upload-audio-button-reply, .upload-video-button-reply"
+  );
   if (uploadBtn) {
     const replyForm = uploadBtn.closest(".reply-form-wrapper");
     if (!replyForm) return;
@@ -412,7 +420,9 @@ document.addEventListener("click", function (e) {
     if (!replyForm) return;
     // In our controls container we store the current file type.
     const fileControls = replyForm.querySelector(".file-controls-reply");
-    const currentFileType = fileControls ? fileControls.dataset.currentFileType : null;
+    const currentFileType = fileControls
+      ? fileControls.dataset.currentFileType
+      : null;
     if (!currentFileType) return;
 
     // Get the corresponding file input and preview wrapper.
@@ -441,20 +451,28 @@ document.addEventListener("click", function (e) {
     const replyForm = deleteBtn.closest(".reply-form-wrapper");
     if (!replyForm) return;
     const fileControls = replyForm.querySelector(".file-controls-reply");
-    const currentFileType = fileControls ? fileControls.dataset.currentFileType : null;
+    const currentFileType = fileControls
+      ? fileControls.dataset.currentFileType
+      : null;
     if (currentFileType === "image") {
       const fileInput = replyForm.querySelector(".reply-image-upload");
-      const previewWrapper = replyForm.querySelector(".image-preview-wrapper-reply");
+      const previewWrapper = replyForm.querySelector(
+        ".image-preview-wrapper-reply"
+      );
       if (previewWrapper) previewWrapper.innerHTML = "";
       if (fileInput) fileInput.value = "";
     } else if (currentFileType === "audio") {
       const fileInput = replyForm.querySelector(".reply-audio-upload");
-      const previewWrapper = replyForm.querySelector(".audio-preview-wrapper-reply");
+      const previewWrapper = replyForm.querySelector(
+        ".audio-preview-wrapper-reply"
+      );
       if (previewWrapper) previewWrapper.innerHTML = "";
       if (fileInput) fileInput.value = "";
     } else if (currentFileType === "video") {
       const fileInput = replyForm.querySelector(".reply-video-upload");
-      const previewWrapper = replyForm.querySelector(".video-preview-wrapper-reply");
+      const previewWrapper = replyForm.querySelector(
+        ".video-preview-wrapper-reply"
+      );
       if (previewWrapper) previewWrapper.innerHTML = "";
       if (fileInput) fileInput.value = "";
     }
@@ -464,22 +482,27 @@ document.addEventListener("click", function (e) {
       fileControls.removeAttribute("data-current-file-type");
     }
     // Show the upload buttons again.
-    const uploadButtons = replyForm.querySelectorAll(".upload-image-button-reply, .upload-audio-button-reply, .upload-video-button-reply");
-    uploadButtons.forEach(btn => btn.classList.remove("hidden"));
+    const uploadButtons = replyForm.querySelectorAll(
+      ".upload-image-button-reply, .upload-audio-button-reply, .upload-video-button-reply"
+    );
+    uploadButtons.forEach((btn) => btn.classList.remove("hidden"));
     return;
   }
 });
-
 
 // -------------------------------
 // Delegated Change Listener for File Inputs
 // -------------------------------
 document.addEventListener("change", function (e) {
   // Check if the event target is one of our file inputs.
-  if (e.target.matches(".reply-image-upload, .reply-audio-upload, .reply-video-upload")) {
+  if (
+    e.target.matches(
+      ".reply-image-upload, .reply-audio-upload, .reply-video-upload"
+    )
+  ) {
     const file = e.target.files[0];
     if (!file) return; // No file was selected.
-    
+
     let fileType = "";
     if (e.target.classList.contains("reply-image-upload")) {
       fileType = "image";
@@ -488,19 +511,23 @@ document.addEventListener("change", function (e) {
     } else if (e.target.classList.contains("reply-video-upload")) {
       fileType = "video";
     }
-    
+
     // Find the corresponding reply form container.
     const replyForm = e.target.closest(".reply-form-wrapper");
     if (!replyForm) return;
-    
+
     // Clear other file inputs and their previews in this reply form.
     if (fileType === "image") {
       const audioInput = replyForm.querySelector(".reply-audio-upload");
       const videoInput = replyForm.querySelector(".reply-video-upload");
       if (audioInput) audioInput.value = "";
       if (videoInput) videoInput.value = "";
-      const audioPreview = replyForm.querySelector(".audio-preview-wrapper-reply");
-      const videoPreview = replyForm.querySelector(".video-preview-wrapper-reply");
+      const audioPreview = replyForm.querySelector(
+        ".audio-preview-wrapper-reply"
+      );
+      const videoPreview = replyForm.querySelector(
+        ".video-preview-wrapper-reply"
+      );
       if (audioPreview) audioPreview.innerHTML = "";
       if (videoPreview) videoPreview.innerHTML = "";
     } else if (fileType === "audio") {
@@ -508,8 +535,12 @@ document.addEventListener("change", function (e) {
       const videoInput = replyForm.querySelector(".reply-video-upload");
       if (imageInput) imageInput.value = "";
       if (videoInput) videoInput.value = "";
-      const imagePreview = replyForm.querySelector(".image-preview-wrapper-reply");
-      const videoPreview = replyForm.querySelector(".video-preview-wrapper-reply");
+      const imagePreview = replyForm.querySelector(
+        ".image-preview-wrapper-reply"
+      );
+      const videoPreview = replyForm.querySelector(
+        ".video-preview-wrapper-reply"
+      );
       if (imagePreview) imagePreview.innerHTML = "";
       if (videoPreview) videoPreview.innerHTML = "";
     } else if (fileType === "video") {
@@ -517,12 +548,16 @@ document.addEventListener("change", function (e) {
       const audioInput = replyForm.querySelector(".reply-audio-upload");
       if (imageInput) imageInput.value = "";
       if (audioInput) audioInput.value = "";
-      const imagePreview = replyForm.querySelector(".image-preview-wrapper-reply");
-      const audioPreview = replyForm.querySelector(".audio-preview-wrapper-reply");
+      const imagePreview = replyForm.querySelector(
+        ".image-preview-wrapper-reply"
+      );
+      const audioPreview = replyForm.querySelector(
+        ".audio-preview-wrapper-reply"
+      );
       if (imagePreview) imagePreview.innerHTML = "";
       if (audioPreview) audioPreview.innerHTML = "";
     }
-    
+
     // Create a preview URL for the selected file.
     const previewURL = URL.createObjectURL(file);
     let previewWrapper = null;
@@ -533,7 +568,7 @@ document.addEventListener("change", function (e) {
     } else if (fileType === "video") {
       previewWrapper = replyForm.querySelector(".video-preview-wrapper-reply");
     }
-    
+
     // Clear any existing preview and add the new one.
     if (previewWrapper) {
       previewWrapper.innerHTML = "";
@@ -564,10 +599,12 @@ document.addEventListener("change", function (e) {
         previewWrapper.appendChild(video);
       }
     }
-    
+
     // Hide the upload buttons and show the refresh/delete controls.
-    const uploadButtons = replyForm.querySelectorAll(".upload-image-button-reply, .upload-audio-button-reply, .upload-video-button-reply");
-    uploadButtons.forEach(btn => btn.classList.add("hidden"));
+    const uploadButtons = replyForm.querySelectorAll(
+      ".upload-image-button-reply, .upload-audio-button-reply, .upload-video-button-reply"
+    );
+    uploadButtons.forEach((btn) => btn.classList.add("hidden"));
     const fileControls = replyForm.querySelector(".file-controls-reply");
     if (fileControls) {
       fileControls.classList.remove("hidden");
@@ -578,7 +615,6 @@ document.addEventListener("change", function (e) {
     }
   }
 });
-
 
 // -------------------------------
 // Delegated Change Listener for File Inputs

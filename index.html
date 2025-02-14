@@ -740,7 +740,8 @@
                                     </button>
                                     <div class="o1 page-text vote-count">{{:CommentVotesCount}}</div>
                                 </div>
-                                <button class = "button page-text reply-form-toggler-{{:id}}" @click = "
+                                
+                                <button class = "button page-text text-sm font-['Avenir LT Std'] leading-[14px] reply-form-toggler-{{:id}}" @click = "
                                 let replyForm = document.querySelector('.reply-form-{{:id}}');
                                 if (replyForm.classList.contains('hidden')) {
                                     replyForm.classList.remove('hidden');
@@ -1003,8 +1004,7 @@
                 errorDisplay: "#error-display",
             },
         };
-    </script>
-
+    </script>    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/1.0.5/jsrender.min.js"></script>
