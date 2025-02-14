@@ -760,7 +760,7 @@
                 <!-- Add reply form -->
                 <div class="flex gap-2 reply-form reply-form-{{:id}} hidden">
                     <img class="w-[32px] h-[32px] rounded-full"
-                        src="{{:author.profileImage}}" />
+                        src="${CONFIG.api.defaultLoggedInAuthorImage}" />
                     <div
                         class="reply-form-wrapper reply-form flex flex-col flex-1 w-[80%] h-auto mb-4 p-2 rounded-[12px] border border-gray-600 bg-primary-100 z-[999] max-[500px]:mb-0">
                         <div id="reply-editor-{{:id}}"
@@ -978,6 +978,7 @@
         const LOGGED_IN_USER_FIRST_NAME = "Dpes";
         const LOGGED_IN_USER_LAST_NAME = "Adikari";
         const LOGGED_IN_USER_FULL_NAME = "Dpes Adikari";
+
         const LOGGED_IN_USER_PROFILE_IMAGE_LINK = "https://i.ontraport.com/22612.7af9e9baa3d56ef7636bd6db2600bc6f.PNG";
         const DEFAULT_AVATAR = "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA";
         const GRAPHQL_ENDPOINT = "https://priestess.vitalstats.app/api/v1/graphql";

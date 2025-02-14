@@ -279,9 +279,7 @@ class PostModalManager {
             </div>
             <div class="h-[0px] border border-[#d9d9d9]"></div>
             <div class="flex gap-2">
-                <img class="w-[32px] h-[32px] rounded-full block max-[500px]:hidden" src="${
-                  post.author.profileImage
-                }">
+                <img class="w-[32px] h-[32px] rounded-full block max-[500px]:hidden" src="${CONFIG.api.defaultLoggedInAuthorImage}">
                 <div class="
                     comment-form-wrapper
                     comment-form 
