@@ -235,7 +235,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     file_tpe: uploadedFile ? fileType : null,
     author: {
       name: forumManager.fullName,
-      profileImage: forumManager.defaultAuthorImage,
+      profileImage: forumManager.defaultLoggedInAuthorImage,
     },
     date: "Just now",
     content: textContent,

@@ -760,7 +760,7 @@
                 <!-- Add reply form -->
                 <div class="flex gap-2 reply-form reply-form-{{:id}} hidden">
                     <img class="w-[32px] h-[32px] rounded-full"
-                        src="https://i.ontraport.com/22612.7af9e9baa3d56ef7636bd6db2600bc6f.PNG" />
+                        src="{{:author.profileImage}}" />
                     <div
                         class="reply-form-wrapper reply-form flex flex-col flex-1 w-[80%] h-auto mb-4 p-2 rounded-[12px] border border-gray-600 bg-primary-100 z-[999] max-[500px]:mb-0">
                         <div id="reply-editor-{{:id}}"
@@ -992,7 +992,8 @@
                 firstName: LOGGED_IN_USER_FIRST_NAME,
                 lastName: LOGGED_IN_USER_LAST_NAME,
                 fullName: LOGGED_IN_USER_FULL_NAME,
-                defaultAuthorImage: LOGGED_IN_USER_PROFILE_IMAGE_LINK?.trim() ? LOGGED_IN_USER_PROFILE_IMAGE_LINK : DEFAUL_AVATAR,
+                defaultAuthorImage: DEFAULT_AVATAR,
+                defaultLoggedInAuthorImage: LOGGED_IN_USER_PROFILE_IMAGE_LINK?.trim() ? LOGGED_IN_USER_PROFILE_IMAGE_LINK : DEFAUL_AVATAR,
                 currentCourseId: courseID,
             },
             pagination: {
@@ -1004,7 +1005,8 @@
                 errorDisplay: "#error-display",
             },
         };
-    </script>    
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/1.0.5/jsrender.min.js"></script>

@@ -4,6 +4,7 @@ class ForumManager {
     this.firstName = CONFIG.api.firstName;
     this.lastName = CONFIG.api.lastName;
     this.fullName = CONFIG.api.fullName;
+    this.defaultLoggedInAuthorImage = CONFIG.api.defaultLoggedInAuthorImage;
     this.defaultAuthorImage = CONFIG.api.defaultAuthorImage;
     this.postsOffset = 0;
     this.postsLimit = CONFIG.pagination.postsPerPage;
@@ -95,19 +96,20 @@ class ForumManager {
           isVoted: this.votedPostIds.has(postId),
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
-          // NEW: Use the unified file fields
-          file_tpe: post.File_Tpe, // from your GraphQL response
+          file_tpe: post.File_Tpe,
           file_content:
             typeof post.File_Content === "string"
               ? JSON.parse(post.File_Content)
               : post.File_Content,
-          defaultAuthorImage: CONFIG.api.defaultAuthorImage,
           PostVotesCount: post.Member_Post_Upvotes_DataTotal_Count,
           PostCommentCount: post.ForumCommentsTotalCount,
           author: Formatter.formatAuthor({
             firstName: post.Author_First_Name,
             lastName: post.Author_Last_Name,
-            profileImage: post.Author_Profile_Image,
+            profileImage:
+              post.Author_Profile_Image && post.Author_Profile_Image.trim()
+                ? post.Author_Profile_Image
+                : this.defaultAuthorImage,
           }),
           date: Formatter.formatTimestamp(post.Date_Added),
           title: post.Post_Title,
@@ -723,7 +725,10 @@ class ForumManager {
         author: Formatter.formatAuthor({
           firstName: comment.Author_First_Name,
           lastName: comment.Author_Last_Name,
-          profileImage: comment.Author_Profile_Image,
+          profileImage:
+          comment.Author_Profile_Image && comment.Author_Profile_Image.trim()
+            ? comment.Author_Profile_Image
+            : this.defaultAuthorImage,
         }),
         // If you are storing vote records in a Map (see below), check whether votes exist:
         isCommentVoted: this.votedCommentIds.get(comment.ID)?.size > 0,
@@ -759,7 +764,7 @@ class ForumManager {
       file_type: fileType,
       author: {
         name: this.fullName,
-        profileImage: this.defaultAuthorImage,
+        profileImage: this.defaultLoggedInAuthorImage,
       },
     };
 
@@ -1175,9 +1180,11 @@ class ForumManager {
           author: Formatter.formatAuthor({
             firstName: reply.Author_First_Name,
             lastName: reply.Author_Last_Name,
-            profileImage: reply.Author_Profile_Image,
+            profileImage:
+              reply.Author_Profile_Image && reply.Author_Profile_Image.trim()
+                ? reply.Author_Profile_Image
+                : this.defaultAuthorImage,
           }),
-          defaultAuthorImage: CONFIG.api.defaultAuthorImage,
         })) || []
       );
     } catch (error) {
@@ -1207,7 +1214,7 @@ class ForumManager {
       file_content: previewFileContent, // may be null if no file attached
       author: {
         name: this.fullName,
-        profileImage: this.defaultAuthorImage,
+        profileImage: this.defaultLoggedInAuthorImage,
       },
     };
 
