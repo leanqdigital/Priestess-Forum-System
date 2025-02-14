@@ -10,6 +10,7 @@ let courseIdToCheck = CONFIG.api.currentCourseId;
 const SUBSCRIPTION_QUERY = `
 subscription subscribeToCalcAnnouncements(
   $author_id: PriestessContactID
+  $id: PriestessContactID
 ) {
   subscribeToCalcAnnouncements(
     query: [
@@ -28,6 +29,13 @@ subscription subscribeToCalcAnnouncements(
                 ]
               }
             }
+            {
+              andWhere: {
+                Comment_or_Reply_Mentions: [
+                  { where: { id: $id } }
+                ]
+              }
+            }
           ]
         }
       }
@@ -38,6 +46,11 @@ subscription subscribeToCalcAnnouncements(
               where: {
                 author_id: $author_id
                 _OPERATOR_: neq
+              }
+            }
+            {
+              andWhere: {
+                Mentioned_Users: [{ where: { id: $id } }]
               }
             }
           ]
@@ -90,6 +103,12 @@ subscription subscribeToCalcAnnouncements(
         "Related_Course"
         "course_name"
       ]
+    )
+    Contact_Contact_ID: field(
+      arg: ["Comment", "Comment_or_Reply_Mentions", "id"]
+    )
+    Contact_Contact_ID1: field(
+      arg: ["Post", "Mentioned_Users", "id"]
     )
   }
 }
@@ -525,10 +544,14 @@ function connect() {
         type: "GQL_START",
         payload: {
           query: SUBSCRIPTION_QUERY,
-          variables: { author_id: LOGGED_IN_CONTACT_ID },
+          variables: { 
+            author_id: LOGGED_IN_CONTACT_ID,
+            id: LOGGED_IN_CONTACT_ID
+          },
         },
       })
     );
+      
     // Fetch the read announcements data on page load.
     fetchReadData();
   };

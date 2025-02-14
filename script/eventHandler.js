@@ -338,7 +338,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     postElement.querySelector(".post-author-image").src =
       actualPost.Author_Profile_Image?.trim()
         ? actualPost.Author_Profile_Image
-        : DEFAUL_AVATAR;
+        : DEFAULT_AVATAR;
     postElement.querySelector(".post-copy-content").textContent =
       actualPost.Post_Copy;
     postElement.querySelector(".postCommentCount").textContent =
