@@ -173,6 +173,7 @@ function getPostDetails(notification) {
   let postId = null,
     courseId = null,
     courseName = null;
+  commentId = null;
   if (notification.Post_ID !== null && notification.Post_ID !== undefined) {
     // Announcement triggered by a new post.
     postId = notification.Post_ID;
@@ -223,7 +224,6 @@ function timeAgo(unixTimestamp) {
   return "Just now";
 }
 
-// Create a notification card element (for one container).
 function createNotificationCard(notification, isRead) {
   // Create the card element.
   const card = document.createElement("div");
@@ -246,6 +246,11 @@ function createNotificationCard(notification, isRead) {
     if (courseName) {
       card.setAttribute("data-course-name", courseName);
     }
+  }
+
+  // NEW: If the notification has a Comment_ID, add it as a data attribute.
+  if (notification.Comment_ID) {
+    card.setAttribute("data-comment-id", String(notification.Comment_ID));
   }
 
   card.innerHTML = `
@@ -299,14 +304,45 @@ function createNotificationCard(notification, isRead) {
       notifCourseId !== null &&
       currentCourseId === notifCourseId
     ) {
-      // Course IDs match, let the x-on:click handle modal opening
+      const commentId = card.getAttribute("data-comment-id");
+
+      // If it's a comment announcement, open the modal and then scroll to/highlight the comment.
+      if (commentId) {
+        console.log("Comment id is", commentId);
+        // Open the comment modal (your existing code already sets openCommentModal = true)
+        openCommentModal = true;
+
+        // Give the modal a short delay to render (adjust the delay if needed)
+        setTimeout(() => {
+          // Find the element with the matching data-comment-id that contains the .commentCard
+          const commentEl = document.querySelector(
+            `[data-comment-id="${commentId}"] .commentCard`
+          );
+          console.log("Comment Element is", commentEl);
+          if (commentEl) {
+            commentEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            commentEl.classList.add("highlight");
+            setTimeout(() => {
+              commentEl.classList.remove("highlight");
+            }, 5000);
+          }
+        }, 1000); // delay (in milliseconds) to ensure the modal is fully rendered
+
+        // Stop further redirection logic
+        return;
+      }
       return;
     } else {
       // Course IDs don't match or missing, redirect
       const formattedCourseName = notifCourseName
         ? notifCourseName.replace(/\s+/g, "-").toLowerCase()
         : "course";
-      const redirectUrl = `https://library.priestesspresence.com/forum/${formattedCourseName}?pid=${postIdAttr}`;
+      let redirectUrl = `https://library.priestesspresence.com/forum/${formattedCourseName}?pid=${postIdAttr}`;
+      // Append comment id if available
+      const commentId = card.getAttribute("data-comment-id");
+      if (commentId) {
+        redirectUrl += `&cid=${commentId}`;
+      }
       console.log("Redirecting to:", redirectUrl);
       window.location.href = redirectUrl;
       return; // Exit to prevent further execution
@@ -544,14 +580,14 @@ function connect() {
         type: "GQL_START",
         payload: {
           query: SUBSCRIPTION_QUERY,
-          variables: { 
+          variables: {
             author_id: LOGGED_IN_CONTACT_ID,
-            id: LOGGED_IN_CONTACT_ID
+            id: LOGGED_IN_CONTACT_ID,
           },
         },
       })
     );
-      
+
     // Fetch the read announcements data on page load.
     fetchReadData();
   };
