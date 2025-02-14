@@ -1512,11 +1512,10 @@ class ForumManager {
 
     try {
       const data = await ApiService.query(query, { id: replyId });
-      const updatedCount =
-        data?.calcForumComments?.[0]?.Member_Comment_Upvotes_DataTotal_Count;
+      const count = await this.fetchCommentVoteCount(replyId);
       const voteCountElement = replyElement.querySelector(".vote-count");
-      if (voteCountElement && updatedCount !== undefined) {
-        voteCountElement.textContent = updatedCount;
+      if (voteCountElement) {
+        voteCountElement.textContent = count;
       }
     } catch (error) {
       console.error("Failed to update vote count for reply", error);
