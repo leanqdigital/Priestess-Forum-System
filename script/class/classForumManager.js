@@ -715,7 +715,7 @@ class ForumManager {
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
         CommentVotesCount: comment.Member_Comment_Upvotes_DataTotal_Count,
-
+        forLoggedInUserImage: this.defaultLoggedInAuthorImage,
         // NEW: Use the unified file fields
         file_type: comment.File_Type, // from your GraphQL response
         file_content:
@@ -726,9 +726,9 @@ class ForumManager {
           firstName: comment.Author_First_Name,
           lastName: comment.Author_Last_Name,
           profileImage:
-          comment.Author_Profile_Image && comment.Author_Profile_Image.trim()
-            ? comment.Author_Profile_Image
-            : this.defaultAuthorImage,
+            comment.Author_Profile_Image && comment.Author_Profile_Image.trim()
+              ? comment.Author_Profile_Image
+              : this.defaultAuthorImage,
         }),
         // If you are storing vote records in a Map (see below), check whether votes exist:
         isCommentVoted: this.votedCommentIds.get(comment.ID)?.size > 0,
@@ -1165,14 +1165,14 @@ class ForumManager {
         }
       `;
       const data = await ApiService.query(query);
+
       return (
         data?.calcForumComments?.map((reply) => ({
           id: reply.ID,
           content: reply.Comment,
           date: Formatter.formatTimestamp(reply.Date_Added),
           ReplyVoteCount: reply.Member_Comment_Upvotes_DataTotal_Count,
-          // NEW: Use the unified file fields
-          file_type: reply.File_Type, // from your GraphQL response
+          file_type: reply.File_Type,
           file_content:
             typeof reply.File_Content === "string"
               ? JSON.parse(reply.File_Content)

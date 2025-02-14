@@ -759,8 +759,7 @@
                 </div>
                 <!-- Add reply form -->
                 <div class="flex gap-2 reply-form reply-form-{{:id}} hidden">
-                    <img class="w-[32px] h-[32px] rounded-full"
-                        src="${CONFIG.api.defaultLoggedInAuthorImage}" />
+                    <img class="w-[32px] h-[32px] rounded-full" src="{{:forLoggedInUserImage}}">
                     <div
                         class="reply-form-wrapper reply-form flex flex-col flex-1 w-[80%] h-auto mb-4 p-2 rounded-[12px] border border-gray-600 bg-primary-100 z-[999] max-[500px]:mb-0">
                         <div id="reply-editor-{{:id}}"
