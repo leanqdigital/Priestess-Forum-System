@@ -304,7 +304,7 @@ class PostModalManager {
                     max-[500px]:bg-primary 
                     max-[500px]:w-[calc(100%-16px)]">
 
-                    <div id="comment-editor" class="
+                    <div id="comment-editor" style = "font-size: 16px !important;" class="
                         min-h-[80px] 
                         max-[500px]:min-h-[20px]
                         editor 
