@@ -2,15 +2,68 @@
 const API_KEY = "U6F6ofQc_Oes9BimgiEs5";
 const WS_ENDPOINT = `wss://priestess.vitalstats.app/api/v1/graphql?apiKey=${API_KEY}`;
 const HTTP_ENDPOINT = `https://priestess.vitalstats.app/api/v1/graphql`;
+
 // Set the logged-in user's contact ID – ensure this is a number.
 const LOGGED_IN_CONTACT_ID = CONFIG.api.userId; // Example value
+console.log(LOGGED_IN_CONTACT_ID);
+// courseIdToCheck is used to handle dynamic UI behavior.
 let courseIdToCheck = CONFIG.api.currentCourseId;
 
+// -----------------------------------------------------------
+// Fetch Registered Courses of Logged in Member
+const REGISTERD_COURSES_QUERY = `
+query calcRegisteredMembersRegisteredCoursesMany(
+  $id: PriestessContactID
+) {
+  calcRegisteredMembersRegisteredCoursesMany(
+    query: [
+      {
+        where: {
+          Registered_Member: [{ where: { id: $id } }]
+        }
+      }
+    ]
+  ) {
+    Registered_Course_ID: field(arg: ["registered_course_id"])
+  }
+}
+
+`;
+
+// Step 1: Fetch registered courses for the logged-in user.
+function fetchRegisteredCourses() {
+  return fetch(HTTP_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Key": API_KEY,
+    },
+    body: JSON.stringify({
+      query: REGISTERD_COURSES_QUERY,
+      variables: { id: LOGGED_IN_CONTACT_ID },
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const courses =
+        data.data.calcRegisteredMembersRegisteredCoursesMany || [];
+      // Return an array of course IDs (converted to numbers)
+      return courses.map((course) => Number(course.Registered_Course_ID));
+    })
+    .catch((error) => {
+      console.error("Error fetching registered courses:", error);
+      return [];
+    });
+}
+// -----------------------------------------------------------
 // NEW SUBSCRIPTION QUERY using the updated structure
 const SUBSCRIPTION_QUERY = `
 subscription subscribeToCalcAnnouncements(
+  $related_course_id: PriestessCourseID
   $author_id: PriestessContactID
   $id: PriestessContactID
+  $limit: IntScalar
+  $offset: IntScalar
 ) {
   subscribeToCalcAnnouncements(
     query: [
@@ -19,6 +72,17 @@ subscription subscribeToCalcAnnouncements(
           Comment: [
             {
               where: {
+                Forum_Post: [
+                  {
+                    where: {
+                      related_course_id: $related_course_id
+                    }
+                  }
+                ]
+              }
+            }
+            {
+              andWhere: {
                 Forum_Post: [
                   {
                     where: {
@@ -44,6 +108,11 @@ subscription subscribeToCalcAnnouncements(
           Post: [
             {
               where: {
+                related_course_id: $related_course_id
+              }
+            }
+            {
+              andWhere: {
                 author_id: $author_id
                 _OPERATOR_: neq
               }
@@ -57,6 +126,8 @@ subscription subscribeToCalcAnnouncements(
         }
       }
     ]
+    limit: $limit
+    offset: $offset
     orderBy: [{ path: ["created_at"], type: desc }]
   ) {
     ID: field(arg: ["id"])
@@ -114,7 +185,8 @@ subscription subscribeToCalcAnnouncements(
 }
 `;
 
-// Query to fetch read status data (using your provided query)
+// -----------------------------------------------------------
+// Query to fetch read status data
 const READ_QUERY = `
   query calcOReadContactReadAnnouncements {
     calcOReadContactReadAnnouncements {
@@ -136,9 +208,8 @@ const MARK_READ_MUTATION = `
   }
 `;
 
-// --------------------------------------------------------------------
-// Instead of one container, we now support multiple containers.
-// These IDs should match your markup.
+// -----------------------------------------------------------
+// Notification Containers & Buttons (for multiple areas)
 const containerNavbar = document.getElementById(
   "parentNotificationTemplatesInNavbar"
 );
@@ -149,46 +220,34 @@ const notificationsContainers = [];
 if (containerNavbar) notificationsContainers.push(containerNavbar);
 if (containerBody) notificationsContainers.push(containerBody);
 
-// Query all "Mark all as read" buttons using a common class.
 const markAllButtons = document.querySelectorAll(".mark-all-button");
 
+// -----------------------------------------------------------
+// Variables to track notifications
 let socket;
 let keepAliveInterval;
-// A set to track which announcement IDs have been processed.
 const displayedNotifications = new Set();
-// A map to hold, for each announcement ID, an array of its card elements (one per container).
 const cardMap = new Map();
-// Set to track read announcement IDs for the logged-in user (stored as numbers).
 const readAnnouncements = new Set();
-// Set to track announcements for which a "mark as read" mutation is in-flight.
 const pendingAnnouncements = new Set();
 
-// --------------------------------------------------------------------
-// UPDATED HELPER FUNCTION: getPostDetails
-// This function examines the notification (using the new field names) and returns an object with:
-// - postId: the id of the related post (whether directly, via a comment, or via a reply)
-// - courseId: the id of the course related to the post
-// - courseName: the course name (to be used in the URL)
+// -----------------------------------------------------------
+// Helper: Get post details from a notification object
 function getPostDetails(notification) {
   let postId = null,
     courseId = null,
     courseName = null;
-  commentId = null;
-  if (notification.Post_ID !== null && notification.Post_ID !== undefined) {
-    // Announcement triggered by a new post.
+  if (notification.Post_ID != null) {
+    // New post announcement
     postId = notification.Post_ID;
     courseId = notification.Post_Related_Course_ID;
     courseName = notification.Course_Course_name;
-  } else if (
-    notification.Comment_ID !== null &&
-    notification.Comment_ID !== undefined
-  ) {
-    // Announcement triggered by a comment or a reply.
+  } else if (notification.Comment_ID != null) {
+    // Comment or reply announcement
     if (notification.ForumComment_Forum_Post_ID) {
-      // Reply scenario: using parent's forum post id.
+      // Reply: use parent's forum post id.
       postId = notification.ForumComment_Forum_Post_ID;
       courseId = notification.ForumPost_Related_Course_ID1;
-      // Optionally, if a course name is available from the comment branch, use it.
       courseName = notification.Course_Course_name1 || null;
     } else if (notification.Comment_Forum_Post_ID) {
       // Comment scenario.
@@ -205,7 +264,6 @@ function timeAgo(unixTimestamp) {
   const now = new Date();
   const date = new Date(unixTimestamp * 1000);
   const seconds = Math.floor((now - date) / 1000);
-
   let interval = Math.floor(seconds / 31536000);
   if (interval >= 1)
     return interval + " year" + (interval > 1 ? "s" : "") + " ago";
@@ -224,19 +282,19 @@ function timeAgo(unixTimestamp) {
   return "Just now";
 }
 
+// -----------------------------------------------------------
+// Create a notification card element.
 function createNotificationCard(notification, isRead) {
-  // Create the card element.
   const card = document.createElement("div");
   card.className = "notification flex justify-between gap-2 load-comments-btn";
-  // Save the numeric ID as a string attribute.
   card.setAttribute("data-id", String(notification.ID));
 
-  // Get the post details using the updated helper.
   const { postId, courseId, courseName } = getPostDetails(notification);
   if (postId) {
     card.setAttribute("data-post-id", String(postId));
     if (courseId) {
       card.setAttribute("data-course-id", String(courseId));
+      // If the course matches the current UI course, add click handler for modal.
       if (courseId == courseIdToCheck) {
         card.setAttribute("x-on:click", "openCommentModal = true");
       } else {
@@ -248,7 +306,7 @@ function createNotificationCard(notification, isRead) {
     }
   }
 
-  // NEW: If the notification has a Comment_ID, add it as a data attribute.
+  // If this is a comment notification, store its comment id.
   if (notification.Comment_ID) {
     card.setAttribute("data-comment-id", String(notification.Comment_ID));
   }
@@ -269,7 +327,7 @@ function createNotificationCard(notification, isRead) {
     </div>
   `;
 
-  // Inside the createNotificationCard function's click handler:
+  // Click handler: mark as read and handle redirection or modal open.
   card.addEventListener("click", function () {
     const id = Number(card.getAttribute("data-id"));
     const postIdAttr = card.getAttribute("data-post-id");
@@ -278,12 +336,10 @@ function createNotificationCard(notification, isRead) {
       return;
     }
 
-    // Mark as read if needed
     if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
       markAsRead(id);
     }
 
-    // Retrieve course details
     const notifCourseIdRaw = card.getAttribute("data-course-id");
     const notifCourseId = notifCourseIdRaw
       ? Number(notifCourseIdRaw.trim())
@@ -293,28 +349,20 @@ function createNotificationCard(notification, isRead) {
       ? Number(courseIdToCheck.trim())
       : null;
 
-    // Debugging logs
     console.log("Current Course ID:", currentCourseId);
     console.log("Notification Course ID:", notifCourseId);
     console.log("Post ID:", postIdAttr);
 
-    // Check if course IDs exist and match
     if (
       currentCourseId &&
       notifCourseId !== null &&
       currentCourseId === notifCourseId
     ) {
       const commentId = card.getAttribute("data-comment-id");
-
-      // If it's a comment announcement, open the modal and then scroll to/highlight the comment.
       if (commentId) {
         console.log("Comment id is", commentId);
-        // Open the comment modal (your existing code already sets openCommentModal = true)
         openCommentModal = true;
-
-        // Give the modal a short delay to render (adjust the delay if needed)
         setTimeout(() => {
-          // Find the element with the matching data-comment-id that contains the .commentCard
           const commentEl = document.querySelector(
             `[data-comment-id="${commentId}"] .commentCard`
           );
@@ -326,41 +374,36 @@ function createNotificationCard(notification, isRead) {
               commentEl.classList.remove("highlight");
             }, 5000);
           }
-        }, 1000); // delay (in milliseconds) to ensure the modal is fully rendered
-
-        // Stop further redirection logic
+        }, 1000);
         return;
       }
       return;
     } else {
-      // Course IDs don't match or missing, redirect
       const formattedCourseName = notifCourseName
         ? notifCourseName.replace(/\s+/g, "-").toLowerCase()
         : "course";
       let redirectUrl = `https://library.priestesspresence.com/forum/${formattedCourseName}?pid=${postIdAttr}`;
-      // Append comment id if available
       const commentId = card.getAttribute("data-comment-id");
       if (commentId) {
         redirectUrl += `&cid=${commentId}`;
       }
       console.log("Redirecting to:", redirectUrl);
       window.location.href = redirectUrl;
-      return; // Exit to prevent further execution
+      return;
     }
   });
 
   return card;
 }
 
+// -----------------------------------------------------------
+// Update "No notifications" message based on current notifications.
 function updateNoNotificationsMessage() {
   const notificationContainers = document.querySelectorAll(
     "#parentNotificationTemplatesInNavbar, #parentNotificationTemplatesInBody"
   );
-
   notificationContainers.forEach((container) => {
     let messageDiv = container.querySelector(".no-notifications-message");
-
-    // If no notifications exist, show the message
     if (displayedNotifications.size === 0) {
       if (!messageDiv) {
         messageDiv = document.createElement("div");
@@ -379,10 +422,9 @@ function updateNoNotificationsMessage() {
 }
 
 // Process a single announcement notification.
-// For each announcement (by its unique ID), create a card clone for each container and store them in cardMap.
 function processNotification(notification) {
   const id = Number(notification.ID);
-  if (displayedNotifications.has(id)) return; // already processed
+  if (displayedNotifications.has(id)) return;
   displayedNotifications.add(id);
   const isRead = readAnnouncements.has(id);
   const cards = [];
@@ -392,12 +434,11 @@ function processNotification(notification) {
     cards.push(card);
   });
   cardMap.set(id, cards);
-
-  // Update message visibility
   updateNoNotificationsMessage();
 }
 
-// Update styling of each rendered notification based on read status.
+// -----------------------------------------------------------
+// Update notification read status styling.
 function updateNotificationReadStatus() {
   cardMap.forEach((cards, id) => {
     cards.forEach((card) => {
@@ -411,21 +452,15 @@ function updateNotificationReadStatus() {
       }
     });
   });
-
   updateRedDot();
-  updateNoNotificationsMessage(); // Check for empty state
+  updateNoNotificationsMessage();
 }
 
+// Update the red dot indicator based on unread notifications.
 function updateRedDot() {
-  // Select the red dot element.
-  // Ensure your red dot element has a class (or id) that uniquely identifies it.
   const redDot = document.querySelector(".red-dot");
-  if (!redDot) return; // exit if not found
-
-  // Calculate unread announcements.
-  // (displayedNotifications.size gives total announcements; readAnnouncements.size gives those marked as read)
+  if (!redDot) return;
   const unreadCount = displayedNotifications.size - readAnnouncements.size;
-
   if (unreadCount > 0) {
     redDot.classList.remove("hidden");
   } else {
@@ -433,7 +468,8 @@ function updateRedDot() {
   }
 }
 
-// Disable UI for a notification across all containers.
+// -----------------------------------------------------------
+// Disable and re-enable UI for notifications during async updates.
 function disableNotificationUI(announcementId) {
   const cards = cardMap.get(announcementId);
   if (cards) {
@@ -445,7 +481,6 @@ function disableNotificationUI(announcementId) {
   }
 }
 
-// Re-enable UI for a notification across all containers.
 function enableNotificationUI(announcementId) {
   const cards = cardMap.get(announcementId);
   if (cards) {
@@ -466,14 +501,12 @@ function markAsRead(announcementId) {
     return;
   pendingAnnouncements.add(announcementId);
   disableNotificationUI(announcementId);
-
   const variables = {
     payload: {
       read_announcement_id: announcementId,
       read_contact_id: LOGGED_IN_CONTACT_ID,
     },
   };
-
   fetch(HTTP_ENDPOINT, {
     method: "POST",
     headers: {
@@ -503,28 +536,22 @@ function markAsRead(announcementId) {
     });
 }
 
-// Mark all unread announcements as read by iterating over each and calling markAsRead.
+// Mark all unread announcements as read.
 async function markAllAsRead() {
-  // Compute unread announcement IDs.
   const unreadAnnouncementIds = [...displayedNotifications].filter(
     (id) => !readAnnouncements.has(id)
   );
   if (unreadAnnouncementIds.length === 0) return;
-
-  // Disable all "Mark all as read" buttons while processing.
   markAllButtons.forEach((btn) => btn.classList.add("disabled"));
-
-  // For each unread announcement, call markAsRead.
   const promises = unreadAnnouncementIds.map((announcementId) =>
     markAsRead(announcementId)
   );
   await Promise.all(promises);
-
-  // After all are processed, update the UI.
   updateNotificationReadStatus();
   markAllButtons.forEach((btn) => btn.classList.remove("disabled"));
 }
 
+// -----------------------------------------------------------
 // Fetch the read announcements for the logged-in user.
 function fetchReadData() {
   fetch(HTTP_ENDPOINT, {
@@ -543,15 +570,13 @@ function fetchReadData() {
         )
           ? data.data.calcOReadContactReadAnnouncements
           : [data.data.calcOReadContactReadAnnouncements];
-
         records.forEach((record) => {
           if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
             readAnnouncements.add(Number(record.Read_Announcement_ID));
           }
         });
-
         updateNotificationReadStatus();
-        updateNoNotificationsMessage(); // Check after fetching
+        updateNoNotificationsMessage();
       }
     })
     .catch((error) => {
@@ -559,6 +584,7 @@ function fetchReadData() {
     });
 }
 
+// -----------------------------------------------------------
 // Send a KEEP_ALIVE message over the WebSocket.
 function sendKeepAlive() {
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -566,29 +592,37 @@ function sendKeepAlive() {
   }
 }
 
-// Connect to the announcements WebSocket and fetch initial read data.
+// Connect to the WebSocket and subscribe for announcements for each registered course.
 function connect() {
   socket = new WebSocket(WS_ENDPOINT, "vitalstats");
 
   socket.onopen = () => {
     socket.send(JSON.stringify({ type: "connection_init" }));
     keepAliveInterval = setInterval(sendKeepAlive, 28000);
-    // Start the announcements subscription (id "1") using the new query and variables.
-    socket.send(
-      JSON.stringify({
-        id: "1",
-        type: "GQL_START",
-        payload: {
-          query: SUBSCRIPTION_QUERY,
-          variables: {
-            author_id: LOGGED_IN_CONTACT_ID,
-            id: LOGGED_IN_CONTACT_ID,
-          },
-        },
-      })
-    );
 
-    // Fetch the read announcements data on page load.
+    // Fetch registered courses and subscribe for each course's announcements.
+    fetchRegisteredCourses().then((registeredCourseIds) => {
+      console.log("Registered Course IDs:", registeredCourseIds);
+      registeredCourseIds.forEach((courseId, index) => {
+        const subscriptionId = `sub-${courseId}-${index}`;
+        socket.send(
+          JSON.stringify({
+            id: subscriptionId,
+            type: "GQL_START",
+            payload: {
+              query: SUBSCRIPTION_QUERY,
+              variables: {
+                author_id: LOGGED_IN_CONTACT_ID,
+                id: LOGGED_IN_CONTACT_ID,
+                related_course_id: courseId,
+              },
+            },
+          })
+        );
+      });
+    });
+
+    // Fetch the read announcements on page load.
     fetchReadData();
   };
 
@@ -612,9 +646,11 @@ function connect() {
   };
 }
 
-// Attach event listeners for all "Mark all as read" buttons.
+// -----------------------------------------------------------
+// Attach event listeners for "Mark all as read" buttons.
 markAllButtons.forEach((btn) => {
   btn.addEventListener("click", markAllAsRead);
 });
 
+// Start the connection.
 connect();
