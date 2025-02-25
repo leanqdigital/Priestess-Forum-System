@@ -71,48 +71,44 @@ subscription subscribeToCalcAnnouncements(
         where: {
           Comment: [
             {
-              where: {
-                author_id: $author_id
-                _OPERATOR_: neq
-              }
-            }
-            {
-              andWhere: {
-                Forum_Post: [
-                  {
-                    where: {
-                      related_course_id: $related_course_id
-                    }
+              whereGroup: [
+                {
+                  where: {
+                    author_id: $author_id
+                    _OPERATOR_: neq
                   }
-                ]
-              }
+                }
+                {
+                  andWhere: {
+                    Forum_Post: [
+                      {
+                        where: {
+                          related_course_id: $related_course_id
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
             }
             {
               orWhere: {
                 Comment_or_Reply_Mentions: [
-                  { where: { id: $id } }
                   {
-                    orWhere: {
-                      ForumComments: [
-                        {
-                          where: {
-                            author_id: $author_id
-                            _OPERATOR_: neq
-                          }
+                    whereGroup: [
+                      { where: { id: $id } }
+                      {
+                        andWhere: {
+                          ForumPosts: [
+                            {
+                              where: {
+                                related_course_id: $related_course_id
+                              }
+                            }
+                          ]
                         }
-                      ]
-                    }
-                  }
-                  {
-                    andWhere: {
-                      ForumPosts: [
-                        {
-                          where: {
-                            related_course_id: $related_course_id
-                          }
-                        }
-                      ]
-                    }
+                      }
+                    ]
                   }
                 ]
               }
@@ -124,15 +120,19 @@ subscription subscribeToCalcAnnouncements(
         orWhere: {
           Post: [
             {
-              where: {
-                author_id: $author_id
-                _OPERATOR_: neq
-              }
-            }
-            {
-              andWhere: {
-                related_course_id: $related_course_id
-              }
+              whereGroup: [
+                {
+                  where: {
+                    author_id: $author_id
+                    _OPERATOR_: neq
+                  }
+                }
+                {
+                  andWhere: {
+                    related_course_id: $related_course_id
+                  }
+                }
+              ]
             }
             {
               orWhere: {
