@@ -69,48 +69,16 @@ subscription subscribeToCalcAnnouncements(
     query: [
       {
         where: {
-          Comment: [
+          Post: [
             {
-              whereGroup: [
-                {
-                  where: {
-                    author_id: $author_id
-                    _OPERATOR_: neq
-                  }
-                }
-                {
-                  andWhere: {
-                    Forum_Post: [
-                      {
-                        where: {
-                          related_course_id: $related_course_id
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
+              where: {
+                author_id: $author_id
+                _OPERATOR_: neq
+              }
             }
             {
-              orWhere: {
-                Comment_or_Reply_Mentions: [
-                  {
-                    whereGroup: [
-                      { where: { id: $id } }
-                      {
-                        andWhere: {
-                          ForumPosts: [
-                            {
-                              where: {
-                                related_course_id: $related_course_id
-                              }
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  }
-                ]
+              andWhere: {
+                related_course_id: $related_course_id
               }
             }
           ]
@@ -120,23 +88,61 @@ subscription subscribeToCalcAnnouncements(
         orWhere: {
           Post: [
             {
-              whereGroup: [
-                {
-                  where: {
-                    author_id: $author_id
-                    _OPERATOR_: neq
-                  }
-                }
-                {
-                  andWhere: {
-                    related_course_id: $related_course_id
-                  }
-                }
-              ]
+              where: {
+                Mentioned_Users: [{ where: { id: $id } }]
+              }
+            }
+          ]
+        }
+      }
+      {
+        orWhere: {
+          Comment: [
+            {
+              where: {
+                Comment_or_Reply_Mentions: [
+                  { where: { id: $id } }
+                ]
+              }
             }
             {
-              orWhere: {
-                Mentioned_Users: [{ where: { id: $id } }]
+              andWhere: {
+                author_id: $author_id
+                _OPERATOR_: neq
+              }
+            }
+            {
+              andWhere: {
+                Forum_Post: [
+                  {
+                    where: {
+                      related_course_id: $related_course_id
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+      {
+        orWhere: {
+          Comment: [
+            {
+              where: {
+                author_id: $author_id
+                _OPERATOR_: neq
+              }
+            }
+            {
+              andWhere: {
+                Forum_Post: [
+                  {
+                    where: {
+                      related_course_id: $related_course_id
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -332,16 +338,14 @@ function createNotificationCard(notification, isRead) {
   card.innerHTML = `
     <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${
       isRead ? "" : "bg-unread"
-    } hover:bg-[#022327]">
+    } hover:bg-primary hover:text-white">
       <div class="flex justify-between w-full gap-[4px]">
-        <div class="text-white text-sm font-semibold leading-none">${
+        <div class="text-sm font-semibold leading-none">${
           notification.Title
         }</div>
-        <div class="text-white text-xs leading-3">${timeAgo(
-          notification.Date_Added
-        )}</div>
+        <div class="text-xs leading-3">${timeAgo(notification.Date_Added)}</div>
       </div>
-      <div class="text-white text-xs leading-none">${notification.Content}</div>
+      <div class="text-xs leading-none">${notification.Content}</div>
     </div>
   `;
 
@@ -478,7 +482,10 @@ function updateNotificationReadStatus() {
 function updateRedDot() {
   const redDot = document.querySelector(".red-dot");
   if (!redDot) return;
-  const unreadCount = displayedNotifications.size - readAnnouncements.size;
+  const unreadCount = Array.from(displayedNotifications).filter(
+    (id) => !readAnnouncements.has(id)
+  ).length;
+  console.log("Unread count is", unreadCount);
   if (unreadCount > 0) {
     redDot.classList.remove("hidden");
   } else {

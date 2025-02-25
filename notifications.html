@@ -13,7 +13,7 @@
 
 </head>
 
-<body class="bg-primary" x-data="{ openCommentModal: false }">
+<body class="page-background" x-data="{ openCommentModal: false }">
     <header class="max-w-[680px] mx-auto py-10">
         <div class="w-full px-4 py-2 justify-between items-center inline-flex">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,11 +43,13 @@
                             d="M13.0758 19.2308C13.0758 19.4348 12.9948 19.6304 12.8505 19.7747C12.7062 19.919 12.5106 20 12.3066 20H6.15273C5.94872 20 5.75306 19.919 5.6088 19.7747C5.46455 19.6304 5.3835 19.4348 5.3835 19.2308C5.3835 19.0268 5.46455 18.8311 5.6088 18.6868C5.75306 18.5426 5.94872 18.4615 6.15273 18.4615H12.3066C12.5106 18.4615 12.7062 18.5426 12.8505 18.6868C12.9948 18.8311 13.0758 19.0268 13.0758 19.2308ZM18.2498 14.6096C17.7152 13.6904 16.922 11.0894 16.922 7.69231C16.922 5.65218 16.1115 3.69561 14.6689 2.25302C13.2263 0.810437 11.2698 0 9.22966 0C7.18953 0 5.23296 0.810437 3.79037 2.25302C2.34778 3.69561 1.53735 5.65218 1.53735 7.69231C1.53735 11.0904 0.743116 13.6904 0.209462 14.6096C0.0731841 14.8433 0.000937784 15.1088 9.06823e-06 15.3793C-0.000919647 15.6499 0.0695022 15.9158 0.204173 16.1505C0.338843 16.3851 0.533 16.5801 0.767064 16.7157C1.00113 16.8514 1.26682 16.9229 1.53735 16.9231H16.922C17.1924 16.9227 17.458 16.8511 17.6919 16.7153C17.9258 16.5796 18.1199 16.3847 18.2544 16.1501C18.389 15.9155 18.4593 15.6495 18.4583 15.3791C18.4574 15.1087 18.3851 14.8432 18.2489 14.6096H18.2498Z"
                             fill="#C29D68" />
                     </svg>
-                    <div class="red-dot hidden w-[5px] h-[5px] bg-[#d70f0f] rounded-full absolute top-[2px] right-[2px]"></div>
+                    <div
+                        class="red-dot hidden w-[5px] h-[5px] bg-[#d70f0f] rounded-full absolute top-[2px] right-[2px]">
+                    </div>
                 </div>
 
 
-                <div class="announcements hidden absolute top-8 right-0 w-fit md:min-w-[515px] flex-col overflow-hidden rounded-md bg-[#084D55] shadow-lg p-4 max-[600px]:fixed max-[600px]:h-screen max-[600px]:right-0 max-[600px]:w-[90vw] max-[600px]:top-0"
+                <div class="announcements hidden absolute top-8 right-0 w-fit md:min-w-[515px] flex-col overflow-hidden rounded-md bg-grey-300 shadow-lg p-4 max-[600px]:fixed max-[600px]:h-screen max-[600px]:right-0 max-[600px]:w-[90vw] max-[600px]:top-0"
                     style="z-index:1">
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
@@ -58,8 +60,8 @@
                                         d="M17.3332 7.27761C17.3332 7.46178 17.26 7.63841 17.1298 7.76864C16.9996 7.89887 16.8229 7.97203 16.6388 7.97203H3.03763L8.10257 13.0361C8.16709 13.1006 8.21827 13.1772 8.25319 13.2615C8.2881 13.3458 8.30608 13.4362 8.30608 13.5274C8.30608 13.6187 8.2881 13.709 8.25319 13.7933C8.21827 13.8776 8.16709 13.9542 8.10257 14.0187C8.03805 14.0832 7.96146 14.1344 7.87716 14.1693C7.79286 14.2042 7.70251 14.2222 7.61127 14.2222C7.52002 14.2222 7.42967 14.2042 7.34538 14.1693C7.26108 14.1344 7.18448 14.0832 7.11996 14.0187L0.870168 7.76892C0.805604 7.70442 0.754384 7.62784 0.719438 7.54353C0.684491 7.45923 0.666504 7.36887 0.666504 7.27761C0.666504 7.18635 0.684491 7.09599 0.719438 7.01169C0.754384 6.92739 0.805604 6.8508 0.870168 6.78631L7.11996 0.536512C7.25027 0.406211 7.42699 0.333008 7.61127 0.333008C7.79554 0.333008 7.97227 0.406211 8.10257 0.536512C8.23287 0.666814 8.30608 0.843541 8.30608 1.02782C8.30608 1.21209 8.23287 1.38882 8.10257 1.51912L3.03763 6.58319H16.6388C16.8229 6.58319 16.9996 6.65635 17.1298 6.78658C17.26 6.91681 17.3332 7.09344 17.3332 7.27761Z"
                                         fill="#636D88" />
                                 </svg>
-                                <div class="text-white text-lg font-semibold font-['Avenir LT Std'] leading-snug">
-                                    Notification</div>
+                                <div class="page-text text-lg font-semibold font-['Avenir LT Std'] leading-snug">
+                                    Notifications</div>
                             </div>
                         </div>
 
@@ -67,7 +69,7 @@
                         <div class="mark-all-button flex items-center gap-x-1 cursor-pointer"
                             id="markAllAsReadButtonModal">
                             <div
-                                class="text-white text-xs font-normal font-['Avenir LT Std'] leading-3 hover:underline">
+                                class="page-text text-xs font-normal font-['Avenir LT Std'] leading-3 hover:underline">
                                 Mark all as read
                             </div>
                         </div>
@@ -88,7 +90,7 @@
 
 
     <div class="announcement-wrapper relative">
-        <div class="announcements max-w-[680px] mx-auto  flex-col overflow-hidden rounded-md bg-[#084D55] p-4"
+        <div class="announcements max-w-[680px] mx-auto  flex-col overflow-hidden rounded-md bg-grey-300 p-4"
             style="z-index:1">
             <div class="flex flex-col gap-4">
                 <div class="flex items-center justify-between">
@@ -99,14 +101,14 @@
                                 d="M17.3332 7.27761C17.3332 7.46178 17.26 7.63841 17.1298 7.76864C16.9996 7.89887 16.8229 7.97203 16.6388 7.97203H3.03763L8.10257 13.0361C8.16709 13.1006 8.21827 13.1772 8.25319 13.2615C8.2881 13.3458 8.30608 13.4362 8.30608 13.5274C8.30608 13.6187 8.2881 13.709 8.25319 13.7933C8.21827 13.8776 8.16709 13.9542 8.10257 14.0187C8.03805 14.0832 7.96146 14.1344 7.87716 14.1693C7.79286 14.2042 7.70251 14.2222 7.61127 14.2222C7.52002 14.2222 7.42967 14.2042 7.34538 14.1693C7.26108 14.1344 7.18448 14.0832 7.11996 14.0187L0.870168 7.76892C0.805604 7.70442 0.754384 7.62784 0.719438 7.54353C0.684491 7.45923 0.666504 7.36887 0.666504 7.27761C0.666504 7.18635 0.684491 7.09599 0.719438 7.01169C0.754384 6.92739 0.805604 6.8508 0.870168 6.78631L7.11996 0.536512C7.25027 0.406211 7.42699 0.333008 7.61127 0.333008C7.79554 0.333008 7.97227 0.406211 8.10257 0.536512C8.23287 0.666814 8.30608 0.843541 8.30608 1.02782C8.30608 1.21209 8.23287 1.38882 8.10257 1.51912L3.03763 6.58319H16.6388C16.8229 6.58319 16.9996 6.65635 17.1298 6.78658C17.26 6.91681 17.3332 7.09344 17.3332 7.27761Z"
                                 fill="#636D88" />
                         </svg>
-                        <div class="text-white text-lg font-semibold font-['Avenir LT Std'] leading-snug">
+                        <div class="page-text text-lg font-semibold font-['Avenir LT Std'] leading-snug">
                             Notification</div>
                     </div>
                 </div>
 
                 <!-- And on the notifications page: -->
                 <div class="mark-all-button flex items-center gap-x-1 cursor-pointer" id="markAllAsReadButtonPage">
-                    <div class="text-white text-xs font-normal font-['Avenir LT Std'] leading-3 hover:underline">Mark
+                    <div class="page-text text-xs font-normal font-['Avenir LT Std'] leading-3 hover:underline">Mark
                         all as read
                     </div>
                 </div>
@@ -151,7 +153,7 @@
             if (event.target.closest(".bellIcon")) {
                 document.querySelector(".announcements").classList.toggle("hidden");
             }
-            if(event.target.closest(".closeNotificationModal")){
+            if (event.target.closest(".closeNotificationModal")) {
                 document.querySelector(".announcements").classList.add("hidden");
             }
         });

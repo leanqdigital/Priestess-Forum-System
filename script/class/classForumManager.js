@@ -136,7 +136,7 @@ class ForumManager {
         .forEach((el) => el.remove());
       document.querySelector(CONFIG.selectors.postsContainer).innerHTML = `
         <div class="text-center text-red-600 p-4">
-          <p>⚠️ Failed to load posts. Please try again later.</p>
+          <p>⚠️ Server timeout. Please refresh the page to load the posts.</p>
         </div>
       `;
     }
@@ -448,7 +448,7 @@ class ForumManager {
   getBookmarkSVG(isBookmarked) {
     return `
           <svg class = "${
-            isBookmarked ? "bookmarked" : "notBookmarked"
+            isBookmarked ? "isBookmarked" : "notBookmarked"
           }" width="24" height="24" viewBox="0 0 24 24" 
                fill="" 
                stroke="">
@@ -522,9 +522,9 @@ class ForumManager {
       const updatedVoteCount = await this.fetchPostVoteCount(postId);
 
       this.updateVoteUI(postId, updatedVoteCount);
-      UIManager.showSuccess(`Post ${isVoted ? "unvoted" : "voted"}`);
+      UIManager.showSuccess(`Post ${isVoted ? "unliked" : "liked"}`);
     } catch (error) {
-      UIManager.showError(`Failed to ${isVoted ? "unvote" : "vote"}`);
+      UIManager.showError(`Failed to ${isVoted ? "unlike" : "like"}`);
     } finally {
       // Re-enable buttons and reset opacity
       buttons.forEach((button) => {
@@ -1007,10 +1007,10 @@ class ForumManager {
 
       // Update the vote button icon and vote count.
       await this.updateCommentVoteUI(commentId);
-      UIManager.showSuccess(`Comment ${isCommentVoted ? "unvoted" : "voted"}`);
+      UIManager.showSuccess(`Comment ${isCommentVoted ? "unliked" : "liked"}`);
     } catch (error) {
       UIManager.showError(
-        `Failed to ${isCommentVoted ? "unvote" : "vote"} comment`
+        `Failed to ${isCommentVoted ? "unlike" : "like"} comment`
       );
       console.error("Error in toggleCommentVote:", error);
     } finally {
@@ -1115,8 +1115,8 @@ class ForumManager {
   getCommentVoteSVG(isVoted) {
     return `
     <svg width="24" height="24" viewBox="0 0 24 24" 
-         fill="${isVoted ? "#C29D68" : "none"}" 
-         stroke="#C29D68">
+         fill="${isVoted ? "#044047" : "none"}" 
+         stroke="#044047">
       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
                2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
                C13.09 3.81 14.76 3 16.5 3
@@ -1420,20 +1420,20 @@ class ForumManager {
       if (isReplyVoted) {
         await this.deleteReplyVote(replyId);
         this.votedReplyIds.delete(replyId);
-        successMessage = "Comment unvoted";
+        successMessage = "Comment unliked";
       } else {
         const voteId = await this.createReplyVote(replyId);
         if (!this.votedReplyIds.has(replyId)) {
           this.votedReplyIds.set(replyId, new Set());
         }
         this.votedReplyIds.get(replyId).add(voteId);
-        successMessage = "Comment voted";
+        successMessage = "Comment liked";
       }
       // Update both the vote icon and the vote count.
       await this.updateReplyVoteUI(replyId);
     } catch (error) {
       UIManager.showError(
-        `Failed to ${isReplyVoted ? "unvote" : "vote"} comment`
+        `Failed to ${isReplyVoted ? "unlike" : "like"} comment`
       );
       return;
     } finally {

@@ -91,7 +91,7 @@ The section is named individual component styling */
 
   /* Other Colors */
   --black: #0e0e0e !important;
-  --white: #fef5f1 !important;
+  --white: #ffffff !important;
 }
 
 /* Headings */
@@ -221,7 +221,7 @@ This is the spinner loader that spins until the page is fully loaded.
 You can style 3 components here, the loader background, the spinner border color and the color of partial border that 
 spins on top of full circle */
 .initial-loader-background-color {
-  background: var(--primary);
+  background: var(--secondary-300);
 }
 
 .loader-circle-border-color {
@@ -233,17 +233,17 @@ spins on top of full circle */
 /* Text color */
 /* This styling will change the color of every text in the page except for button texts*/
 .page-text {
-  color: var(--white);
+  color: var(--black);
 }
 
 /* Page background color */
 .page-background {
-  background-color: var(--primary);
+  background: var(--secondary-300);
 }
 
 /* This styles the start a post box*/
 .start-a-post-box {
-  background: transparent;
+  background: var(--white);
   border: 1px solid var(--white);
   border-radius: 4px;
 }
@@ -251,7 +251,7 @@ spins on top of full circle */
 /* This section styles the popup modal that allows us to create  or edit post*/
 /* This is the title of the modal. Current text in the title is Start a Post */
 sl-dialog::part(title) {
-  color: var(--white) !important; /*Change the color of the title here*/
+  color: var(--black) !important; /*Change the color of the title here*/
 }
 
 /* This is the overlay behind the modal that covers the entire page */
@@ -264,17 +264,17 @@ sl-dialog::part(overlay),
 /*This is the background color of the modal*/
 sl-dialog::part(panel),
 .modal-background {
-  background: var(--primary-100); /*Change the modal background color here*/
+  background: var(--white); /*Change the modal background color here*/
 }
 
 /* This is the close(X) button on top right corner of modal */
 sl-dialog::part(close-button) {
-  color: var(--white); /*Change the color of the close button here*/
+  color: var(--black); /*Change the color of the close button here*/
 }
 
 /* These are upload buttons that allow to upload either image or photo or video. This will update icon buttons across the application */
 .icon-button {
-  background: var(--primary); /*Change the background color of button here*/
+  background: var(--grey-300); /*Change the background color of button here*/
   svg {
     path {
       fill: var(--secondary); /*Change the icon color here*/
@@ -323,12 +323,12 @@ sl-dialog::part(close-button) {
 
 /* This is for when tabs are inactive */
 .tab-Inactive {
-  color: var(--white); /*Text color of button*/
+  color: var(--black); /*Text color of button*/
   border-radius: 0px;
   border-bottom: 2px solid transparent; /*Colors the bottom border*/
   svg {
     path {
-      fill: var(--white); /*Colors the icon*/
+      fill: var(--black); /*Colors the icon*/
     }
   }
 }
@@ -336,25 +336,30 @@ sl-dialog::part(close-button) {
 /* Sort and filter buttons */
 /* These buttons allow to filter beetween different type of post like video or image posts and also allow to toggle between latest or oldest or popular ones*/
 .sort-outer-button {
-  background: transparent;
+  background: var(--secondary);
   border: 1px solid var(--secondary);
-  color: var(--secondary);
+  color: var(--black);
+  svg {
+    path {
+      fill: var(--black);
+    }
+  }
 }
 
 .sort-outer-button:focus,
 .sort-outer-button:hover,
 .sort-outer-button:active {
-  background: var(--secondary);
-  color: var(--white);
+  background: transparent;
+  color: var(--black);
   svg {
     path {
-      fill: var(--white);
+      fill: var(--black);
     }
   }
 }
 
 .sort-options-wrapper {
-  background-color: var(--primary);
+  background-color: var(--secondary);
 }
 
 .sort-option {
@@ -367,7 +372,7 @@ sl-dialog::part(close-button) {
 
 /* Following styles each post card. The post card is the list of posts */
 .postCard {
-  background: var(--primary-100);
+  background: var(--white);
 }
 
 /* This is smal vertical line that divided post's author name and date of post created */
@@ -378,13 +383,13 @@ sl-dialog::part(close-button) {
 /* This sets the color of three dot icon that opens up the option for editing or deleting the post */
 .three-dot-icon {
   path {
-    fill: var(--white);
+    fill: var(--black);
   }
 }
 
 /* This wraps the edit and delete button for each post */
 .action-options-wrapper {
-  background: #084d55;
+  background: var(--secondary);
 }
 
 .action-button {
@@ -397,86 +402,86 @@ sl-dialog::part(close-button) {
 
 /* This styles the background color of audio player */
 .audio-player {
-  background-color: var(--primary);
+  background-color: var(--grey-300);
 }
 
 /* This colors the all icons inside the audio player  */
 .audio-player svg path {
-  fill: var(--secondary);
+  fill: var(--primary);
 }
 
 /* This is specific to play pause icon inside audio player */
 .audio-player .audioStateIcon {
   rect {
     fill: var(
-      --secondary
+      --primary
     ); /*This sets the background color of circle that contains play pause icon*/
   }
   path {
-    fill: var(--black); /*This sets the background color of play or pause icon*/
+    fill: var(--white); /*This sets the background color of play or pause icon*/
   }
 }
 
 /* This styles the vote icon */
 .voted path {
-  fill: var(--secondary); /*This is for voted state*/
-  stroke: var(--secondary);
+  fill: var(--primary); /*This is for voted state*/
+  stroke: var(--primary);
 }
 
 .unVoted path {
   fill: none; /*This is for non voted state*/
-  stroke: var(--secondary);
+  stroke: var(--primary);
 }
 
 /* This styles comment icon */
 .comment-icon path {
-  fill: var(--secondary);
+  fill: var(--primary);
 }
 
 /* This styles bookmark icon */
-.bookmarked path {
-  fill: var(--secondary); /*This is for voted state*/
-  stroke: var(--secondary);
+.isBookmarked path {
+  fill: var(--primary); /*This is for voted state*/
+  stroke: var(--primary);
 }
 
 .notBookmarked path {
   fill: transparent; /*This is for non voted state*/
-  stroke: var(--secondary);
+  stroke: var(--primary);
 }
 
 /* Post details modal styling */
 /* This is the small border on the right side of the post text content on post details modal */
 .modal-post-content-right-border {
-  background: #586a80;
+  background: var(--secondary);
 }
 
 .post-details-modal {
-  background: var(--primary-100);
+  background: var(--grey-300);
 }
 
 /* This is audio player inside the post details modal */
 .audio-player-modal {
-  background-color: var(--primary);
+  background-color: var(--grey-300);
 }
 
 .audio-player-modal svg path {
-  fill: var(--secondary);
+  fill: var(--primary);
 }
 
 /* This is specific to play pause icon inside audio player */
 .audio-player-modal .audioStateIcon {
   rect {
     fill: var(
-      --secondary
+      --primary
     ); /*This sets the background color of circle that contains play pause icon*/
   }
   path {
-    fill: var(--black); /*This sets the background color of play or pause icon*/
+  fill: var(--white); /*This sets the background color of play or pause icon*/
   }
 }
 
 .commentCard {
-  background: var(--primary);
+  background: var(--white);
 }
 /* ----------------------------------------------- */
 /* ----------------------------------------------- */
@@ -769,6 +774,7 @@ sl-dialog::part(base) {
 
 .bg-unread {
   background-color: var(--primary);
+  color: var(--white);
 }
 
 .load-comments-btn {
