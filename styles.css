@@ -476,7 +476,7 @@ sl-dialog::part(close-button) {
     ); /*This sets the background color of circle that contains play pause icon*/
   }
   path {
-  fill: var(--white); /*This sets the background color of play or pause icon*/
+    fill: var(--white); /*This sets the background color of play or pause icon*/
   }
 }
 
@@ -813,6 +813,22 @@ sl-dialog::part(panel) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.tribute-container {
+  z-index: 999999 !important;
+}
+
+.reply-form-toggler {
+  font-size: 14px !important;
+  &:focus {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  &:active {
+    background: none !important;
+    box-shadow: none !important;
+  }
 }
 
 /* Example highlight style */
