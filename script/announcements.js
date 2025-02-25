@@ -62,8 +62,6 @@ subscription subscribeToCalcAnnouncements(
   $related_course_id: PriestessCourseID
   $author_id: PriestessContactID
   $id: PriestessContactID
-  $limit: IntScalar
-  $offset: IntScalar
 ) {
   subscribeToCalcAnnouncements(
     query: [
@@ -78,14 +76,8 @@ subscription subscribeToCalcAnnouncements(
                       related_course_id: $related_course_id
                     }
                   }
-                ]
-              }
-            }
-            {
-              andWhere: {
-                Forum_Post: [
                   {
-                    where: {
+                    andWhere: {
                       author_id: $author_id
                       _OPERATOR_: neq
                     }
@@ -126,8 +118,6 @@ subscription subscribeToCalcAnnouncements(
         }
       }
     ]
-    limit: $limit
-    offset: $offset
     orderBy: [{ path: ["created_at"], type: desc }]
   ) {
     ID: field(arg: ["id"])
