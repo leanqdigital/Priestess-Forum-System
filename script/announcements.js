@@ -430,7 +430,7 @@ function updateNoNotificationsMessage() {
       if (!messageDiv) {
         messageDiv = document.createElement("div");
         messageDiv.className =
-          "no-notifications-message text-white text-center p-2";
+          "no-notifications-message text-black text-center p-2";
         messageDiv.textContent = "No notifications";
         container.appendChild(messageDiv);
       }
@@ -457,6 +457,7 @@ function processNotification(notification) {
   });
   cardMap.set(id, cards);
   updateNoNotificationsMessage();
+  updateRedDot();
 }
 
 // -----------------------------------------------------------
