@@ -92,6 +92,18 @@ subscription subscribeToCalcAnnouncements(
                 Comment_or_Reply_Mentions: [
                   {
                     where: {
+                      ForumComments: [
+                        {
+                          where: {
+                            author_id: $author_id
+                            _OPERATOR_: neq
+                          }
+                        }
+                      ]
+                    }
+                  }
+                  {
+                    andWhere: {
                       ForumPosts: [
                         {
                           where: {
@@ -188,6 +200,7 @@ subscription subscribeToCalcAnnouncements(
     )
   }
 }
+
 
 `;
 
