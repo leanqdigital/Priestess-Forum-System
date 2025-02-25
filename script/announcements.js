@@ -90,8 +90,9 @@ subscription subscribeToCalcAnnouncements(
             {
               orWhere: {
                 Comment_or_Reply_Mentions: [
+                  { where: { id: $id } }
                   {
-                    where: {
+                    orWhere: {
                       ForumComments: [
                         {
                           where: {
@@ -113,7 +114,6 @@ subscription subscribeToCalcAnnouncements(
                       ]
                     }
                   }
-                  { andWhere: { id: $id } }
                 ]
               }
             }
@@ -200,7 +200,6 @@ subscription subscribeToCalcAnnouncements(
     )
   }
 }
-
 
 `;
 
