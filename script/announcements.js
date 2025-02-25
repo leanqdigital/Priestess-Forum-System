@@ -59,9 +59,11 @@ function fetchRegisteredCourses() {
 // NEW SUBSCRIPTION QUERY using the updated structure
 const SUBSCRIPTION_QUERY = `
 subscription subscribeToCalcAnnouncements(
-  $related_course_id: PriestessCourseID
   $author_id: PriestessContactID
+  $related_course_id: PriestessCourseID
   $id: PriestessContactID
+  $limit: IntScalar
+  $offset: IntScalar
 ) {
   subscribeToCalcAnnouncements(
     query: [
@@ -70,25 +72,36 @@ subscription subscribeToCalcAnnouncements(
           Comment: [
             {
               where: {
+                author_id: $author_id
+                _OPERATOR_: neq
+              }
+            }
+            {
+              andWhere: {
                 Forum_Post: [
                   {
                     where: {
                       related_course_id: $related_course_id
                     }
                   }
-                  {
-                    andWhere: {
-                      author_id: $author_id
-                      _OPERATOR_: neq
-                    }
-                  }
                 ]
               }
             }
             {
-              andWhere: {
+              orWhere: {
                 Comment_or_Reply_Mentions: [
-                  { where: { id: $id } }
+                  {
+                    where: {
+                      ForumPosts: [
+                        {
+                          where: {
+                            related_course_id: $related_course_id
+                          }
+                        }
+                      ]
+                    }
+                  }
+                  { andWhere: { id: $id } }
                 ]
               }
             }
@@ -100,17 +113,17 @@ subscription subscribeToCalcAnnouncements(
           Post: [
             {
               where: {
-                related_course_id: $related_course_id
-              }
-            }
-            {
-              andWhere: {
                 author_id: $author_id
                 _OPERATOR_: neq
               }
             }
             {
               andWhere: {
+                related_course_id: $related_course_id
+              }
+            }
+            {
+              orWhere: {
                 Mentioned_Users: [{ where: { id: $id } }]
               }
             }
@@ -118,6 +131,8 @@ subscription subscribeToCalcAnnouncements(
         }
       }
     ]
+    limit: $limit
+    offset: $offset
     orderBy: [{ path: ["created_at"], type: desc }]
   ) {
     ID: field(arg: ["id"])
@@ -173,6 +188,7 @@ subscription subscribeToCalcAnnouncements(
     )
   }
 }
+
 `;
 
 // -----------------------------------------------------------
