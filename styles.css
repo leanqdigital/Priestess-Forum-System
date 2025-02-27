@@ -849,3 +849,7 @@ sl-dialog::part(panel) {
   width: 300px !important;
   height: 300px !important;
 }
+
+.searchInput::placeholder{
+  color: var(--secondary);
+}

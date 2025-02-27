@@ -145,19 +145,31 @@ class ForumManager {
 
   buildQuery() {
     const sortCondition = this.buildSortCondition();
-    const dynamicFilter = this.buildFilterCondition(); // e.g. `{ file_tpe: "Video" }` or empty string
+    const dynamicFilter = this.buildFilterCondition();
+    const filters = [];
 
-    // Build the filter array with proper chaining.
-    // If a dynamic filter exists, use it as the first (using 'where') and then chain the course condition with 'andWhere'
-    // Otherwise, only use the course condition (with 'where').
-    let queryFilters = "";
+    // Base filter: course filter (always required) using a "where" clause.
+    filters.push(
+      `{ where: { Related_Course: [{ where: { id: "${courseID}" } }] } }`
+    );
+
+    // If a dynamic filter exists, chain it with "andWhere"
     if (dynamicFilter) {
-      queryFilters = `[ { where: ${dynamicFilter} }, { andWhere: { Related_Course: [{ where: { id: "${courseID}" } }] } } ]`;
-    } else {
-      queryFilters = `[ { where: { Related_Course: [{ where: { id: "${courseID}" } }] } } ]`;
+      filters.push(`{ andWhere: ${dynamicFilter} }`);
     }
 
-    // Build the rest of the arguments
+    // Append search filters if a search term exists.
+    if (this.searchTerm && this.searchTerm.trim() !== "") {
+      // Chain the Author search filter using andWhere.
+      filters.push(
+        `{ andWhere: { Author: { where: { first_name: $first_name } } } }`
+      );
+    }
+
+    // Build the complete filters array string.
+    const queryFilters = `[ ${filters.join(", ")} ]`;
+
+    // Build the rest of the query arguments.
     let args = [];
     args.push(`query: ${queryFilters}`);
     args.push(`limit: $limit`, `offset: $offset`);
@@ -165,35 +177,51 @@ class ForumManager {
     const argsString = args.join(", ");
 
     // Construct the final query string.
-    let query = `query calcForumPosts($limit: IntScalar, $offset: IntScalar${
-      this.needsUserId() ? ", $id: PriestessContactID" : ""
-    }) {
-        calcForumPosts(
-           ${argsString}
-        ) {
-            ID: field(arg: ["id"])
-            Author_ID: field(arg: ["author_id"])
-            Author_First_Name: field(arg: ["Author", "first_name"])
-            Author_Last_Name: field(arg: ["Author", "last_name"])
-            Author_Profile_Image: field(arg: ["Author", "profile_image"])
-            Date_Added: field(arg: ["created_at"])
-            Post_Title: field(arg: ["post_title"])
-            Post_Copy: field(arg: ["post_copy"])
-            Featured_Post: field(arg: ["featured_post"])
-            ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
-            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
-            ForumCommentsIDCalc: calc(args: [{countDistinct: [{ field: ["ForumComments", "id"] }]}{countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }]operator: "+"}])
-            File_Tpe: field(arg: ["file_tpe"])
-            File_Content: field(arg: ["file_content"])
-        }
+    let query = `query calcForumPosts(
+      $limit: IntScalar,
+      $offset: IntScalar${
+        this.needsUserId() ? ", $id: PriestessContactID" : ""
+      }${
+      this.searchTerm && this.searchTerm.trim() !== ""
+        ? ", $first_name: TextScalar"
+        : ""
+    }
+    ) {
+      calcForumPosts(
+        ${argsString}
+      ) {
+        ID: field(arg: ["id"])
+        Author_ID: field(arg: ["author_id"])
+        Author_First_Name: field(arg: ["Author", "first_name"])
+        Author_Last_Name: field(arg: ["Author", "last_name"])
+        Author_Profile_Image: field(arg: ["Author", "profile_image"])
+        Date_Added: field(arg: ["created_at"])
+        Post_Title: field(arg: ["post_title"])
+        Post_Copy: field(arg: ["post_copy"])
+        Featured_Post: field(arg: ["featured_post"])
+        ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+        Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+        ForumCommentsIDCalc: calc(args: [
+          { countDistinct: [{ field: ["ForumComments", "id"] }] },
+          { countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }], operator: "+" }
+        ])
+        File_Tpe: field(arg: ["file_tpe"])
+        File_Content: field(arg: ["file_content"])
+      }
     }`;
 
+    // Set up variables.
     let variables = {
       limit: this.postsLimit,
       offset: this.postsOffset,
     };
+
     if (this.needsUserId()) {
       variables.id = this.userId;
+    }
+    if (this.searchTerm && this.searchTerm.trim() !== "") {
+      // Use the search term for all three variables.
+      variables.first_name = this.searchTerm;
     }
     return { query, variables };
   }
@@ -1671,6 +1699,16 @@ class ForumManager {
       if (e.target.closest(".refresh-button")) {
         this.refreshPosts();
       }
+
+      const searchInput = document.getElementById("searchPost");
+      let debounceTimer;
+      searchInput.addEventListener("input", (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          this.searchTerm = e.target.value.trim();
+          this.refreshPosts();
+        }, 500);
+      });
     });
   }
 }
