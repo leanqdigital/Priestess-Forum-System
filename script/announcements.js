@@ -204,6 +204,19 @@ subscription subscribeToCalcAnnouncements(
     Contact_Contact_ID1: field(
       arg: ["Post", "Mentioned_Users", "id"]
     )
+    Contact_First_Name: field(
+      arg: ["Comment", "Author", "first_name"]
+    )
+    Contact_Last_Name: field(
+      arg: ["Comment", "Author", "last_name"]
+    )
+    Contact_First_Name1: field(
+      arg: ["Post", "Author", "first_name"]
+    )
+    Contact_Last_Name1: field(
+      arg: ["Post", "Author", "last_name"]
+    )
+    Type: field(arg: ["type"])
   }
 }
 
@@ -306,6 +319,35 @@ function timeAgo(unixTimestamp) {
   return "Just now";
 }
 
+// New helper to override title and content based on custom fields.
+function getCustomTitleAndContent(notification) {
+  let title = notification.Title; // default fallback
+  let content = notification.Content; // default fallback
+
+  // If post-related fields are available, use them.
+  if (notification.Contact_Contact_ID1) {
+    const creatorId = Number(notification.Contact_Contact_ID1);
+    if (creatorId !== Number(LOGGED_IN_CONTACT_ID)) {
+      title = "A new post has been created";
+      content = `${notification.Contact_First_Name1} ${notification.Contact_Last_Name1} has created a post`;
+    } else {
+      title = "You have been mentioned in a post";
+      content = `${notification.Contact_First_Name1} ${notification.Contact_Last_Name1} mentioned you in a post`;
+    }
+  } else if (notification.Contact_Contact_ID) {
+    // Otherwise if comment-related fields are available, use them.
+    const creatorId = Number(notification.Contact_Contact_ID);
+    if (creatorId !== Number(LOGGED_IN_CONTACT_ID)) {
+      title = "A new comment has been created";
+      content = `${notification.Contact_First_Name} ${notification.Contact_Last_Name} has added a comment`;
+    } else {
+      title = "You have been mentioned in a post";
+      content = `${notification.Contact_First_Name} ${notification.Contact_Last_Name} mentioned you in a comment`;
+    }
+  }
+  return { title, content };
+}
+
 // -----------------------------------------------------------
 // Create a notification card element.
 function createNotificationCard(notification, isRead) {
@@ -318,7 +360,6 @@ function createNotificationCard(notification, isRead) {
     card.setAttribute("data-post-id", String(postId));
     if (courseId) {
       card.setAttribute("data-course-id", String(courseId));
-      // If the course matches the current UI course, add click handler for modal.
       if (courseId == courseIdToCheck) {
         card.setAttribute("x-on:click", "openCommentModal = true");
       } else {
@@ -329,26 +370,24 @@ function createNotificationCard(notification, isRead) {
       card.setAttribute("data-course-name", courseName);
     }
   }
-
-  // If this is a comment notification, store its comment id.
   if (notification.Comment_ID) {
     card.setAttribute("data-comment-id", String(notification.Comment_ID));
   }
+
+  // Use our helper to override title and content
+  const { title, content } = getCustomTitleAndContent(notification);
 
   card.innerHTML = `
     <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${
       isRead ? "" : "bg-unread"
     } hover:bg-primary hover:text-white">
       <div class="flex justify-between w-full gap-[4px]">
-        <div class="text-sm font-semibold leading-none">${
-          notification.Title
-        }</div>
+        <div class="text-sm font-semibold leading-none">${title}</div>
         <div class="text-xs leading-3">${timeAgo(notification.Date_Added)}</div>
       </div>
-      <div class="text-xs leading-none">${notification.Content}</div>
+      <div class="text-xs leading-none">${content}</div>
     </div>
   `;
-
   // Click handler: mark as read and handle redirection or modal open.
   card.addEventListener("click", function () {
     const id = Number(card.getAttribute("data-id"));
