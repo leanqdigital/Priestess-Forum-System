@@ -397,7 +397,6 @@
     </div>
 
     <!-- Templates -->
-
     <script type="text/html" id="post-template">
         <div class="p-4 flex flex-col items-start gap-3 rounded postCard postcard-{{:id}}" 
         data-post-id="{{:id}}"
@@ -640,7 +639,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p3 page-text">{{:content}}</div>
+                    <div class="p2 page-text !font-[350] post-copy-content mb-4 content-container">{{:content}}</div>
+                    <div id="video-container"></div>
                     <!-- Display attached file, if available -->
                     {{if file_type === "Image" && file_content}}
                         <div class="comment-file-image my-2">
@@ -865,7 +865,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p3 page-text">{{:content}}</div>
+                    <div class="p2 page-text !font-[350] post-copy-content mb-4 content-container">{{:content}}</div>
+                    <div id="video-container"></div>
                     <!-- Display attached file, if available -->
                     {{if file_type === "Image" && file_content}}
                         <div class="comment-file-image my-2">

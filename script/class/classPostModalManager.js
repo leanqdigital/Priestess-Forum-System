@@ -680,6 +680,7 @@ class PostModalManager {
             "";
           document.getElementById("video-preview-wrapper-comment").innerHTML =
             "";
+            formatPreiview();
         } catch (error) {
           console.error("Error creating comment:", error);
         } finally {
@@ -754,6 +755,7 @@ class PostModalManager {
       });
 
       loadRepliesForComments(comments);
+      formatPreiview();
     } catch (error) {
       document.getElementById(
         "modal-comments-container"
@@ -784,6 +786,7 @@ class PostModalManager {
                 .map((reply) => replyTemplate.render(reply))
                 .join("");
             }
+            formatPreiview();
           } catch (error) {}
         })
       );

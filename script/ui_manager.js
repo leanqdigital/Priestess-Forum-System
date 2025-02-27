@@ -205,16 +205,13 @@ let formatPreiview = function formatPreview() {
             iframe.style.position = "absolute";
             iframe.style.top = "0";
             iframe.style.left = "0";
-            iframe.style.width = "100%";
-            iframe.style.height = "100%";
 
             // Create a container for the iframe (16:9 aspect ratio)
             const container = document.createElement("div");
             container.classList.add("preview-container"); // Mark container for later removal
             container.style.position = "relative";
             container.style.height = "0";
-            container.style.marginTop = "16px";
-            container.style.paddingBottom = "56.25%"; // 16:9 aspect ratio
+            container.style.marginTop = "16px"; // 16:9 aspect ratio
 
             container.appendChild(iframe);
             post.appendChild(container);
@@ -228,16 +225,13 @@ let formatPreiview = function formatPreview() {
             iframe.style.position = "absolute";
             iframe.style.top = "0";
             iframe.style.left = "0";
-            iframe.style.width = "100%";
-            iframe.style.height = "100%";
 
             // Create a container for the iframe (16:9 aspect ratio)
             const container = document.createElement("div");
             container.classList.add("preview-container"); // Mark container for later removal
             container.style.position = "relative";
             container.style.height = "0";
-            container.style.marginTop = "16px";
-            container.style.paddingBottom = "56.25%"; // 16:9 aspect ratio
+            container.style.marginTop = "16px"; // 16:9 aspect ratio
 
             container.appendChild(iframe);
             post.appendChild(container);

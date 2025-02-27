@@ -806,6 +806,7 @@ document.addEventListener("click", async (e) => {
       fileType,
       uploadedFile
     );
+    formatPreiview();
     // Clear the reply editor and file inputs.
     editor.innerHTML = "";
     imageInput.value = "";

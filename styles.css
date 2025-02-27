@@ -836,3 +836,16 @@ sl-dialog::part(panel) {
   background-color: var(--success-100);
   transition: background-color 0.5s;
 }
+
+.preview-container{
+  width: 300px !important;
+  height: 200px !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  overflow: hidden !important;
+}
+
+.preview-container iframe{
+  width: 300px !important;
+  height: 300px !important;
+}
