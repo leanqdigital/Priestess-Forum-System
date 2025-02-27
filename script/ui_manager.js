@@ -173,14 +173,12 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Use a timeout if needed (e.g., to wait for dynamic content to load)
-let formatPreiview = function formatPreview() {
+let formatPreiview  = function formatPreiview() {
   setTimeout(() => {
     // Select only posts that haven't been processed yet
     const posts = document.querySelectorAll(
       ".content-container:not([data-preview-loaded])"
     );
-
-    // Regular expression to match YouTube or Loom URLs
     const urlRegex =
       /(https?:\/\/(?:www\.)?(youtube\.com|youtu\.be|loom\.com)\/\S+)/gi;
 
@@ -193,51 +191,62 @@ let formatPreiview = function formatPreview() {
       // Find all matching URLs
       const matches = content.match(urlRegex);
       if (matches) {
-        // Process each found URL
         matches.forEach((rawUrl) => {
           let url = rawUrl;
           if (url.includes("youtube") || url.includes("youtu.be")) {
-            // Transform YouTube URL and create an iframe
             url = transformYoutubeUrl(url);
-            const iframe = document.createElement("iframe");
-            iframe.src = url;
-            iframe.setAttribute("frameborder", "0");
-            iframe.setAttribute("allowfullscreen", "");
-            iframe.style.position = "absolute";
-            iframe.style.top = "0";
-            iframe.style.left = "0";
-
-            // Create a container for the iframe (16:9 aspect ratio)
-            const container = document.createElement("div");
-            container.classList.add("preview-container");
-            container.style.position = "relative";
-            container.style.height = "0";
-            container.style.marginTop = "16px"; // 16:9 aspect ratio
-
-            container.appendChild(iframe);
-            post.appendChild(container);
+            createPreviewContainer(url, post);
           } else if (url.includes("loom.com")) {
             url = transformLoomUrl(url);
-            const iframe = document.createElement("iframe");
-            iframe.src = url;
-            iframe.setAttribute("frameborder", "0");
-            iframe.setAttribute("allowfullscreen", "");
-            iframe.style.position = "absolute";
-            iframe.style.top = "0";
-            iframe.style.left = "0";
-
-            const container = document.createElement("div");
-            container.classList.add("preview-container");
-            container.style.position = "relative";
-            container.style.height = "0";
-            container.style.marginTop = "16px"; // 16:9 aspect ratio
-
-            container.appendChild(iframe);
-            post.appendChild(container);
+            createPreviewContainer(url, post);
           }
         });
       }
     });
+
+    // Helper function to create preview container with skeleton loader
+    function createPreviewContainer(url, post) {
+      // Create the iframe
+      const iframe = document.createElement("iframe");
+      iframe.src = url;
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.style.position = "absolute";
+      iframe.style.top = "0";
+      iframe.style.left = "0";
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+
+      // Create the container using the padding-bottom trick for 16:9 aspect ratio
+      const container = document.createElement("div");
+      container.classList.add("preview-container");
+      container.style.position = "relative";
+      container.style.paddingBottom = "56.25%"; // 16:9 ratio
+      container.style.height = "0";
+      container.style.marginTop = "16px";
+
+      // Create skeleton loader element
+      const skeleton = document.createElement("div");
+      skeleton.classList.add("skeleton-loader");
+      skeleton.style.position = "absolute";
+      skeleton.style.top = "0";
+      skeleton.style.left = "0";
+      skeleton.style.width = "100%";
+      skeleton.style.height = "100%";
+      skeleton.style.backgroundColor = "#e0e0e0"; // light gray background
+      skeleton.style.animation = "pulse 1.5s infinite";
+
+      // Append the skeleton loader and iframe to the container
+      container.appendChild(skeleton);
+      container.appendChild(iframe);
+
+      // Remove skeleton when iframe has finished loading
+      iframe.addEventListener("load", () => {
+        skeleton.remove();
+      });
+
+      post.appendChild(container);
+    }
 
     // Helper function: transforms a YouTube URL into an embed URL
     function transformYoutubeUrl(url) {
@@ -250,6 +259,7 @@ let formatPreiview = function formatPreview() {
       return url;
     }
 
+    // Helper function: transforms a Loom URL into an embed URL
     function transformLoomUrl(url) {
       var regExp = /loom\.com\/share\/([a-f0-9]+)/;
       var match = url.match(regExp);

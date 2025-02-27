@@ -177,8 +177,7 @@ document.getElementById("delete-upload").addEventListener("click", function () {
 });
 
 document.getElementById("submit-post").addEventListener("click", async (e) => {
-  e.preventDefault();
-
+  formatPreiview();
   // Get post content and file inputs...
   const editor = document.getElementById("post-editor");
   const textContent = editor.innerText.trim();
@@ -373,7 +372,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     if (audioPlayer) {
       audioPlayer.dataset.audioPlayer = actualPost.ID;
     }
-    formatPreiview();
+    e.preventDefault();
   } catch (fetchError) {
     // If fetching additional details fails, log the error but don't remove the post.
     console.error("Error fetching post details:", fetchError);

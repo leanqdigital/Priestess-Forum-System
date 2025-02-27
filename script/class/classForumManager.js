@@ -876,8 +876,6 @@ class ForumManager {
       return;
     }
 
-    // ----- STEP 2: Update the Optimistic Comment with Real Data -----
-    // ----- STEP 2: Update the Optimistic Comment with Real Data -----
     try {
       // Delay briefly to allow backend indexing.
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -923,7 +921,10 @@ class ForumManager {
             : content, // fall back to the original content
         author: {
           name: `${actualComment.Author_First_Name} ${actualComment.Author_Last_Name}`,
-          profileImage: actualComment.Author_Profile_Image,
+          profileImage:       
+          actualComment.Author_Forum_Image?.trim()
+          ? actualComment.Author_Forum_Image
+          : DEFAULT_AVATAR,
         },
         CommentVotesCount: actualComment.Member_Comment_Upvotes_DataTotal_Count,
         file_content: finalFileContent, // use our valid file content (or preview)
