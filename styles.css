@@ -838,15 +838,15 @@ sl-dialog::part(panel) {
 }
 
 .preview-container{
-  width: 300px !important;
-  height: 200px !important;
+  width: 100% !important;
+  height: 400px !important;
   padding: 0 !important;
   margin-bottom: 0 !important;
   overflow: hidden !important;
 }
 
 .preview-container iframe{
-  width: 300px !important;
+  width: 100% !important;
   height: 100% !important;
 }
 
