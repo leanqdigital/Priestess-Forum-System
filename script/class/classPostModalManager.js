@@ -110,7 +110,7 @@ class PostModalManager {
             </div>
             <div class="flex">
                 <div class="post-content w-[90%]">
-                    <div class="page-text text-base font-['Avenir LT Std'] leading-tight">${
+                    <div class="page-text text-base font-['Avenir LT Std'] leading-tight content-container">${
                       post.content
                     }.</div>
                 </div>
