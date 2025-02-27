@@ -116,7 +116,7 @@
     <sl-dialog id="postNewModal" style="color: red;" label="Start a post">
         <section class="flex flex-col gap-4 bg-transparent">
             <div class="flex items-center gap-2">
-                <div class="size-8">
+                <div class="size-8 profile-image-wrapper">
                     <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                         alt="Profile" class="size-full object-cover rounded-full">
                 </div>
@@ -424,7 +424,7 @@
 
             <div class="flex items-center justify-between w-full">
                 <div class="flex items-center gap-2">
-                    <div class="size-8">
+                    <div class="size-8 profile-image-wrapper">
                         <img alt="{{:author.name}}" src="{{:author.profileImage}}" class="rounded-full size-full object-cover post-author-image">
                     </div>
                     <h2 class="page-text h2 post-author-name">{{:author.name}}</h2>
@@ -614,7 +614,7 @@
 
     <script type="text/html" id="comment-template">
         <div class="flex w-full items-start gap-2" data-comment-id="{{:id}}">
-            <div class="size-6">
+            <div class="size-6 profile-image-wrapper">
                 <img src="{{:author.profileImage}}" alt="{{:author.name}}"
                     class="size-full rounded-full object-cover" />
             </div>
@@ -849,7 +849,7 @@
 
     <script type="text/html" id="reply-template">
         <div class="flex w-full gap-2 reply" data-reply-id="{{:id}}">
-            <div class="size-6">
+            <div class="size-6 profile-image-wrapper">
                 <img src="{{:author.profileImage}}" alt="{{:author.name}}" class="size-full rounded-full object-cover" />
             </div>
             <div class="flex flex-col gap-2 w-full toHighLightCard">

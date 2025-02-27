@@ -6,6 +6,5 @@ tabs.forEach((tab) => {
     tabs.forEach((t) => t.classList.add("tab-Inactive"));
     tab.classList.add("tab-Active");
     tab.classList.remove("tab-Inactive");
-    textElement.textContent = tab.textContent;
   });
 });

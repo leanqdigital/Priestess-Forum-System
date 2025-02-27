@@ -853,3 +853,8 @@ sl-dialog::part(panel) {
 .searchInput::placeholder{
   color: var(--secondary);
 }
+
+.profile-image-wrapper{
+  border: 1px solid var(--secondary);
+  border-radius: 100%;
+}

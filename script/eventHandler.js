@@ -346,7 +346,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     const actualPost = fetchResponse.calcForumPosts[0];
     // Update the postElement with actualPost details.
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
-    postElement.querySelector(".editPostModal").dataset.postId = actualPost.ID;
     postElement.querySelector(".post-author-name").textContent =
       actualPost.Author_First_Name + " " + actualPost.Author_Last_Name;
     postElement.querySelector(".post-author-image").src =
@@ -374,6 +373,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     if (audioPlayer) {
       audioPlayer.dataset.audioPlayer = actualPost.ID;
     }
+    formatPreiview();
   } catch (fetchError) {
     // If fetching additional details fails, log the error but don't remove the post.
     console.error("Error fetching post details:", fetchError);

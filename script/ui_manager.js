@@ -175,17 +175,18 @@ document.addEventListener("DOMContentLoaded", function () {
 // Use a timeout if needed (e.g., to wait for dynamic content to load)
 let formatPreiview = function formatPreview() {
   setTimeout(() => {
-    // Select all post containers (each may include one or more links)
-    const posts = document.querySelectorAll(".content-container");
+    // Select only posts that haven't been processed yet
+    const posts = document.querySelectorAll(
+      ".content-container:not([data-preview-loaded])"
+    );
 
     // Regular expression to match YouTube or Loom URLs
     const urlRegex =
       /(https?:\/\/(?:www\.)?(youtube\.com|youtu\.be|loom\.com)\/\S+)/gi;
 
     posts.forEach((post) => {
-      // Remove any existing preview containers to avoid duplication
-      const existingPreviews = post.querySelectorAll(".preview-container");
-      existingPreviews.forEach((preview) => preview.remove());
+      // Mark this post as processed to avoid duplicate processing later
+      post.dataset.previewLoaded = "true";
 
       // Get the HTML content of the current post
       let content = post.innerHTML;
@@ -208,7 +209,7 @@ let formatPreiview = function formatPreview() {
 
             // Create a container for the iframe (16:9 aspect ratio)
             const container = document.createElement("div");
-            container.classList.add("preview-container"); // Mark container for later removal
+            container.classList.add("preview-container");
             container.style.position = "relative";
             container.style.height = "0";
             container.style.marginTop = "16px"; // 16:9 aspect ratio
@@ -217,7 +218,6 @@ let formatPreiview = function formatPreview() {
             post.appendChild(container);
           } else if (url.includes("loom.com")) {
             url = transformLoomUrl(url);
-            // Transform YouTube URL and create an iframe
             const iframe = document.createElement("iframe");
             iframe.src = url;
             iframe.setAttribute("frameborder", "0");
@@ -226,9 +226,8 @@ let formatPreiview = function formatPreview() {
             iframe.style.top = "0";
             iframe.style.left = "0";
 
-            // Create a container for the iframe (16:9 aspect ratio)
             const container = document.createElement("div");
-            container.classList.add("preview-container"); // Mark container for later removal
+            container.classList.add("preview-container");
             container.style.position = "relative";
             container.style.height = "0";
             container.style.marginTop = "16px"; // 16:9 aspect ratio
@@ -261,4 +260,3 @@ let formatPreiview = function formatPreview() {
     }
   }, 3000); // Adjust the timeout duration as needed
 };
-
