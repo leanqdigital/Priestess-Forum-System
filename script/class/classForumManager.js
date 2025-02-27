@@ -720,13 +720,13 @@ class ForumManager {
           Author_First_Name: field(arg: ["Author", "first_name"])
           Author_Last_Name: field(arg: ["Author", "last_name"])
           Author_Profile_Image: field(arg: ["Author", "profile_image"])
-          Author_Forum_Image
           Date_Added: field(arg: ["created_at"])
           Comment: field(arg: ["comment"])
           Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
           File_Type: field(arg: ["file_type"])
           File_Content: field(arg: ["file_content"])
           Author_Forum_Image: field(arg: ["Author", "forum_image"])
+          Author_ID: field(arg: ["author_id"])
         }
       }
     `;
@@ -734,6 +734,7 @@ class ForumManager {
       const comments = data?.calcForumComments || [];
       return comments.map((comment) => ({
         id: comment.ID,
+        author_id: comment.Author_ID,
         content: comment.Comment,
         date: Formatter.formatTimestamp(comment.Date_Added),
         CommentVotesCount: comment.Member_Comment_Upvotes_DataTotal_Count,
@@ -1184,6 +1185,7 @@ class ForumManager {
             File_Type: field(arg: ["file_type"])
             File_Content: field(arg: ["file_content"])
             Author_Forum_Image: field(arg: ["Author", "forum_image"])
+            Author_ID: field(arg: ["author_id"])
           }
         }
       `;
@@ -1192,6 +1194,7 @@ class ForumManager {
       return (
         data?.calcForumComments?.map((reply) => ({
           id: reply.ID,
+          author_id: reply.Author_ID,
           content: reply.Comment,
           date: Formatter.formatTimestamp(reply.Date_Added),
           ReplyVoteCount: reply.Member_Comment_Upvotes_DataTotal_Count,
