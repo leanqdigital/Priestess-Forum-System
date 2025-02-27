@@ -847,7 +847,7 @@ sl-dialog::part(panel) {
 
 .preview-container iframe{
   width: 300px !important;
-  height: 300px !important;
+  height: 100% !important;
 }
 
 .searchInput::placeholder{

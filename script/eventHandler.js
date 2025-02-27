@@ -349,8 +349,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     postElement.querySelector(".post-author-name").textContent =
       actualPost.Author_First_Name + " " + actualPost.Author_Last_Name;
     postElement.querySelector(".post-author-image").src =
-      actualPost.Author_Profile_Image?.trim()
-        ? actualPost.Author_Profile_Image
+      actualPost.Author_Forum_Image?.trim()
+        ? actualPost.Author_Forum_Image
         : DEFAULT_AVATAR;
     postElement.querySelector(".post-copy-content").textContent =
       actualPost.Post_Copy;

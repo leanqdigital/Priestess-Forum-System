@@ -130,8 +130,8 @@ class ForumManager {
             firstName: post.Author_First_Name,
             lastName: post.Author_Last_Name,
             profileImage:
-              post.Author_Profile_Image && post.Author_Profile_Image.trim()
-                ? post.Author_Profile_Image
+              post.Author_Forum_Image && post.Author_Forum_Image.trim()
+                ? post.Author_Forum_Image
                 : this.defaultAuthorImage,
           }),
           date: Formatter.formatTimestamp(post.Date_Added),
@@ -232,6 +232,7 @@ class ForumManager {
         File_Tpe: field(arg: ["file_tpe"])
         File_Content: field(arg: ["file_content"])
         Disable_New_Comments: field(arg: ["disable_new_comments"])
+        Author_Forum_Image: field(arg: ["Author", "forum_image"])
       }
     }`;
 
@@ -719,11 +720,13 @@ class ForumManager {
           Author_First_Name: field(arg: ["Author", "first_name"])
           Author_Last_Name: field(arg: ["Author", "last_name"])
           Author_Profile_Image: field(arg: ["Author", "profile_image"])
+          Author_Forum_Image
           Date_Added: field(arg: ["created_at"])
           Comment: field(arg: ["comment"])
           Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
           File_Type: field(arg: ["file_type"])
           File_Content: field(arg: ["file_content"])
+          Author_Forum_Image: field(arg: ["Author", "forum_image"])
         }
       }
     `;
@@ -745,8 +748,8 @@ class ForumManager {
           firstName: comment.Author_First_Name,
           lastName: comment.Author_Last_Name,
           profileImage:
-            comment.Author_Profile_Image && comment.Author_Profile_Image.trim()
-              ? comment.Author_Profile_Image
+            comment.Author_Forum_Image && comment.Author_Forum_Image.trim()
+              ? comment.Author_Forum_Image
               : this.defaultAuthorImage,
         }),
         // If you are storing vote records in a Map (see below), check whether votes exist:
@@ -1180,6 +1183,7 @@ class ForumManager {
             Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }]) 
             File_Type: field(arg: ["file_type"])
             File_Content: field(arg: ["file_content"])
+            Author_Forum_Image: field(arg: ["Author", "forum_image"])
           }
         }
       `;
@@ -1200,8 +1204,8 @@ class ForumManager {
             firstName: reply.Author_First_Name,
             lastName: reply.Author_Last_Name,
             profileImage:
-              reply.Author_Profile_Image && reply.Author_Profile_Image.trim()
-                ? reply.Author_Profile_Image
+              reply.Author_Forum_Image && reply.Author_Forum_Image.trim()
+                ? reply.Author_Forum_Image
                 : this.defaultAuthorImage,
           }),
         })) || []
@@ -1641,8 +1645,21 @@ class ForumManager {
           // NEW unified file fields:
           const fileTpe = postElement.dataset.fileTpe;
           const fileContentRaw = postElement.dataset.fileContent;
-          const voteCount = postElement.dataset.voteCount;
+          const voteCountDiv = postElement.querySelector(".postVoteCount");
+          const voteCount = voteCountDiv.textContent;
           const commentCount = postElement.dataset.commentCount;
+          const voteButton = postElement.querySelector(".vote-button");
+          const voteIcon = voteButton.querySelector("svg");
+          let voted = false; // Default value
+          console.log("Vote count is", voteCount);
+
+          if (voteIcon?.classList.contains("voted-heart")) {
+            voted = true;
+          } else if (voteIcon?.classList.contains("unvoted-heart")) {
+            voted = false;
+          }
+
+          console.log(voted);
 
           // Parse fileContent (if it exists)
           let fileContent = null;
@@ -1665,6 +1682,7 @@ class ForumManager {
             file_content: fileContent,
             PostVotesCount: voteCount,
             PostCommentCount: commentCount,
+            voted: voted,
           };
 
           await PostModalManager.open(post);
