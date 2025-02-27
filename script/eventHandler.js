@@ -179,16 +179,12 @@ document.getElementById("delete-upload").addEventListener("click", function () {
 document.getElementById("submit-post").addEventListener("click", async (e) => {
   e.preventDefault();
 
-  // Get the post content from the editor
+  // Get post content and file inputs...
   const editor = document.getElementById("post-editor");
   const textContent = editor.innerText.trim();
-
-  // Get file inputs (the three remain in the DOM)
   const imageInput = document.getElementById("post-image-upload");
   const audioInput = document.getElementById("post-audio-upload");
   const videoInput = document.getElementById("post-video-upload");
-
-  // Determine which file is uploaded – only one is allowed
   const imageFile = imageInput.files[0];
   const audioFile = audioInput.files[0];
   const videoFile = videoInput.files[0];
@@ -206,22 +202,21 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     fileType = "Video";
   }
 
-  // At least one (text or file) is required
+  // At least one (text or file) is required.
   if (!textContent && !uploadedFile) {
     UIManager.showError("Post content or a file is required.");
     return;
   }
 
-  // Hide the modal (your modal hide logic remains)
+  // Hide the modal (your modal hide logic)
   document.getElementById("postNewModal").hide();
 
-  // Extract mentioned IDs
+  // Process mentions...
   const mentionedIds = [];
   document.querySelectorAll(".mention").forEach((mention) => {
     const id = mention.dataset.contactId;
     if (id) {
       if (id === "all" && MentionManager.allContacts) {
-        // Push all contact IDs from the cached list.
         MentionManager.allContacts.forEach((contact) => {
           if (!mentionedIds.includes(contact.id)) {
             mentionedIds.push(contact.id);
@@ -233,11 +228,11 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     }
   });
 
-  // Create a temporary post using the new fields:
+  // Create a temporary post for immediate UI feedback.
   const tempPost = {
     id: `temp-${Date.now()}`,
     author_id: forumManager.userId,
-    // NEW: Use file_content (preview URL) and file_tpe (the file type)
+    disableComments: false,
     file_content: uploadedFile
       ? { link: URL.createObjectURL(uploadedFile) }
       : null,
@@ -256,16 +251,18 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
   const postElement = postContainer.firstElementChild;
   postElement.classList.add("state-disabled");
 
-  // Process file upload (only one file field is needed)
+  // Process file upload if applicable.
   let fileData = null;
   const fileFields = [];
   if (uploadedFile) {
     fileFields.push({
-      fieldName: "file_content", // NEW: single file field name
+      fieldName: "file_content",
       file: uploadedFile,
     });
   }
 
+  // Separate try/catch for post creation (mutation)
+  let newPost;
   try {
     if (fileFields.length > 0) {
       const toSubmitFields = {};
@@ -284,7 +281,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       fileData.type = fileData.type || uploadedFile.type;
     }
 
-    // Send the create post mutation using the new file fields
+    // Send the create post mutation.
     const response = await ApiService.query(
       `
         mutation createForumPost($payload: ForumPostCreateInput!) {
@@ -300,7 +297,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
             }
           }
         }
-        `,
+      `,
       {
         payload: {
           author_id: forumManager.userId,
@@ -313,10 +310,17 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       }
     );
 
-    const newPost = response.createForumPost;
+    newPost = response.createForumPost;
     postElement.dataset.postId = newPost.id;
+  } catch (error) {
+    console.error("Error during post creation:", error);
+    UIManager.showError("Failed to post. Please try again.");
+    postContainer.removeChild(postElement);
+    return;
+  }
 
-    // (Optional) Fetch additional details as before…
+  // Now try to fetch additional post details.
+  try {
     const fetchResponse = await ApiService.query(
       `
         query calcForumPosts($id: PriestessForumPostID) {
@@ -332,15 +336,15 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
             File_Content: field(arg: ["file_content"])
             ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
             Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+            Disable_New_Comments: field(arg: ["disable_new_comments"])
           }
         }
-        `,
+      `,
       { id: newPost.id }
     );
 
     const actualPost = fetchResponse.calcForumPosts[0];
-    formatPreiview();
-    // Update DOM elements (update any file-related UI as needed)
+    // Update the postElement with actualPost details.
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
     postElement.querySelector(".editPostModal").dataset.postId = actualPost.ID;
     postElement.querySelector(".post-author-name").textContent =
@@ -360,24 +364,23 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     postElement.querySelector(".load-comments-btn").dataset.postId =
       actualPost.ID;
     postElement.dataset.postId = actualPost.ID;
-    // postElement.querySelector(".audio-player").id = "audio-" + actualPost.ID;
+
+    // Update audio player elements if necessary.
     const playPauseButton = postElement.querySelector("#play-pause");
     if (playPauseButton) {
-      playPauseButton.dataset.audioButton = actualPost.ID; // Update with actual ID
+      playPauseButton.dataset.audioButton = actualPost.ID;
     }
     const audioPlayer = postElement.querySelector(".audio-player");
     if (audioPlayer) {
       audioPlayer.dataset.audioPlayer = actualPost.ID;
     }
-  } catch (error) {
-    console.error("Error during post creation:", error);
-    UIManager.showError("Failed to post. Please try again.");
-    postContainer.removeChild(postElement);
+  } catch (fetchError) {
+    // If fetching additional details fails, log the error but don't remove the post.
+    console.error("Error fetching post details:", fetchError);
   } finally {
-    // Clear the editor and remove the temporary disabled state
+    // Clear the editor and remove the temporary disabled state.
     editor.innerHTML = "";
     postElement.classList.remove("state-disabled");
-    // (Optional) Clear the file inputs here if desired.
   }
 });
 

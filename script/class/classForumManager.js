@@ -89,6 +89,32 @@ class ForumManager {
 
       // Map each returned post to include the unified file fields
       const posts = data.calcForumPosts.map((post) => {
+        let fileContent = post.File_Content;
+        if (typeof fileContent === "string") {
+          fileContent = fileContent.trim();
+          // If it starts with a '{', it's likely a JSON string
+          if (fileContent.startsWith("{")) {
+            try {
+              fileContent = JSON.parse(fileContent);
+            } catch (e) {
+              // Fallback: if parsing fails, treat it as a URL string
+              fileContent = { link: fileContent };
+            }
+          } else {
+            // Sometimes the URL string might have extra quotes.
+            if (
+              (fileContent.startsWith('"') && fileContent.endsWith('"')) ||
+              (fileContent.startsWith("'") && fileContent.endsWith("'"))
+            ) {
+              fileContent = fileContent.substring(1, fileContent.length - 1);
+            }
+            // Wrap the plain URL string into an object so your template works as expected.
+            fileContent = { link: fileContent };
+          }
+        } else {
+          // fileContent is already an object
+          fileContent = post.File_Content;
+        }
         const postId = String(post.ID);
         return {
           id: postId,
@@ -97,10 +123,7 @@ class ForumManager {
           author_id: post.Author_ID,
           featured_post: post.Featured_Post,
           file_tpe: post.File_Tpe,
-          file_content:
-            typeof post.File_Content === "string"
-              ? JSON.parse(post.File_Content)
-              : post.File_Content,
+          file_content: fileContent,
           PostVotesCount: post.Member_Post_Upvotes_DataTotal_Count,
           PostCommentCount: post.ForumCommentsTotalCount,
           author: Formatter.formatAuthor({
