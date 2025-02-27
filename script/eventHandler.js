@@ -794,13 +794,6 @@ document.addEventListener("click", async (e) => {
       }
     });
 
-    // Get mention IDs if any.
-    // const mentionedIds = [];
-    // replyForm.querySelectorAll(".mention").forEach((mention) => {
-    //   if (mention.dataset.contactId)
-    //     mentionedIds.push(mention.dataset.contactId);
-    // });
-
     // --- File Handling for Replies ---
     const imageInput = document.getElementById("reply-image-upload");
     const audioInput = document.getElementById("reply-audio-upload");
