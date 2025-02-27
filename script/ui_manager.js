@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Use a timeout if needed (e.g., to wait for dynamic content to load)
-let formatPreiview  = function formatPreiview() {
+let formatPreiview = function formatPreiview() {
   setTimeout(() => {
     // Select only posts that haven't been processed yet
     const posts = document.querySelectorAll(

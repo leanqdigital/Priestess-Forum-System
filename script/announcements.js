@@ -341,7 +341,7 @@ function getCustomTitleAndContent(notification) {
       title = "A new comment has been created";
       content = `${notification.Contact_First_Name} ${notification.Contact_Last_Name} has added a comment`;
     } else {
-      title = "You have been mentioned in a post";
+      title = "You have been mentioned in a comment";
       content = `${notification.Contact_First_Name} ${notification.Contact_Last_Name} mentioned you in a comment`;
     }
   }
