@@ -456,16 +456,6 @@
                             x-on:click.outside="editDeletePost = false, openedWithKeyboard = false"
                             x-on:keydown.down.prevent="$focus.wrap().next()" x-on:keydown.up.prevent="$focus.wrap().previous()"
                             class="absolute top-5 right-0 flex p-1 action-options-wrapper rounded w-[100px] flex-col shadow-[0px_4px_4px_0px_#0000000F]">
-                            <button @click = "
-                                                document.querySelector('.post-editor').textContent = '{{:content}}';
-                                                let postModal = document.getElementById('postNewModal');
-                                                let postElement = document.querySelector('.postCard');
-                                                let postId = postElement.dataset.postId;
-                                                postModal.setAttribute('data-postid', postId);
-                                                postModal.querySelector('#edit-post').classList.remove('hidden');
-                                                postModal.querySelector('#submit-post').classList.add('hidden');
-                                                postModal.show();"
-                            type="button" data-post-id="{{:id}}" class="action-button editPostModal edit-post-btn p-[10px] transition-all rounded cursor-pointer o3 text-left">Edit</button>
                             <button type="button" data-post-id="{{:id}}" class="action-button delete-post-btn p-[10px] transition-all rounded cursor-pointer o3 text-left">Delete</button>
                         </div>
                     </div>

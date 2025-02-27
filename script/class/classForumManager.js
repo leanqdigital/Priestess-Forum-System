@@ -683,41 +683,6 @@ class ForumManager {
     return skeletons;
   }
 
-  async editPost(postid, content) {
-    const postCard = document.querySelector(
-      `.postCard[data-post-id="${postid}"]`
-    );
-    postCard.style.opacity = "50%";
-    postCard.style.cursor = "not-allowed";
-    try {
-      const response = await ApiService.query(
-        `
-          mutation updateForumPost(
-            $payload: ForumPostUpdateInput = null
-          ) {
-            updateForumPost(
-              query: [{ where: { id: ${postid} } }]
-              payload: $payload
-            ) {
-              post_copy
-            }
-          }
-`,
-        {
-          payload: {
-            post_copy: content,
-          },
-        }
-      );
-    } catch (error) {
-      UIManager.showError("Failed to update post. Please try again.");
-    } finally {
-      postCard.style.opacity = "100%";
-      postCard.style.cursor = "";
-      this.refreshPosts();
-    }
-  }
-
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------

@@ -843,14 +843,3 @@ document.addEventListener("click", async (e) => {
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
 //Create Reply Part End
-
-document.addEventListener("click", (event) => {
-  if (event.target.closest(".edit-post")) {
-    const postElement = event.target.closest("[data-postid]");
-    const postId = postElement.dataset.postid;
-    const editor = postElement.querySelector(".post-editor");
-    const content = editor.innerText.trim();
-    forumManager.editPost(postId, content);
-    postElement.hide();
-  }
-});
