@@ -465,11 +465,10 @@
                 <div class="p2 page-text !font-[350] post-copy-content mb-4 content-container">{{:content}}</div>
                 <div id="video-container"></div>
                 {{if file_tpe === "Image" && file_content}}
-                <div class="post-image-wrapper mb-4">
-                  <img src="{{:file_content.link}}" alt="Post Image" class="size-full object-contain">
-                </div>
+                    <div class="post-image-wrapper mb-4">
+                    <img src="{{:file_content.link}}" alt="Post Image" class="size-full object-contain">
+                    </div>
                 {{/if}}
-
 
               {{if file_tpe === "Audio" && file_content}}
               <div class="post-audio-wrapper mb-4">

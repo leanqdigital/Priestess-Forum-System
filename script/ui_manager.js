@@ -172,8 +172,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Use a timeout if needed (e.g., to wait for dynamic content to load)
+// Use a timeout if needed (e.g., to wait for dynamic content to load)
+let formatPreiview = function formatPreview() {
   setTimeout(() => {
     // Select all post containers (each may include one or more links)
     const posts = document.querySelectorAll(".content-container");
@@ -183,6 +183,10 @@ document.addEventListener("DOMContentLoaded", function () {
       /(https?:\/\/(?:www\.)?(youtube\.com|youtu\.be|loom\.com)\/\S+)/gi;
 
     posts.forEach((post) => {
+      // Remove any existing preview containers to avoid duplication
+      const existingPreviews = post.querySelectorAll(".preview-container");
+      existingPreviews.forEach((preview) => preview.remove());
+
       // Get the HTML content of the current post
       let content = post.innerHTML;
       // Find all matching URLs
@@ -191,8 +195,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // Process each found URL
         matches.forEach((rawUrl) => {
           let url = rawUrl;
-          if (url.indexOf("youtube") !== -1 || url.indexOf("youtu.be") !== -1) {
-            // For YouTube URLs, transform to embed URL and create an iframe
+          if (url.includes("youtube") || url.includes("youtu.be")) {
+            // Transform YouTube URL and create an iframe
             url = transformYoutubeUrl(url);
             const iframe = document.createElement("iframe");
             iframe.src = url;
@@ -206,6 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Create a container for the iframe (16:9 aspect ratio)
             const container = document.createElement("div");
+            container.classList.add("preview-container"); // Mark container for later removal
             container.style.position = "relative";
             container.style.height = "0";
             container.style.marginTop = "16px";
@@ -213,41 +218,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
             container.appendChild(iframe);
             post.appendChild(container);
-          } else if (url.indexOf("loom.com") !== -1) {
-            // For Loom URLs, create a preview container with a black background
-            const previewContainer = document.createElement("div");
-            previewContainer.style.position = "relative";
-            previewContainer.style.cursor = "pointer";
-            previewContainer.style.marginTop = "16px";
-            previewContainer.style.width = "400px";
-            previewContainer.style.height = "250px";
-            previewContainer.style.borderRadius = "12px";
-            previewContainer.style.display = "flex";
-            previewContainer.style.alignItems = "center";
-            previewContainer.style.justifyContent = "center";
-            previewContainer.style.backgroundColor = "#000";
+          } else if (url.includes("loom.com")) {
+            url = transformLoomUrl(url);
+            // Transform YouTube URL and create an iframe
+            const iframe = document.createElement("iframe");
+            iframe.src = url;
+            iframe.setAttribute("frameborder", "0");
+            iframe.setAttribute("allowfullscreen", "");
+            iframe.style.position = "absolute";
+            iframe.style.top = "0";
+            iframe.style.left = "0";
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
 
-            // Create an overlay for the play icon
-            const overlay = document.createElement("div");
-            overlay.style.pointerEvents = "none";
-            overlay.style.marginTop = "16px";
-            overlay.style.display = "flex";
-            overlay.style.alignItems = "center";
-            overlay.style.justifyContent = "center";
+            // Create a container for the iframe (16:9 aspect ratio)
+            const container = document.createElement("div");
+            container.classList.add("preview-container"); // Mark container for later removal
+            container.style.position = "relative";
+            container.style.height = "0";
+            container.style.marginTop = "16px";
+            container.style.paddingBottom = "56.25%"; // 16:9 aspect ratio
 
-            const playIcon = document.createElement("div");
-            playIcon.textContent = "Play";
-            playIcon.style.color = "white";
-            overlay.appendChild(playIcon);
-
-            previewContainer.appendChild(overlay);
-
-            // When clicked, open the Loom video in a new tab
-            previewContainer.addEventListener("click", function () {
-              window.open(url, "_blank");
-            });
-
-            post.appendChild(previewContainer);
+            container.appendChild(iframe);
+            post.appendChild(container);
           }
         });
       }
@@ -263,5 +256,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       return url;
     }
+
+    function transformLoomUrl(url) {
+      var regExp = /loom\.com\/share\/([a-f0-9]+)/;
+      var match = url.match(regExp);
+      if (match && match[1]) {
+        return "https://www.loom.com/embed/" + match[1];
+      }
+      return url;
+    }
   }, 3000); // Adjust the timeout duration as needed
-});
+};
+

@@ -330,6 +330,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     );
 
     const actualPost = fetchResponse.calcForumPosts[0];
+    formatPreiview();
     // Update DOM elements (update any file-related UI as needed)
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
     postElement.querySelector(".editPostModal").dataset.postId = actualPost.ID;

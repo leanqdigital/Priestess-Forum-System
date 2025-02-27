@@ -130,6 +130,7 @@ class ForumManager {
         this.hasMorePosts = false;
       }
       this.updateBookmarkIcons();
+      formatPreiview();
     } catch (error) {
       document
         .querySelectorAll(".skeleton-loader")
