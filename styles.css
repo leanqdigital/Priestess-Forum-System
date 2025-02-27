@@ -833,7 +833,7 @@ sl-dialog::part(panel) {
 
 /* Example highlight style */
 .highlight {
-  background-color: var(--success-100);
+  background-color: var(--secondary);
   transition: background-color 0.5s;
 }
 

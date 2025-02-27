@@ -114,6 +114,7 @@ class ForumManager {
           date: Formatter.formatTimestamp(post.Date_Added),
           title: post.Post_Title,
           content: post.Post_Copy,
+          disableComments: post.Disable_New_Comments,
         };
       });
 
@@ -207,6 +208,7 @@ class ForumManager {
         ])
         File_Tpe: field(arg: ["file_tpe"])
         File_Content: field(arg: ["file_content"])
+        Disable_New_Comments: field(arg: ["disable_new_comments"])
       }
     }`;
 

@@ -217,10 +217,19 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
 
   // Extract mentioned IDs
   const mentionedIds = [];
-  editor.querySelectorAll(".mention").forEach((mention) => {
+  document.querySelectorAll(".mention").forEach((mention) => {
     const id = mention.dataset.contactId;
     if (id) {
-      mentionedIds.push(id);
+      if (id === "all" && MentionManager.allContacts) {
+        // Push all contact IDs from the cached list.
+        MentionManager.allContacts.forEach((contact) => {
+          if (!mentionedIds.includes(contact.id)) {
+            mentionedIds.push(contact.id);
+          }
+        });
+      } else if (!mentionedIds.includes(id)) {
+        mentionedIds.push(id);
+      }
     }
   });
 
@@ -768,12 +777,29 @@ document.addEventListener("click", async (e) => {
       return;
     }
 
-    // Get mention IDs if any.
     const mentionedIds = [];
-    replyForm.querySelectorAll(".mention").forEach((mention) => {
-      if (mention.dataset.contactId)
-        mentionedIds.push(mention.dataset.contactId);
+    document.querySelectorAll(".mention").forEach((mention) => {
+      const id = mention.dataset.contactId;
+      if (id) {
+        if (id === "all" && MentionManager.allContacts) {
+          // Push all contact IDs from the cached list.
+          MentionManager.allContacts.forEach((contact) => {
+            if (!mentionedIds.includes(contact.id)) {
+              mentionedIds.push(contact.id);
+            }
+          });
+        } else if (!mentionedIds.includes(id)) {
+          mentionedIds.push(id);
+        }
+      }
     });
+
+    // Get mention IDs if any.
+    // const mentionedIds = [];
+    // replyForm.querySelectorAll(".mention").forEach((mention) => {
+    //   if (mention.dataset.contactId)
+    //     mentionedIds.push(mention.dataset.contactId);
+    // });
 
     // --- File Handling for Replies ---
     const imageInput = document.getElementById("reply-image-upload");

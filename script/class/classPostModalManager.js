@@ -279,7 +279,9 @@ class PostModalManager {
             </div>
             <div class="h-[0px] border border-[#d9d9d9]"></div>
             <div class="flex gap-2">
-                <img class="w-[32px] h-[32px] rounded-full block max-[500px]:hidden" src="${CONFIG.api.defaultLoggedInAuthorImage}">
+                <img class="w-[32px] h-[32px] rounded-full block max-[500px]:hidden" src="${
+                  CONFIG.api.defaultLoggedInAuthorImage
+                }">
                 <div class="
                     comment-form-wrapper
                     comment-form 
@@ -646,9 +648,22 @@ class PostModalManager {
         }
 
         // Get mention IDs from the editor (if any)
-        const mentions = Array.from(editor.querySelectorAll(".mention")).map(
-          (el) => el.dataset.contactId
-        );
+        const mentions = [];
+        document.querySelectorAll(".mention").forEach((mention) => {
+          const id = mention.dataset.contactId;
+          if (id) {
+            if (id === "all" && MentionManager.allContacts) {
+              // Push all contact IDs from the cached list.
+              MentionManager.allContacts.forEach((contact) => {
+                if (!mentions.includes(contact.id)) {
+                  mentions.push(contact.id);
+                }
+              });
+            } else if (!mentions.includes(id)) {
+              mentions.push(id);
+            }
+          }
+        });
 
         // Disable the form during submission
         commentForm.classList.add("state-disabled");
@@ -680,7 +695,7 @@ class PostModalManager {
             "";
           document.getElementById("video-preview-wrapper-comment").innerHTML =
             "";
-            formatPreiview();
+          formatPreiview();
         } catch (error) {
           console.error("Error creating comment:", error);
         } finally {
