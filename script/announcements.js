@@ -321,8 +321,8 @@ function timeAgo(unixTimestamp) {
 
 // New helper to override title and content based on custom fields.
 function getCustomTitleAndContent(notification) {
-  let title = notification.Title; // default fallback
-  let content = notification.Content; // default fallback
+  let title = ""; // default fallback
+  let content = ""; // default fallback
 
   // If post-related fields are available, use them.
   if (notification.Contact_Contact_ID1) {
