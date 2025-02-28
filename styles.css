@@ -424,29 +424,29 @@ sl-dialog::part(close-button) {
 
 /* This styles the vote icon */
 .voted path {
-  fill: var(--primary); /*This is for voted state*/
-  stroke: var(--primary);
+  fill: var(--secondary); /*This is for voted state*/
+  stroke: var(--secondary);
 }
 
 .unVoted path {
   fill: none; /*This is for non voted state*/
-  stroke: var(--primary);
+  stroke: var(--secondary);
 }
 
 /* This styles comment icon */
 .comment-icon path {
-  fill: var(--primary);
+  fill: var(--secondary);
 }
 
 /* This styles bookmark icon */
 .isBookmarked path {
-  fill: var(--primary); /*This is for voted state*/
-  stroke: var(--primary);
+  fill: var(--secondary); /*This is for voted state*/
+  stroke: var(--secondary);
 }
 
 .notBookmarked path {
   fill: transparent; /*This is for non voted state*/
-  stroke: var(--primary);
+  stroke: var(--secondary);
 }
 
 /* Post details modal styling */

@@ -1141,43 +1141,42 @@ class ForumManager {
 
   // --- UPDATE COMMENT VOTE UI (Icon and Count) ---
   async updateCommentVoteUI(commentId) {
-    const commentElement = document.querySelector(
+    const commentElements = document.querySelectorAll(
       `[data-comment-id="${commentId}"]`
     );
-    if (!commentElement) return;
-
-    // Determine if the comment is voted (using our local map).
-    const isVoted = this.votedCommentIds.get(commentId)?.size > 0;
-    const voteButton = commentElement.querySelector(".vote-button");
-    if (voteButton) {
-      voteButton.innerHTML = this.getCommentVoteSVG(isVoted);
-    }
-
-    // Also update the vote count by fetching the latest count.
-    try {
-      const count = await this.fetchCommentVoteCount(commentId);
-      const voteCountElement = commentElement.querySelector(".vote-count");
-      if (voteCountElement) {
-        voteCountElement.textContent = count;
+    commentElements.forEach(async (commentElement) => {
+      const isVoted = this.votedCommentIds.get(commentId)?.size > 0;
+      const voteButton = commentElement.querySelector(".vote-button");
+      if (voteButton) {
+        voteButton.innerHTML = this.getCommentVoteSVG(isVoted);
       }
-    } catch (error) {
-      console.error("Error fetching vote count:", error);
-    }
+      try {
+        const count = await this.fetchCommentVoteCount(commentId);
+        const voteCountElement = commentElement.querySelector(".vote-count");
+        if (voteCountElement) {
+          voteCountElement.textContent = count;
+        }
+      } catch (error) {
+        console.error("Error fetching vote count:", error);
+      }
+    });
   }
 
   // --- GET THE SVG FOR THE VOTE BUTTON ---
   getCommentVoteSVG(isVoted) {
     return `
-    <svg width="24" height="24" viewBox="0 0 24 24" 
-         fill="${isVoted ? "#044047" : "none"}" 
-         stroke="#044047">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-               2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-               C13.09 3.81 14.76 3 16.5 3
-               19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54
-               L12 21.35z"/>
-    </svg>
-  `;
+      <svg class = "${
+        isVoted ? "voted" : "unVoted"
+      }" width="24" height="24" viewBox="0 0 24 24" 
+           fill="" 
+           stroke="#c29d68">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
+                 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                 C13.09 3.81 14.76 3 16.5 3
+                 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54
+                 L12 21.35z"/>
+      </svg>
+    `;
   }
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
@@ -1597,10 +1596,10 @@ class ForumManager {
   getReplyVoteSVG(isVoted) {
     return `
       <svg class = "${
-        isVoted ? "voted" : "nonVoted"
+        isVoted ? "voted" : "unVoted"
       }" width="24" height="24" viewBox="0 0 24 24" 
            fill="" 
-           stroke="#C29D68">
+           stroke="#c29d68">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
                  2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
                  C13.09 3.81 14.76 3 16.5 3
