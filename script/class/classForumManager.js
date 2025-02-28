@@ -172,71 +172,93 @@ class ForumManager {
     const dynamicFilter = this.buildFilterCondition();
     const filters = [];
 
-    // Base filter: course filter (always required) using a "where" clause.
+    // Static course filter
     filters.push(
       `{ where: { Related_Course: [{ where: { id: "${courseID}" } }] } }`
     );
 
-    // If a dynamic filter exists, chain it with "andWhere"
     if (dynamicFilter) {
       filters.push(`{ andWhere: ${dynamicFilter} }`);
     }
 
-    // Append search filters if a search term exists.
+    // If there is a search term, build filters for Author and post_copy
     if (this.searchTerm && this.searchTerm.trim() !== "") {
-      // Chain the Author search filter using andWhere.
-      filters.push(
-        `{ andWhere: { Author: { where: { first_name: $first_name } } } }`
-      );
+      // Split the search term on whitespace
+      const parts = this.searchTerm.trim().split(/\s+/);
+      // If only one word, use it for both first and last names;
+      // if multiple words, assume first and last words are the names.
+      let authorFirstPattern, authorLastPattern;
+      if (parts.length === 1) {
+        authorFirstPattern = `%${parts[0]}%`;
+        authorLastPattern = `%${parts[0]}%`;
+      } else {
+        authorFirstPattern = `%${parts[0]}%`;
+        authorLastPattern = `%${parts[parts.length - 1]}%`;
+      }
+
+      // Build filter for Author (nested) and for post_copy (top-level)
+      filters.push(`{
+        andWhere: {
+          Author: [
+            { where: { first_name: $searchPatternAuthorFirst, _OPERATOR_: like } },
+            { orWhere: { last_name: $searchPatternAuthorLast, _OPERATOR_: like } }
+          ]
+        }
+      }`);
+      filters.push(`{
+        orWhere: {
+          post_copy: $searchPatternPostCopy, _OPERATOR_: like
+        }
+      }`);
     }
 
-    // Build the complete filters array string.
+    // Build the query filters string
     const queryFilters = `[ ${filters.join(", ")} ]`;
 
-    // Build the rest of the query arguments.
+    // Build the argument list
     let args = [];
     args.push(`query: ${queryFilters}`);
-    args.push(`limit: $limit`, `offset: $offset`);
+    args.push(`limit: $limit, offset: $offset`);
     if (sortCondition) args.push(sortCondition);
     const argsString = args.join(", ");
 
-    // Construct the final query string.
+    // Construct the final query string with separate variables for author and post
     let query = `query calcForumPosts(
-      $limit: IntScalar,
-      $offset: IntScalar${
-        this.needsUserId() ? ", $id: PriestessContactID" : ""
-      }${
+          $limit: IntScalar,
+          $offset: IntScalar${
+            this.needsUserId() ? ", $id: PriestessContactID" : ""
+          }${
       this.searchTerm && this.searchTerm.trim() !== ""
-        ? ", $first_name: TextScalar"
+        ? ", $searchPatternAuthorFirst: TextScalar, $searchPatternAuthorLast: TextScalar, $searchPatternPostCopy: LongtextScalar"
         : ""
     }
-    ) {
-      calcForumPosts(
-        ${argsString}
-      ) {
-        ID: field(arg: ["id"])
-        Author_ID: field(arg: ["author_id"])
-        Author_First_Name: field(arg: ["Author", "first_name"])
-        Author_Last_Name: field(arg: ["Author", "last_name"])
-        Author_Profile_Image: field(arg: ["Author", "profile_image"])
-        Date_Added: field(arg: ["created_at"])
-        Post_Title: field(arg: ["post_title"])
-        Post_Copy: field(arg: ["post_copy"])
-        Featured_Post: field(arg: ["featured_post"])
-        ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
-        Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
-        ForumCommentsIDCalc: calc(args: [
-          { countDistinct: [{ field: ["ForumComments", "id"] }] },
-          { countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }], operator: "+" }
-        ])
-        File_Tpe: field(arg: ["file_tpe"])
-        File_Content: field(arg: ["file_content"])
-        Disable_New_Comments: field(arg: ["disable_new_comments"])
-        Author_Forum_Image: field(arg: ["Author", "forum_image"])
-      }
-    }`;
+        ) {
+          calcForumPosts(
+            ${argsString}
+          ) {
+            ID: field(arg: ["id"])
+            Author_ID: field(arg: ["author_id"])
+            Author_First_Name: field(arg: ["Author", "first_name"])
+            Author_Last_Name: field(arg: ["Author", "last_name"])
+            Author_Profile_Image: field(arg: ["Author", "profile_image"])
+            Date_Added: field(arg: ["created_at"])
+            Post_Title: field(arg: ["post_title"])
+            Post_Copy: field(arg: ["post_copy"])
+            Featured_Post: field(arg: ["featured_post"])
+            ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+            Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+            ForumCommentsIDCalc: calc(args: [
+              { countDistinct: [{ field: ["ForumComments", "id"] }] },
+              { countDistinct: [{ field: ["Member_Post_Upvotes_Data", "id"] }], operator: "+" }
+            ])
+            File_Tpe: field(arg: ["file_tpe"])
+            File_Content: field(arg: ["file_content"])
+            Disable_New_Comments: field(arg: ["disable_new_comments"])
+            Author_Forum_Image: field(arg: ["Author", "forum_image"])
+          }
+        }`;
 
-    // Set up variables.
+    // Build the variables object
     let variables = {
       limit: this.postsLimit,
       offset: this.postsOffset,
@@ -245,10 +267,19 @@ class ForumManager {
     if (this.needsUserId()) {
       variables.id = this.userId;
     }
+
     if (this.searchTerm && this.searchTerm.trim() !== "") {
-      // Use the search term for all three variables.
-      variables.first_name = this.searchTerm;
+      const parts = this.searchTerm.trim().split(/\s+/);
+      if (parts.length === 1) {
+        variables.searchPatternAuthorFirst = `%${parts[0]}%`;
+        variables.searchPatternAuthorLast = `%${parts[0]}%`;
+      } else {
+        variables.searchPatternAuthorFirst = `%${parts[0]}%`;
+        variables.searchPatternAuthorLast = `%${parts[parts.length - 1]}%`;
+      }
+      variables.searchPatternPostCopy = `%${this.searchTerm.trim()}%`;
     }
+
     return { query, variables };
   }
 
@@ -921,10 +952,9 @@ class ForumManager {
             : content, // fall back to the original content
         author: {
           name: `${actualComment.Author_First_Name} ${actualComment.Author_Last_Name}`,
-          profileImage:       
-          actualComment.Author_Forum_Image?.trim()
-          ? actualComment.Author_Forum_Image
-          : DEFAULT_AVATAR,
+          profileImage: actualComment.Author_Forum_Image?.trim()
+            ? actualComment.Author_Forum_Image
+            : DEFAULT_AVATAR,
         },
         CommentVotesCount: actualComment.Member_Comment_Upvotes_DataTotal_Count,
         file_content: finalFileContent, // use our valid file content (or preview)
@@ -1634,7 +1664,6 @@ class ForumManager {
       }
 
       const buttonForComment = e.target.closest(".load-comments-btn");
-
       if (buttonForComment) {
         const postId = buttonForComment.dataset.postId;
         const postElement = document.querySelector(`.postcard-${postId}`);
@@ -1713,14 +1742,54 @@ class ForumManager {
       }
 
       const searchInput = document.getElementById("searchPost");
+      const postsContainer = document.getElementById("posts-container");
+
       let debounceTimer;
+
       searchInput.addEventListener("input", (e) => {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
-          this.searchTerm = e.target.value.trim();
-          this.refreshPosts();
+          const query = e.target.value.trim();
+          this.searchTerm = query;
+          // Call refreshPosts and then apply highlighting
+          this.refreshPosts().then(() => {
+            removeHighlights(postsContainer); // Remove old highlights
+            if (query) {
+              highlightMatches(postsContainer, query);
+            }
+          });
         }, 500);
       });
+
+      function highlightMatches(element, query) {
+        // Split query on spaces and filter out empty strings
+        const terms = query.split(/\s+/).filter(Boolean);
+        if (element.nodeType === Node.TEXT_NODE) {
+          let text = element.nodeValue;
+          // Escape regex special characters in each term
+          const escapedTerms = terms.map((term) =>
+            term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+          );
+          const regex = new RegExp(`(${escapedTerms.join("|")})`, "gi");
+
+          if (regex.test(text)) {
+            const span = document.createElement("span");
+            // Replace each term with a mark tag
+            span.innerHTML = text.replace(regex, `<mark>$1</mark>`);
+            element.replaceWith(span);
+          }
+        } else if (element.nodeType === Node.ELEMENT_NODE) {
+          element.childNodes.forEach((child) => highlightMatches(child, query));
+        }
+      }
+
+      function removeHighlights(element) {
+        if (element.nodeType === Node.ELEMENT_NODE) {
+          element.querySelectorAll("mark").forEach((mark) => {
+            mark.replaceWith(document.createTextNode(mark.textContent));
+          });
+        }
+      }
     });
   }
 }

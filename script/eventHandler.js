@@ -177,7 +177,6 @@ document.getElementById("delete-upload").addEventListener("click", function () {
 });
 
 document.getElementById("submit-post").addEventListener("click", async (e) => {
-  formatPreiview();
   // Get post content and file inputs...
   const editor = document.getElementById("post-editor");
   const textContent = editor.innerText.trim();
@@ -311,6 +310,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
 
     newPost = response.createForumPost;
     postElement.dataset.postId = newPost.id;
+    formatPreiview();
   } catch (error) {
     console.error("Error during post creation:", error);
     UIManager.showError("Failed to post. Please try again.");

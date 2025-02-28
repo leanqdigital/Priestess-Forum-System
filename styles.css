@@ -494,7 +494,7 @@ sl-dialog::part(close-button) {
 
 /* General styling. */
 .tab-Button {
-  padding: 12px 24px !important;
+  padding: 12px !important;
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
@@ -837,7 +837,7 @@ sl-dialog::part(panel) {
   transition: background-color 0.5s;
 }
 
-.preview-container{
+.preview-container {
   width: 100% !important;
   height: 400px !important;
   padding: 0 !important;
@@ -845,16 +845,16 @@ sl-dialog::part(panel) {
   overflow: hidden !important;
 }
 
-.preview-container iframe{
+.preview-container iframe {
   width: 100% !important;
   height: 100% !important;
 }
 
-.searchInput::placeholder{
+.searchInput::placeholder {
   color: var(--secondary);
 }
 
-.profile-image-wrapper{
+.profile-image-wrapper {
   border: 1px solid var(--secondary);
   border-radius: 100%;
 }
