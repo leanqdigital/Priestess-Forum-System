@@ -776,7 +776,7 @@ sl-dialog::part(base) {
 }
 
 .bg-unread {
-  background-color: var(--primary);
+  background-color: var(--secondary);
   color: var(--white);
 }
 

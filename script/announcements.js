@@ -380,7 +380,7 @@ function createNotificationCard(notification, isRead) {
   card.innerHTML = `
     <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${
       isRead ? "" : "bg-unread"
-    } hover:bg-primary hover:text-white">
+    } hover:bg-secondary-100 hover:text-white">
       <div class="flex justify-between w-full gap-[4px]">
         <div class="text-sm font-semibold leading-none">${title}</div>
         <div class="text-xs leading-3">${timeAgo(notification.Date_Added)}</div>
