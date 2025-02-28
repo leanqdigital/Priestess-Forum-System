@@ -493,7 +493,7 @@ document.querySelector(".deleteRecording").addEventListener("click", () => {
     mediaRecorder.onstop = function () {};
   }
   resetAudioRecording();
-
+  stopAudioRecording();
   // Ensure the audio preview container is cleared and remains hidden.
   const audioPreviewWrapper = document.getElementById("audio-preview-wrapper");
   audioPreviewWrapper.innerHTML = "";
