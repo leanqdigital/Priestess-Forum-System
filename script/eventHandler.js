@@ -797,9 +797,10 @@ document.addEventListener("click", async (e) => {
     });
 
     // --- File Handling for Replies ---
-    const imageInput = document.getElementById("reply-image-upload");
-    const audioInput = document.getElementById("reply-audio-upload");
-    const videoInput = document.getElementById("reply-video-upload");
+    const imageInput = replyForm.querySelector(".reply-image-upload");
+    const audioInput = replyForm.querySelector(".reply-audio-upload");
+    const videoInput = replyForm.querySelector(".reply-video-upload");
+    
 
     const imageFile = imageInput.files[0];
     const audioFile = audioInput.files[0];

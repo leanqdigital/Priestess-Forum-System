@@ -295,7 +295,7 @@ class PostModalManager {
                     p-2
                     rounded-[12px] 
                     border 
-                    border-white 
+                    border-grey-200 
                     bg-white
                     z-[999] 
                     max-[500px]:mb-0 

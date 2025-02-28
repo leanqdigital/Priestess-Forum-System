@@ -407,18 +407,20 @@ sl-dialog::part(close-button) {
 
 /* This colors the all icons inside the audio player  */
 .audio-player svg path {
-  fill: var(--primary);
+  fill: var(--secondary);
 }
 
 /* This is specific to play pause icon inside audio player */
 .audio-player .audioStateIcon {
   rect {
     fill: var(
-      --primary
+      --white
     ); /*This sets the background color of circle that contains play pause icon*/
   }
   path {
-    fill: var(--white); /*This sets the background color of play or pause icon*/
+    fill: var(
+      --secondary
+    ); /*This sets the background color of play or pause icon*/
   }
 }
 
@@ -456,7 +458,7 @@ sl-dialog::part(close-button) {
 }
 
 .post-details-modal {
-  background: var(--grey-300);
+  background: var(--white);
 }
 
 /* This is audio player inside the post details modal */
@@ -465,23 +467,24 @@ sl-dialog::part(close-button) {
 }
 
 .audio-player-modal svg path {
-  fill: var(--primary);
+  fill: var(--secondary);
 }
 
 /* This is specific to play pause icon inside audio player */
 .audio-player-modal .audioStateIcon {
   rect {
     fill: var(
-      --primary
+      --white
     ); /*This sets the background color of circle that contains play pause icon*/
   }
   path {
-    fill: var(--white); /*This sets the background color of play or pause icon*/
+    fill: var(--secondary); /*This sets the background color of play or pause icon*/
   }
 }
 
 .commentCard {
   background: var(--white);
+  border: 1px solid var(--grey-200);
 }
 /* ----------------------------------------------- */
 /* ----------------------------------------------- */
@@ -726,7 +729,7 @@ sl-dialog::part(base) {
 .comment-form-wrapper:focus,
 .comment-form-wrapper:focus-visible,
 .comment-form-wrapper:hover {
-  border: 1px solid var(--white);
+  border: 1px solid var(--grey-200);
 }
 
 .reply-editor:focus,
@@ -748,7 +751,7 @@ sl-dialog::part(base) {
 .reply-form-wrapper:focus,
 .reply-form-wrapper:focus-visible,
 .reply-form-wrapper:hover {
-  border: 1px solid var(--white);
+  border: 1px solid var(--grey-200);
 }
 
 .state-disabled {
