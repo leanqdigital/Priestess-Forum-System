@@ -873,6 +873,7 @@ sl-dialog::part(panel) {
   overflow: hidden;
   position: relative;
 }
+
 /* Ensure the canvas fills the wave container */
 #audioWaveCanvas {
   width: 100%;

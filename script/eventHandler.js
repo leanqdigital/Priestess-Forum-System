@@ -287,6 +287,10 @@ function stopAudioRecording() {
   if (audioCtx) {
     audioCtx.close();
   }
+  // Stop all media stream tracks to release the microphone
+  if (mediaRecorder && mediaRecorder.stream) {
+    mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+  }
 }
 
 function resetRecordingState() {
