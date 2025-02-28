@@ -86,23 +86,32 @@ function startAudioRecording() {
     console.error("getUserMedia not supported");
     return;
   }
+  let audioConstraint = true;
+  if (typeof selectedDeviceId === "string" && selectedDeviceId.trim() !== "") {
+    audioConstraint = { deviceId: { exact: selectedDeviceId } };
+  }
+
   navigator.mediaDevices
-    .getUserMedia({ audio: true })
+    .getUserMedia({ audio: audioConstraint })
     .then((stream) => {
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(
+        navigator.userAgent
+      );
       let options = { mimeType: "audio/webm;codecs=opus" };
       if (isSafari) {
         // Use a MIME type that Safari supports (if available)
         if (MediaRecorder.isTypeSupported("audio/mp4")) {
           options = { mimeType: "audio/mp4" };
         } else {
-          console.warn("Safari does not support audio/mp4; audio recording may fail. Consider using a polyfill.");
+          console.warn(
+            "Safari does not support audio/mp4; audio recording may fail. Consider using a polyfill."
+          );
         }
       } else if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         // Fallback for other browsers
         options = { mimeType: "audio/webm" };
       }
-      
+
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         options = { mimeType: "audio/webm" };
       }
