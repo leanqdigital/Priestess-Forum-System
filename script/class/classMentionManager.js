@@ -14,28 +14,6 @@ class MentionManager {
     // Attach Tribute to the main post editor.
     const editor = document.getElementById("post-editor");
     this.tribute.attach(editor);
-
-    // Optionally, add placeholder logic for any element with the class "editor".
-    const styledEditors = document.querySelectorAll(".editor");
-    styledEditors.forEach((singleEditor) => {
-      function setPlaceholder() {
-        if (!singleEditor.textContent.trim()) {
-          singleEditor.innerHTML =
-            '<span class="placeholder"><i>Type @ to mention someone...</i></span>';
-        }
-      }
-
-      singleEditor.addEventListener("focus", () => {
-        if (singleEditor.querySelector(".placeholder")) {
-          singleEditor.innerHTML = "";
-        }
-      });
-
-      singleEditor.addEventListener("blur", setPlaceholder);
-
-      // Initialize placeholder.
-      setPlaceholder();
-    });
   }
 
   // Fetch contacts that can be mentioned and add an "@all" option.

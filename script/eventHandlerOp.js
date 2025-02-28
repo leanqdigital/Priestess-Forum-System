@@ -179,6 +179,10 @@ document.getElementById("delete-upload").addEventListener("click", function () {
 document.getElementById("submit-post").addEventListener("click", async (e) => {
   // Get post content and file inputs...
   const editor = document.getElementById("post-editor");
+  if (editor.querySelector(".placeholder")) {
+    // Clear the editor so that only user-typed content is submitted.
+    editor.innerHTML = "";
+  }
   const textContent = editor.innerText.trim();
   const imageInput = document.getElementById("post-image-upload");
   const audioInput = document.getElementById("post-audio-upload");
