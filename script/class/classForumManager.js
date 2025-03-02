@@ -1768,6 +1768,8 @@ class ForumManager {
 
       const searchInput = document.getElementById("searchPost");
       const postsContainer = document.getElementById("posts-container");
+      const clearIcon = document.querySelector(".clearIcon");
+      const searchIcon = document.querySelector(".searchIcon");
 
       let debounceTimer;
 
@@ -1775,7 +1777,19 @@ class ForumManager {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           const query = e.target.value.trim();
+
+          // Show/Hide the clearIcon and searchIcon based on input value
+          if (query !== "") {
+            clearIcon.classList.remove("hidden"); // Show the clear icon
+            searchIcon.classList.add("hidden"); // Hide the search icon
+          } else {
+            clearIcon.classList.add("hidden"); // Hide the clear icon
+            searchIcon.classList.remove("hidden"); // Show the search icon
+          }
+
+          // Update the search term
           this.searchTerm = query;
+
           // Call refreshPosts and then apply highlighting
           this.refreshPosts().then(() => {
             removeHighlights(postsContainer); // Remove old highlights
@@ -1784,6 +1798,19 @@ class ForumManager {
             }
           });
         }, 500);
+      });
+
+      // Clear the input when the clearIcon is clicked
+      clearIcon.addEventListener("click", () => {
+        searchInput.value = ""; // Clear the input field
+        clearIcon.classList.add("hidden"); // Hide the clear icon
+        searchIcon.classList.remove("hidden"); // Show the search icon
+        this.searchTerm = ""; // Reset the search term
+
+        // Refresh posts and remove highlights
+        this.refreshPosts().then(() => {
+          removeHighlights(postsContainer);
+        });
       });
 
       function highlightMatches(element, query) {
