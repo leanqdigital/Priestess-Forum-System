@@ -203,7 +203,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
   const audioInput = document.getElementById("post-audio-upload");
   const videoInput = document.getElementById("post-video-upload");
   const imageFile = imageInput.files[0];
-  const audioFile = audioInput.files[0] || currentRecordedAudioFile;
+  const audioFile = audioInput.files[0];
   const videoFile = videoInput.files[0];
 
   let uploadedFile = null;
@@ -226,7 +226,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
 
   // Hide modal, reset state, etc.
   document.getElementById("postNewModal").hide();
-  resetPostModal();
 
   // Create a temporary post for immediate UI feedback.
   const tempPost = {
