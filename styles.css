@@ -713,6 +713,21 @@ sl-dialog::part(base) {
   background: var(--secondary-100);
 }
 
+.post-editor:focus,
+.post-editor:focus-visible,
+.post-editor:active {
+  outline: none !important;
+  border: 1px solid var(--secondary) !important;
+  box-shadow: none !important;
+}
+
+.post-editor [contenteditable]:focus,
+.post-editor [contenteditable]:focus-visible {
+  outline: none !important;
+  border: 1px solid var(--secondary) !important;
+  box-shadow: none !important;
+}
+
 .comment-editor:focus,
 .comment-editor:focus-visible,
 .comment-editor:active {
@@ -721,18 +736,9 @@ sl-dialog::part(base) {
   box-shadow: none !important;
 }
 
-.comment-editor [contenteditable]:focus,
-.comment-editor [contenteditable]:focus-visible {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.comment-form-wrapper:active,
-.comment-form-wrapper:focus,
-.comment-form-wrapper:focus-visible,
 .comment-form-wrapper:hover {
-  border: 1px solid var(--grey-200);
+  border: 1px solid var(--secondary) !important;
+  outline: none !important;
 }
 
 .reply-editor:focus,
@@ -743,18 +749,8 @@ sl-dialog::part(base) {
   box-shadow: none !important;
 }
 
-.reply-editor [contenteditable]:focus,
-.reply-editor [contenteditable]:focus-visible {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.reply-form-wrapper:active,
-.reply-form-wrapper:focus,
-.reply-form-wrapper:focus-visible,
 .reply-form-wrapper:hover {
-  border: 1px solid var(--grey-200);
+  border: 1px solid var(--secondary) !important;
 }
 
 .state-disabled {
@@ -839,7 +835,7 @@ sl-dialog::part(panel) {
 
 /* Example highlight style */
 .highlight {
-  background-color: var(--secondary);
+  background-color: var(--secondary-300);
   transition: background-color 0.5s;
 }
 
@@ -882,9 +878,21 @@ sl-dialog::part(panel) {
   display: block;
 }
 
-#post-editor:empty::before,
-.comment-editor:empty::before,
+#post-editor:empty::before {
+  content: "Type @ to mention someone...";
+  color: #999;
+}
+
+.comment-editor:empty::before {
+  content: "Type @ to mention someone...";
+  color: #999;
+}
+
 .reply-editor:empty::before {
   content: "Type @ to mention someone...";
   color: #999;
+}
+
+.formHighlight {
+  border: 1px solid var(--secondary) !important;
 }

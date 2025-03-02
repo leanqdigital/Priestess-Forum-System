@@ -177,18 +177,33 @@ document.getElementById("delete-upload").addEventListener("click", function () {
 });
 
 document.getElementById("submit-post").addEventListener("click", async (e) => {
-  // Get post content and file inputs...
   const editor = document.getElementById("post-editor");
-  if (editor.querySelector(".placeholder")) {
-    // Clear the editor so that only user-typed content is submitted.
-    editor.innerHTML = "";
-  }
-  const textContent = editor.innerText.trim();
+  const htmlContent = editor.innerHTML.trim();
+  const tempContainer = document.createElement("div");
+  tempContainer.innerHTML = htmlContent;
+
+  const mentionedIds = [];
+  tempContainer.querySelectorAll(".mention").forEach((mention) => {
+    const id = mention.dataset.contactId;
+    if (id) {
+      if (id === "all" && MentionManager.allContacts) {
+        MentionManager.allContacts.forEach((contact) => {
+          if (!mentionedIds.includes(contact.id)) {
+            mentionedIds.push(contact.id);
+          }
+        });
+      } else if (!mentionedIds.includes(id)) {
+        mentionedIds.push(id);
+      }
+    }
+  });
+
+  // (File input and other validations remain unchanged)
   const imageInput = document.getElementById("post-image-upload");
   const audioInput = document.getElementById("post-audio-upload");
   const videoInput = document.getElementById("post-video-upload");
   const imageFile = imageInput.files[0];
-  const audioFile = audioInput.files[0];
+  const audioFile = audioInput.files[0] || currentRecordedAudioFile;
   const videoFile = videoInput.files[0];
 
   let uploadedFile = null;
@@ -204,31 +219,14 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     fileType = "Video";
   }
 
-  // At least one (text or file) is required.
-  if (!textContent && !uploadedFile) {
+  if (!htmlContent && !uploadedFile) {
     UIManager.showError("Post content or a file is required.");
     return;
   }
 
-  // Hide the modal (your modal hide logic)
+  // Hide modal, reset state, etc.
   document.getElementById("postNewModal").hide();
-
-  // Process mentions...
-  const mentionedIds = [];
-  document.querySelectorAll(".mention").forEach((mention) => {
-    const id = mention.dataset.contactId;
-    if (id) {
-      if (id === "all" && MentionManager.allContacts) {
-        MentionManager.allContacts.forEach((contact) => {
-          if (!mentionedIds.includes(contact.id)) {
-            mentionedIds.push(contact.id);
-          }
-        });
-      } else if (!mentionedIds.includes(id)) {
-        mentionedIds.push(id);
-      }
-    }
-  });
+  resetPostModal();
 
   // Create a temporary post for immediate UI feedback.
   const tempPost = {
@@ -244,7 +242,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       profileImage: forumManager.defaultLoggedInAuthorImage,
     },
     date: "Just now",
-    content: textContent,
+    content: htmlContent, // Use the HTML content with mention markup.
   };
 
   const template = $.templates("#post-template");
@@ -253,7 +251,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
   const postElement = postContainer.firstElementChild;
   postElement.classList.add("state-disabled");
 
-  // Process file upload if applicable.
+  // Process file upload (unchanged)
   let fileData = null;
   const fileFields = [];
   if (uploadedFile) {
@@ -263,7 +261,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     });
   }
 
-  // Separate try/catch for post creation (mutation)
   let newPost;
   try {
     if (fileFields.length > 0) {
@@ -283,7 +280,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       fileData.type = fileData.type || uploadedFile.type;
     }
 
-    // Send the create post mutation.
+    // Send the create post mutation with HTML content.
     const response = await ApiService.query(
       `
         mutation createForumPost($payload: ForumPostCreateInput!) {
@@ -303,7 +300,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       {
         payload: {
           author_id: forumManager.userId,
-          post_copy: textContent,
+          post_copy: htmlContent,
           Mentioned_Users: mentionedIds.map((id) => ({ id: Number(id) })),
           related_course_id: courseID,
           file_tpe: uploadedFile ? fileType : null,
@@ -322,7 +319,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     return;
   }
 
-  // Now try to fetch additional post details.
+  // Fetch additional post details, update the UI, etc.
   try {
     const fetchResponse = await ApiService.query(
       `
@@ -347,7 +344,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     );
 
     const actualPost = fetchResponse.calcForumPosts[0];
-    // Update the postElement with actualPost details.
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
     postElement.querySelector(".post-author-name").textContent =
       actualPost.Author_First_Name + " " + actualPost.Author_Last_Name;
@@ -355,7 +351,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       actualPost.Author_Forum_Image?.trim()
         ? actualPost.Author_Forum_Image
         : DEFAULT_AVATAR;
-    postElement.querySelector(".post-copy-content").textContent =
+    // Use innerHTML to render the HTML content including mentions.
+    postElement.querySelector(".post-copy-content").innerHTML =
       actualPost.Post_Copy;
     postElement.querySelector(".postCommentCount").textContent =
       actualPost.ForumCommentsTotalCount;
@@ -367,7 +364,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       actualPost.ID;
     postElement.dataset.postId = actualPost.ID;
 
-    // Update audio player elements if necessary.
     const playPauseButton = postElement.querySelector("#play-pause");
     if (playPauseButton) {
       playPauseButton.dataset.audioButton = actualPost.ID;
@@ -378,7 +374,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     }
     e.preventDefault();
   } catch (fetchError) {
-    // If fetching additional details fails, log the error but don't remove the post.
     console.error("Error fetching post details:", fetchError);
   } finally {
     // Clear the editor and remove the temporary disabled state.
@@ -776,7 +771,7 @@ document.addEventListener("click", async (e) => {
 
     // Get the reply editor and text.
     const editor = replyForm.querySelector(".reply-editor");
-    const content = editor.innerText.trim();
+    const content = editor.innerHTML.trim();
     if (!content) {
       UIManager.showError("Reply cannot be empty");
       replyForm.classList.remove("state-disabled");

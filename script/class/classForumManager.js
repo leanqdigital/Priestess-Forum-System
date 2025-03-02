@@ -739,7 +739,7 @@ class ForumManager {
       const query = `
       query {
         calcForumComments(
-          orderBy: [{ path: ["created_at"], type: desc }]
+          orderBy: [{ path: ["created_at"], type: asc }]
           query: [{
             where: {
               Forum_Post: [{ where: { id: "${postId}" } }],
@@ -828,7 +828,7 @@ class ForumManager {
       "modal-comments-container"
     );
     commentsContainer.insertAdjacentHTML(
-      "afterbegin",
+      "beforeend",
       template.render(tempComment)
     );
 
@@ -1201,7 +1201,7 @@ class ForumManager {
       const query = `
         query {
           calcForumComments(
-          orderBy: [{ path: ["created_at"], type: desc }]
+          orderBy: [{ path: ["created_at"], type: asc }]
           query: [{
             where: { Parent_Comment: [{ where: { id: "${commentId}" } }] }
           }]) {
@@ -1285,7 +1285,7 @@ class ForumManager {
     // Render the temporary reply using the reply template.
     const template = $.templates("#reply-template");
     repliesContainer.insertAdjacentHTML(
-      "afterbegin",
+      "beforeend",
       template.render(tempReply)
     );
 
@@ -1667,57 +1667,83 @@ class ForumManager {
         const postId = buttonForComment.dataset.postId;
         const postElement = document.querySelector(`.postcard-${postId}`);
 
-        if (postElement) {
-          const authorId = postElement.dataset.authorId;
-          const authorImage = postElement.dataset.authorImage;
-          const authorName = postElement.dataset.authorName;
-          const date = postElement.dataset.postDate;
-          const title = postElement.dataset.title;
-          const content = postElement.dataset.content;
-          // NEW unified file fields:
-          const fileTpe = postElement.dataset.fileTpe;
-          const fileContentRaw = postElement.dataset.fileContent;
-          const voteCountDiv = postElement.querySelector(".postVoteCount");
-          const voteCount = voteCountDiv.textContent;
-          const commentCount = postElement.dataset.commentCount;
-          const voteButton = postElement.querySelector(".vote-button");
-          const voteIcon = voteButton.querySelector("svg");
-          let voted = false; // Default value
-          console.log("Vote count is", voteCount);
+        try {
+          // Fetch post details with the provided GraphQL query.
+          const response = await ApiService.query(
+            `
+              query calcForumPosts($id: PriestessForumPostID) {
+                calcForumPosts(query: [{ where: { id: $id } }]) {
+                  ID: field(arg: ["id"])
+                  Author_ID: field(arg: ["author_id"])
+                  Author_First_Name: field(arg: ["Author", "first_name"])
+                  Author_Last_Name: field(arg: ["Author", "last_name"])
+                  Author_Profile_Image: field(arg: ["Author", "profile_image"])
+                  Date_Added: field(arg: ["created_at"])
+                  Post_Copy: field(arg: ["post_copy"])
+                  File_Tpe: field(arg: ["file_tpe"])
+                  File_Content: field(arg: ["file_content"])
+                  ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
+                  Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
+                  Disable_New_Comments: field(arg: ["disable_new_comments"])
+                }
+              }
+              `,
+            { id: postId }
+          );
 
-          if (voteIcon?.classList.contains("voted-heart")) {
-            voted = true;
-          } else if (voteIcon?.classList.contains("unvoted-heart")) {
-            voted = false;
-          }
+          const fetchedPost = response.calcForumPosts[0];
 
-          console.log(voted);
-
-          // Parse fileContent (if it exists)
-          let fileContent = null;
-          if (fileContentRaw) {
-            try {
-              fileContent = JSON.parse(fileContentRaw);
-            } catch (err) {
-              fileContent = fileContentRaw;
+          // Parse the file content.
+          let fileContent = fetchedPost.File_Content;
+          if (typeof fileContent === "string") {
+            fileContent = fileContent.trim();
+            // If it starts with a '{', it's likely a JSON string.
+            if (fileContent.startsWith("{")) {
+              try {
+                fileContent = JSON.parse(fileContent);
+              } catch (e) {
+                // Fallback: if parsing fails, treat it as a URL string.
+                fileContent = { link: fileContent };
+              }
+            } else {
+              // Remove extra quotes if present.
+              if (
+                (fileContent.startsWith('"') && fileContent.endsWith('"')) ||
+                (fileContent.startsWith("'") && fileContent.endsWith("'"))
+              ) {
+                fileContent = fileContent.substring(1, fileContent.length - 1);
+              }
+              // Wrap the plain URL string in an object.
+              fileContent = { link: fileContent };
             }
+          } else {
+            // fileContent is already an object.
+            fileContent = fetchedPost.File_Content;
           }
 
+          // Map the fetched post into your post object.
           const post = {
-            id: postId,
-            authorId,
-            author: { name: authorName, profileImage: authorImage },
-            date,
-            title,
-            content,
-            file_tpe: fileTpe,
+            id: fetchedPost.ID,
+            author_id: fetchedPost.Author_ID,
+            author: {
+              name: `${fetchedPost.Author_First_Name} ${fetchedPost.Author_Last_Name}`,
+              profileImage: fetchedPost.Author_Profile_Image || DEFAULT_AVATAR,
+            },
+            date: Formatter.formatTimestamp(fetchedPost.Date_Added),
+            content: fetchedPost.Post_Copy,
+            file_tpe: fetchedPost.File_Tpe,
             file_content: fileContent,
-            PostVotesCount: voteCount,
-            PostCommentCount: commentCount,
-            voted: voted,
+            PostVotesCount: fetchedPost.Member_Post_Upvotes_DataTotal_Count,
+            PostCommentCount: fetchedPost.ForumCommentsTotalCount,
+            voted: false,
           };
 
           await PostModalManager.open(post);
+        } catch (error) {
+          console.error("Error fetching post details:", error);
+          UIManager.showError(
+            "Failed to load post details. Please try again later."
+          );
         }
       }
 
