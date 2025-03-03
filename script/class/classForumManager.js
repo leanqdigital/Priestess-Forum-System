@@ -336,13 +336,9 @@ class ForumManager {
     if (!postElement) return;
 
     try {
-      // Show visual effects
       postElement.classList.add("opacity-50", "pointer-events-none");
-
       const confirmed = await UIManager.showDeleteConfirmation();
-
       if (!confirmed) {
-        // Reset styles if not confirmed
         postElement.classList.remove("opacity-50", "pointer-events-none");
         return;
       }
@@ -663,13 +659,16 @@ class ForumManager {
   }
 
   updateVoteUI(postId, updatedVoteCount) {
-    document
-      .querySelectorAll(`[data-post-id="${postId}"] .vote-button`)
-      .forEach((button) => {
-        const isVoted = this.votedPostIds.has(postId);
-        button.innerHTML = this.getVoteSVG(isVoted);
-        button.nextElementSibling.textContent = updatedVoteCount;
-      });
+    // Select vote buttons that are either the element itself or nested within another element
+    const voteButtons = document.querySelectorAll(
+      `[data-post-id="${postId}"].vote-button, [data-post-id="${postId}"] .vote-button`
+    );
+    voteButtons.forEach((button) => {
+      const isVoted = this.votedPostIds.has(postId);
+      button.innerHTML = this.getVoteSVG(isVoted);
+      // Assuming the vote count element is the next sibling:
+      button.nextElementSibling.textContent = updatedVoteCount;
+    });
   }
 
   getVoteSVG(isVoted) {

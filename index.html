@@ -504,7 +504,7 @@
 
     <!-- Templates -->
     <script type="text/html" id="post-template">
-        <div class="p-4 flex flex-col items-start gap-3 rounded postCard postcard-{{:id}}" data-post-id="{{:id}}">
+        <div class="p-4 flex flex-col items-start gap-3 rounded postCard postcard-{{:id}} overflow-x-hidden" data-post-id="{{:id}}">
             <div class="flex items-center justify-between w-full">
                 <div class="flex items-center gap-2">
                     <div class="size-8 profile-image-wrapper">
@@ -545,7 +545,7 @@
                 {{/if}}
                 <!-- Three Dots Ends -->
             </div>
-            <div class="post-content flex flex-col gap-4 w-full max-h-max overflow-auto">
+            <div class="post-content flex flex-col gap-4 w-full max-h-max">
                 <div class="p-2 page-text !font-[350] post-copy-content content-container">{{:content}}</div>
                 {{if file_tpe === "Image" && file_content}}
                     <div class="post-image-wrapper">

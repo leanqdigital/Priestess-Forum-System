@@ -73,7 +73,7 @@ class PostModalManager {
     }
 
 
-    <div class="flex flex-col gap-4 flex-1 post-details-modal overflow-auto">
+    <div class="flex flex-col gap-4 flex-1 post-details-modal overflow-y-auto overflow-x-hidden">
         <div class="flex items-center justify-between px-6 py-4 w-full post-details-modal sticky top-0 z-[99999]">
             <h2 class="page-text">Post Details</h2>
             <svg class="cursor-pointer" @click="openCommentModal = false" width="14" height="14" viewBox="0 0 14 14"
