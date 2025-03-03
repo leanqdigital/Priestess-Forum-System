@@ -14,8 +14,9 @@
 </head>
 
 <body class="page-background"
-    x-data="{ openCommentModal: false, openAudioOptions: false, openCommentAudioOptions: false, openReplyAudioOptions: false}">
-    <div class="rounded-full w-12 h-12 bg-secondary hover:bg-secondary-100 fixed bottom-[2rem] right-[2rem] flex items-center justify-center cursor-pointer"
+    x-data="{ openCommentModal: false, openAudioOptions: false, openCommentAudioOptions: false, openReplyAudioOptions: false}"
+    x-bind:class="{ 'overflow-hidden': openCommentModal }">
+    <div class="rounded-full w-12 h-12 bg-secondary hover:bg-secondary-100 fixed bottom-[2rem] right-[2rem] flex items-center justify-center cursor-pointer z-[999]"
         @click="window.scrollTo({ top: 0, behavior: 'smooth' });">
         <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
