@@ -177,7 +177,7 @@ class PostModalManager {
                         </div>
 
                         <!-- Audio element -->
-                        <audio id="custom-audio" class="audio">
+                        <audio id="custom-audio-comment" class="audio">
                             <source src="${audioData.link}" type="${audioData.type}">
                         </audio>
 
@@ -236,7 +236,7 @@ class PostModalManager {
                             </button>
                         </div>
 
-                    </div> <!-- end .audio-player -->
+                    </div> 
                 </div>
                 `
                     : ""
@@ -314,10 +314,59 @@ class PostModalManager {
                     bg-white
                     z-[9999]">
                 <div id="comment-editor" style="font-size: 16px !important;" class="editor comment-editor page-text p-2 !border-none !focus-visible:border-none rounded" contenteditable="true"></div>
+                <div class="flex flex-col gap-3 fullAudioRecordingWrapperComment hidden">
+                <div class="o2 text-secondary">Audio Recording</div>
+                <div class="flex p-3 items-center justify-between rounded-[12px] border border-grey-200">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex items-center justify-center !p-2 !rounded-full !w-8 !h-8 icon-button stopRecordingComment cursor-pointer">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M14.6668 2.54611V13.4552C14.6668 13.7767 14.5391 14.085 14.3118 14.3123C14.0845 14.5396 13.7762 14.6673 13.4547 14.6673H2.54562C2.22414 14.6673 1.91583 14.5396 1.68852 14.3123C1.4612 14.085 1.3335 13.7767 1.3335 13.4552V2.54611C1.3335 2.22463 1.4612 1.91632 1.68852 1.68901C1.91583 1.46169 2.22414 1.33398 2.54562 1.33398H13.4547C13.7762 1.33398 14.0845 1.46169 14.3118 1.68901C14.5391 1.91632 14.6668 2.22463 14.6668 2.54611Z"
+                                    fill="#C29D68" />
+                            </svg>
+                        </div>
+                        <div class="recordingTimerComment o3 text-secondary">
+                            0:00
+                        </div>
+                    </div>
+                    <div class="waveWrapper waveWrapperComment"></div>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex items-center justify-center !p-2 !rounded-full !w-8 !h-8 icon-button replaceRecordingComment cursor-pointer">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M14.6668 2.31064V5.64397C14.6668 5.79132 14.6083 5.93262 14.5041 6.03681C14.3999 6.141 14.2586 6.19953 14.1113 6.19953H10.7779C10.668 6.19962 10.5605 6.16708 10.4691 6.10604C10.3776 6.045 10.3063 5.9582 10.2643 5.85664C10.2222 5.75507 10.2112 5.6433 10.2326 5.53547C10.2541 5.42765 10.3071 5.32862 10.3849 5.25092L11.6564 3.97731C10.6335 2.99727 9.273 2.44803 7.85641 2.44328H7.82516C6.3736 2.44043 4.97928 3.00924 3.94391 4.02661C3.83782 4.12566 3.69717 4.17925 3.55207 4.17592C3.40697 4.17259 3.26893 4.11261 3.16748 4.0088C3.06604 3.905 3.00925 3.76562 3.00925 3.62048C3.00926 3.47534 3.06607 3.33596 3.16752 3.23217C4.40598 2.02215 6.06662 1.34143 7.79805 1.33405C9.52948 1.32666 11.1959 1.99318 12.4446 3.19259L13.7196 1.91759C13.7974 1.84028 13.8963 1.78771 14.0039 1.76651C14.1115 1.74531 14.2229 1.75643 14.3242 1.79846C14.4255 1.84049 14.5121 1.91155 14.573 2.00269C14.634 2.09383 14.6666 2.20098 14.6668 2.31064ZM12.0564 11.7058C11.0273 12.7109 9.64855 13.2776 8.21011 13.2868C6.77167 13.296 5.38574 12.7469 4.34391 11.7551L5.61544 10.4836C5.69395 10.406 5.74756 10.3068 5.76945 10.1986C5.79133 10.0904 5.7805 9.97815 5.73833 9.87615C5.69616 9.77415 5.62456 9.68702 5.53267 9.62588C5.44078 9.56474 5.33276 9.53236 5.22238 9.53286H1.88905C1.74171 9.53286 1.6004 9.5914 1.49621 9.69558C1.39203 9.79977 1.3335 9.94108 1.3335 10.0884V13.4218C1.33341 13.5317 1.36595 13.6392 1.42698 13.7306C1.48802 13.8221 1.57482 13.8933 1.67639 13.9354C1.77796 13.9775 1.88973 13.9885 1.99756 13.967C2.10538 13.9456 2.20441 13.8926 2.28211 13.8148L3.55572 12.5398C4.78641 13.7275 6.4287 14.3934 8.13905 14.3981H8.17586C9.91758 14.4026 11.5909 13.7208 12.8335 12.5002C12.935 12.3964 12.9918 12.2571 12.9918 12.1119C12.9918 11.9668 12.935 11.8274 12.8335 11.7236C12.7321 11.6198 12.5941 11.5598 12.449 11.5565C12.3038 11.5531 12.1632 11.6067 12.0571 11.7058H12.0564Z"
+                                    fill="#C29D68" />
+                            </svg>
+                        </div>
+                        <div
+                            class="flex items-center justify-center !p-2 !rounded-full !w-8 !h-8 icon-button deleteRecordingComment cursor-pointer">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M13.7949 3.38527H11.2308V2.87245C11.2308 2.46442 11.0687 2.07311 10.7802 1.78459C10.4916 1.49607 10.1003 1.33398 9.69231 1.33398H6.61539C6.20736 1.33398 5.81605 1.49607 5.52753 1.78459C5.23901 2.07311 5.07692 2.46442 5.07692 2.87245V3.38527H2.51282C2.37681 3.38527 2.24637 3.4393 2.1502 3.53547C2.05403 3.63164 2 3.76208 2 3.89809C2 4.0341 2.05403 4.16453 2.1502 4.26071C2.24637 4.35688 2.37681 4.41091 2.51282 4.41091H3.02564V13.6417C3.02564 13.9137 3.1337 14.1746 3.32604 14.3669C3.51839 14.5593 3.77927 14.6673 4.05128 14.6673H12.2564C12.5284 14.6673 12.7893 14.5593 12.9816 14.3669C13.174 14.1746 13.2821 13.9137 13.2821 13.6417V4.41091H13.7949C13.9309 4.41091 14.0613 4.35688 14.1575 4.26071C14.2537 4.16453 14.3077 4.0341 14.3077 3.89809C14.3077 3.76208 14.2537 3.63164 14.1575 3.53547C14.0613 3.4393 13.9309 3.38527 13.7949 3.38527ZM6.10256 2.87245C6.10256 2.73644 6.15659 2.606 6.25277 2.50983C6.34894 2.41365 6.47938 2.35963 6.61539 2.35963H9.69231C9.82832 2.35963 9.95876 2.41365 10.0549 2.50983C10.1511 2.606 10.2051 2.73644 10.2051 2.87245V3.38527H6.10256V2.87245ZM12.2564 13.6417H4.05128V4.41091H12.2564V13.6417ZM7.12821 6.97501V11.0776C7.12821 11.2136 7.07418 11.344 6.978 11.4402C6.88183 11.5364 6.75139 11.5904 6.61539 11.5904C6.47938 11.5904 6.34894 11.5364 6.25277 11.4402C6.15659 11.344 6.10256 11.2136 6.10256 11.0776V6.97501C6.10256 6.839 6.15659 6.70856 6.25277 6.61239C6.34894 6.51622 6.47938 6.46219 6.61539 6.46219C6.75139 6.46219 6.88183 6.51622 6.978 6.61239C7.07418 6.70856 7.12821 6.839 7.12821 6.97501ZM10.2051 6.97501V11.0776C10.2051 11.2136 10.1511 11.344 10.0549 11.4402C9.95876 11.5364 9.82832 11.5904 9.69231 11.5904C9.5563 11.5904 9.42586 11.5364 9.32969 11.4402C9.23352 11.344 9.17949 11.2136 9.17949 11.0776V6.97501C9.17949 6.839 9.23352 6.70856 9.32969 6.61239C9.42586 6.51622 9.5563 6.46219 9.69231 6.46219C9.82832 6.46219 9.95876 6.51622 10.0549 6.61239C10.1511 6.70856 10.2051 6.839 10.2051 6.97501Z"
+                                    fill="#E57C7C" />
+                            </svg>
+                        </div>
+                        <div
+                            class="flex items-center justify-center !p-2 !rounded-full !w-8 !h-8 icon-button approveRecordingComment cursor-pointer">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M14.4399 4.64775L6.23722 12.8504C6.16578 12.9221 6.08089 12.979 5.98741 13.0178C5.89394 13.0566 5.79372 13.0766 5.69251 13.0766C5.5913 13.0766 5.49109 13.0566 5.39761 13.0178C5.30414 12.979 5.21925 12.9221 5.1478 12.8504L1.55912 9.26177C1.48759 9.19024 1.43085 9.10531 1.39213 9.01185C1.35342 8.91839 1.3335 8.81822 1.3335 8.71706C1.3335 8.6159 1.35342 8.51572 1.39213 8.42226C1.43085 8.3288 1.48759 8.24388 1.55912 8.17235C1.63065 8.10081 1.71558 8.04407 1.80904 8.00536C1.9025 7.96665 2.00267 7.94672 2.10383 7.94672C2.20499 7.94672 2.30517 7.96665 2.39863 8.00536C2.49209 8.04407 2.57701 8.10081 2.64854 8.17235L5.69315 11.217L13.3518 3.55961C13.4962 3.41514 13.6922 3.33398 13.8965 3.33398C14.1008 3.33398 14.2967 3.41514 14.4412 3.55961C14.5857 3.70408 14.6668 3.90002 14.6668 4.10432C14.6668 4.30863 14.5857 4.50457 14.4412 4.64903L14.4399 4.64775Z"
+                                    fill="#C29D68" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
                 <div id="file-preview-container-comment" class="flex flex-col gap-2">
                     <!-- Wrappers for file previews (only one will be used at a time) -->
                     <div id="image-preview-wrapper-comment" class="w-[200px]"></div>
-                    <div id="audio-preview-wrapper-comment" class="w-[200px]"></div>
+                    <div id="audio-preview-wrapper-comment" class="w-full"></div>
                     <div id="video-preview-wrapper-comment" class="w-[200px]"></div>
 
                     <!-- New file control buttons: Refresh (to re-upload the same type) and Clear (to reset) -->
@@ -352,14 +401,28 @@ class PostModalManager {
                             </svg>
                         </button>
                         <input type="file" id="comment-audio-upload" accept="audio/*" style="display: none;">
-                        <button id="upload-audio-button-comment" class="icon-button" type="button">
-                            <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M8.24421 10.1663C9.64153 10.1663 10.774 9.04729 10.774 7.66634V4.33301C10.774 2.95206 9.64153 1.83301 8.24421 1.83301C6.84689 1.83301 5.71445 2.95206 5.71445 4.33301V7.66634C5.71445 9.04729 6.84689 10.1663 8.24421 10.1663ZM13.1549 7.63658C13.1549 7.5711 13.1014 7.51753 13.0359 7.51753H12.143C12.0775 7.51753 12.024 7.5711 12.024 7.63658C12.024 9.72438 10.332 11.4163 8.24421 11.4163C6.15641 11.4163 4.46445 9.72438 4.46445 7.63658C4.46445 7.5711 4.41088 7.51753 4.3454 7.51753H3.45254C3.38707 7.51753 3.3335 7.5711 3.3335 7.63658C3.3335 10.147 5.21742 12.2184 7.64897 12.5116V14.0354H5.48677C5.2829 14.0354 5.11921 14.2482 5.11921 14.5116V15.0473C5.11921 15.1128 5.16088 15.1663 5.21147 15.1663H11.2769C11.3275 15.1663 11.3692 15.1128 11.3692 15.0473V14.5116C11.3692 14.2482 11.2055 14.0354 11.0017 14.0354H8.77992V12.519C11.2397 12.2512 13.1549 10.1678 13.1549 7.63658Z"
-                                    fill="#C29D68" />
-                            </svg>
-                        </button>
+                        <div id="commentAudioOptionsWrapper" class="commentAudioOptionsWrapper relative">
+                            <button x-on:click="openCommentAudioOptions = !openCommentAudioOptions" aria-haspopup="true" class="icon-button">
+                                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M8.24421 10.1663C9.64153 10.1663 10.774 9.04729 10.774 7.66634V4.33301C10.774 2.95206 9.64153 1.83301 8.24421 1.83301C6.84689 1.83301 5.71445 2.95206 5.71445 4.33301V7.66634C5.71445 9.04729 6.84689 10.1663 8.24421 10.1663ZM13.1549 7.63658C13.1549 7.5711 13.1014 7.51753 13.0359 7.51753H12.143C12.0775 7.51753 12.024 7.5711 12.024 7.63658C12.024 9.72438 10.332 11.4163 8.24421 11.4163C6.15641 11.4163 4.46445 9.72438 4.46445 7.63658C4.46445 7.5711 4.41088 7.51753 4.3454 7.51753H3.45254C3.38707 7.51753 3.3335 7.5711 3.3335 7.63658C3.3335 10.147 5.21742 12.2184 7.64897 12.5116V14.0354H5.48677C5.2829 14.0354 5.11921 14.2482 5.11921 14.5116V15.0473C5.11921 15.1128 5.16088 15.1663 5.21147 15.1663H11.2769C11.3275 15.1663 11.3692 15.1128 11.3692 15.0473V14.5116C11.3692 14.2482 11.2055 14.0354 11.0017 14.0354H8.77992V12.519C11.2397 12.2512 13.1549 10.1678 13.1549 7.63658Z"
+                                        fill="#C29D68" />
+                                </svg>
+                            </button>
+
+                            <div x-cloak x-show="openCommentAudioOptions" x-transition x-on:click.outside="openCommentAudioOptions = false;"
+                                x-on:keydown.down.prevent="$focus.wrap().next()"
+                                x-on:keydown.up.prevent="$focus.wrap().previous()"
+                                class="commentAudioDropdownOptions absolute top-[-4rem] right-[-1rem] w-max flex flex-col rounded sort-options-wrapper p-1 shadow-[0px_4px_4px_0px_#0000000F]">
+                                <!-- Dropdown Items -->
+                                <button id="upload-audio-button-comment" type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
+                                    Audio</button>
+                                <button id="record-audio-button-comment" type="button"
+                                    class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
+                                    Audio</button>
+                            </div>
+                        </div>
                         <input type="file" id="comment-video-upload" accept="video/*" style="display: none;">
                         <button id="upload-video-button-comment" class="icon-button" type="button">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
@@ -385,241 +448,59 @@ class PostModalManager {
     </div>
 </div>
 `;
-
-    // Trigger file inputs when the corresponding button is clicked
-    document
-      .getElementById("upload-image-button-comment")
-      .addEventListener("click", () => {
-        document.getElementById("comment-image-upload").click();
-      });
-    document
-      .getElementById("upload-audio-button-comment")
-      .addEventListener("click", () => {
-        document.getElementById("comment-audio-upload").click();
-      });
-    document
-      .getElementById("upload-video-button-comment")
-      .addEventListener("click", () => {
-        document.getElementById("comment-video-upload").click();
-      });
-
-    let currentFileTypeComment = null;
-
-    /**
-     * Helper: Shows the refresh and clear controls and hides the three upload buttons.
-     * @param {string} fileTypeComment - "image", "audio", or "video"
-     */
-
-    function showFileControlsComment(fileTypeComment) {
-      currentFileType = fileTypeComment;
-      // Hide the three separate upload buttons
-      document
-        .getElementById("upload-image-button-comment")
-        .classList.add("hidden");
-      document
-        .getElementById("upload-audio-button-comment")
-        .classList.add("hidden");
-      document
-        .getElementById("upload-video-button-comment")
-        .classList.add("hidden");
-      // Show the controls container (refresh & clear)
-      document
-        .getElementById("file-controls-comment")
-        .classList.remove("hidden");
-    }
-    // -------------------------
-    // File Input Event Listeners
-    // -------------------------
-
-    // IMAGE file input
-    document
-      .getElementById("comment-image-upload")
-      .addEventListener("change", function (e) {
-        const file = e.target.files[0];
-        const wrapper = document.getElementById(
-          "image-preview-wrapper-comment"
-        );
-        wrapper.innerHTML = ""; // Clear previous preview if any
-
-        if (file) {
-          // Clear the other file inputs and their previews
-          document.getElementById("comment-audio-upload").value = "";
-          document.getElementById("audio-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-video-upload").value = "";
-          document.getElementById("video-preview-wrapper-comment").innerHTML =
-            "";
-
-          // Create and show the image preview
-          const imageURL = URL.createObjectURL(file);
-          const img = document.createElement("img");
-          img.src = imageURL;
-          img.alt = "Image Preview";
-          img.classList.add("w-full", "object-contain", "rounded");
-          wrapper.appendChild(img);
-
-          // Show refresh/clear controls for images
-          showFileControlsComment("image");
-        }
-      });
-
-    // AUDIO file input
-    document
-      .getElementById("comment-audio-upload")
-      .addEventListener("change", function (e) {
-        const file = e.target.files[0];
-        const wrapper = document.getElementById(
-          "audio-preview-wrapper-comment"
-        );
-        wrapper.innerHTML = "";
-
-        if (file) {
-          // Clear image and video inputs and their previews
-          document.getElementById("comment-image-upload").value = "";
-          document.getElementById("image-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-video-upload").value = "";
-          document.getElementById("video-preview-wrapper-comment").innerHTML =
-            "";
-
-          // Create and show the audio preview
-          const audioURL = URL.createObjectURL(file);
-          const audio = document.createElement("audio");
-          audio.controls = true;
-          audio.classList.add("w-full");
-          const source = document.createElement("source");
-          source.src = audioURL;
-          source.type = file.type;
-          audio.appendChild(source);
-          wrapper.appendChild(audio);
-
-          // Show refresh/clear controls for audio
-          showFileControlsComment("audio");
-        }
-      });
-
-    // VIDEO file input
-    document
-      .getElementById("comment-video-upload")
-      .addEventListener("change", function (e) {
-        const file = e.target.files[0];
-        const wrapper = document.getElementById(
-          "video-preview-wrapper-comment"
-        );
-        wrapper.innerHTML = "";
-
-        if (file) {
-          // Clear image and audio inputs and their previews
-          document.getElementById("comment-image-upload").value = "";
-          document.getElementById("image-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-audio-upload").value = "";
-          document.getElementById("audio-preview-wrapper-comment").innerHTML =
-            "";
-
-          // Create and show the video preview
-          const videoURL = URL.createObjectURL(file);
-          const video = document.createElement("video");
-          video.controls = true;
-          video.width = 300; // adjust as needed
-          video.classList.add("rounded");
-          const source = document.createElement("source");
-          source.src = videoURL;
-          source.type = file.type;
-          video.appendChild(source);
-          wrapper.appendChild(video);
-
-          // Show refresh/clear controls for video
-          showFileControlsComment("video");
-        }
-      });
-
-    // -------------------------
-    // Refresh and Clear Button Handlers
-    // -------------------------
-    document
-      .getElementById("refresh-upload-comment")
-      .addEventListener("click", function () {
-        if (currentFileType === "image") {
-          document.getElementById("image-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-image-upload").value = "";
-          // Trigger file selection dialog (since the user clicked refresh, which is a user gesture)
-          document.getElementById("comment-image-upload").click();
-        } else if (currentFileType === "audio") {
-          document.getElementById("audio-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-audio-upload").value = "";
-          document.getElementById("comment-audio-upload").click();
-        } else if (currentFileType === "video") {
-          document.getElementById("video-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-video-upload").value = "";
-          document.getElementById("comment-video-upload").click();
-        }
-      });
-
-    // Clear (Delete): Clears the current preview and resets the UI so the three file upload buttons appear again.
-    document
-      .getElementById("delete-upload-comment")
-      .addEventListener("click", function () {
-        if (currentFileType === "image") {
-          document.getElementById("image-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-image-upload").value = "";
-        } else if (currentFileType === "audio") {
-          document.getElementById("audio-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-audio-upload").value = "";
-        } else if (currentFileType === "video") {
-          document.getElementById("video-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("comment-video-upload").value = "";
-        }
-        // Reset state
-        currentFileType = null;
-        // Hide the refresh/clear controls
-        document
-          .getElementById("file-controls-comment")
-          .classList.add("hidden");
-        // Show all three upload buttons so the user may pick any file type
-        document
-          .getElementById("upload-image-button-comment")
-          .classList.remove("hidden");
-        document
-          .getElementById("upload-audio-button-comment")
-          .classList.remove("hidden");
-        document
-          .getElementById("upload-video-button-comment")
-          .classList.remove("hidden");
-      });
-
-    // Initialize mention functionality for comments
-    const commentEditor = document.getElementById("comment-editor");
-    MentionManager.tribute.attach(commentEditor);
-
-    // Add comment submit handler
-
-    // Inside your modal initialization code…
-    // Submit Comment – attached to the submit button
+    const commentFormConfig = {
+      editor: document.getElementById("comment-editor"),
+      imageUploadInput: document.getElementById("comment-image-upload"),
+      audioUploadInput: document.getElementById("comment-audio-upload"),
+      videoUploadInput: document.getElementById("comment-video-upload"),
+      uploadImageBtn: document.getElementById("upload-image-button-comment"),
+      uploadAudioBtn: document.getElementById("upload-audio-button-comment"),
+      uploadVideoBtn: document.getElementById("upload-video-button-comment"),
+      imagePreviewWrapper: document.getElementById(
+        "image-preview-wrapper-comment"
+      ),
+      audioPreviewWrapper: document.getElementById(
+        "audio-preview-wrapper-comment"
+      ),
+      videoPreviewWrapper: document.getElementById(
+        "video-preview-wrapper-comment"
+      ),
+      fileControls: document.getElementById("file-controls-comment"),
+      audioOptionsWrapper: document.getElementById(
+        "commentAudioOptionsWrapper"
+      ),
+      recordAudioBtn: document.getElementById("record-audio-button-comment"),
+      stopRecordingBtn: document.querySelector(".stopRecordingComment"),
+      replaceRecordingBtn: document.querySelector(".replaceRecordingComment"),
+      deleteRecordingBtn: document.querySelector(".deleteRecordingComment"),
+      approveRecordingBtn: document.querySelector(".approveRecordingComment"),
+      fullAudioRecordingWrapper: document.querySelector(
+        ".fullAudioRecordingWrapperComment"
+      ),
+      recordingTimer: document.querySelector(".recordingTimerComment"),
+      waveWrapper: document.querySelector(".waveWrapperComment"),
+      refreshBtn: document.getElementById("refresh-upload-comment"),
+      deleteUploadBtn: document.getElementById("delete-upload-comment"),
+      // modal property is optional if your comment form is within a modal already handled elsewhere
+      modal: null,
+    };
+    window.commentMediaFormHandler = new MediaFormHandler(commentFormConfig);
+    MentionManager.tribute.attach(commentFormConfig.editor);
     document
       .getElementById("submit-comment")
       .addEventListener("click", async () => {
         const commentForm = document.querySelector(".comment-form-wrapper");
-        const editor = document.getElementById("comment-editor");
-
-        // Capture HTML content to preserve the mention markup.
+        const editor = commentFormConfig.editor;
         const content = editor.innerHTML.trim();
-
-        // Get file input elements (they remain in the DOM)
-        const imageInput = document.getElementById("comment-image-upload");
-        const audioInput = document.getElementById("comment-audio-upload");
-        const videoInput = document.getElementById("comment-video-upload");
-
-        // Determine which file is uploaded (only one allowed)
-        const imageFile = imageInput.files[0];
-        const audioFile = audioInput.files[0];
-        const videoFile = videoInput.files[0];
+        if (!content) {
+          UIManager.showError("Comment cannot be empty");
+          return;
+        }
+        const imageFile = commentFormConfig.imageUploadInput.files[0];
+        const audioFile =
+          commentFormConfig.audioUploadInput.files[0] ||
+          window.commentMediaFormHandler.currentRecordedAudioFile;
+        const videoFile = commentFormConfig.videoUploadInput.files[0];
 
         let uploadedFile = null;
         let fileType = null;
@@ -633,14 +514,13 @@ class PostModalManager {
           uploadedFile = videoFile;
           fileType = "Video";
         }
-
-        // Get mention IDs from the editor (if any)
         const mentions = [];
-        document.querySelectorAll(".mention").forEach((mention) => {
+        const tempContainer = document.createElement("div");
+        tempContainer.innerHTML = content;
+        tempContainer.querySelectorAll(".mention").forEach((mention) => {
           const id = mention.dataset.contactId;
           if (id) {
             if (id === "all" && MentionManager.allContacts) {
-              // Push all contact IDs from the cached list.
               MentionManager.allContacts.forEach((contact) => {
                 if (!mentions.includes(contact.id)) {
                   mentions.push(contact.id);
@@ -652,39 +532,50 @@ class PostModalManager {
           }
         });
 
-        // Disable the form during submission
         commentForm.classList.add("state-disabled");
 
-        if (!content) {
-          UIManager.showError("Comment cannot be empty");
-          commentForm.classList.remove("state-disabled");
-          return;
+        let fileData = null;
+        if (uploadedFile) {
+          const fileFields = [
+            { fieldName: "file_content", file: uploadedFile },
+          ];
+          const toSubmitFields = {};
+          await processFileFields(
+            toSubmitFields,
+            fileFields,
+            awsParam,
+            awsParamUrl
+          );
+          fileData =
+            typeof toSubmitFields.file_content === "string"
+              ? JSON.parse(toSubmitFields.file_content)
+              : toSubmitFields.file_content;
+          fileData.name = fileData.name || uploadedFile.name;
+          fileData.size = fileData.size || uploadedFile.size;
+          fileData.type = fileData.type || uploadedFile.type;
         }
 
         try {
-          // Pass the uploadedFile (if any) into createComment
           await forumManager.createComment(
             post.id,
             content,
             mentions,
             fileType,
-            uploadedFile
+            uploadedFile,
+            fileData
           );
 
-          // Optionally, clear the editor and any file previews after success:
           editor.innerHTML = "";
-          imageInput.value = "";
-          audioInput.value = "";
-          videoInput.value = "";
-          document.getElementById("image-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("audio-preview-wrapper-comment").innerHTML =
-            "";
-          document.getElementById("video-preview-wrapper-comment").innerHTML =
-            "";
+          commentFormConfig.imageUploadInput.value = "";
+          commentFormConfig.audioUploadInput.value = "";
+          commentFormConfig.videoUploadInput.value = "";
+          commentFormConfig.imagePreviewWrapper.innerHTML = "";
+          commentFormConfig.audioPreviewWrapper.innerHTML = "";
+          commentFormConfig.videoPreviewWrapper.innerHTML = "";
           formatPreiview();
         } catch (error) {
           console.error("Error creating comment:", error);
+          UIManager.showError("Failed to create comment. Please try again.");
         } finally {
           commentForm.classList.remove("state-disabled");
         }

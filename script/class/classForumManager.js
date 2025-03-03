@@ -737,56 +737,77 @@ class ForumManager {
   async fetchComments(postId) {
     try {
       const query = `
-      query {
-        calcForumComments(
-          orderBy: [{ path: ["created_at"], type: asc }]
-          query: [{
-            where: {
-              Forum_Post: [{ where: { id: "${postId}" } }],
-              Parent_Comment: [{ where: { id: null } }]
-            }
-          }]
-        ) {
-          ID: field(arg: ["id"])
-          Author_First_Name: field(arg: ["Author", "first_name"])
-          Author_Last_Name: field(arg: ["Author", "last_name"])
-          Author_Profile_Image: field(arg: ["Author", "profile_image"])
-          Date_Added: field(arg: ["created_at"])
-          Comment: field(arg: ["comment"])
-          Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
-          File_Type: field(arg: ["file_type"])
-          File_Content: field(arg: ["file_content"])
-          Author_Forum_Image: field(arg: ["Author", "forum_image"])
-          Author_ID: field(arg: ["author_id"])
+        query {
+          calcForumComments(
+            orderBy: [{ path: ["created_at"], type: asc }]
+            query: [{
+              where: {
+                Forum_Post: [{ where: { id: "${postId}" } }],
+                Parent_Comment: [{ where: { id: null } }]
+              }
+            }]
+          ) {
+            ID: field(arg: ["id"])
+            Author_First_Name: field(arg: ["Author", "first_name"])
+            Author_Last_Name: field(arg: ["Author", "last_name"])
+            Author_Profile_Image: field(arg: ["Author", "profile_image"])
+            Date_Added: field(arg: ["created_at"])
+            Comment: field(arg: ["comment"])
+            Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
+            File_Type: field(arg: ["file_type"])
+            File_Content: field(arg: ["file_content"])
+            Author_Forum_Image: field(arg: ["Author", "forum_image"])
+            Author_ID: field(arg: ["author_id"])
+          }
         }
-      }
-    `;
+      `;
       const data = await ApiService.query(query);
       const comments = data?.calcForumComments || [];
-      return comments.map((comment) => ({
-        id: comment.ID,
-        author_id: comment.Author_ID,
-        content: comment.Comment,
-        date: Formatter.formatTimestamp(comment.Date_Added),
-        CommentVotesCount: comment.Member_Comment_Upvotes_DataTotal_Count,
-        forLoggedInUserImage: this.defaultLoggedInAuthorImage,
-        // NEW: Use the unified file fields
-        file_type: comment.File_Type, // from your GraphQL response
-        file_content:
-          typeof comment.File_Content === "string"
-            ? JSON.parse(comment.File_Content)
-            : comment.File_Content,
-        author: Formatter.formatAuthor({
-          firstName: comment.Author_First_Name,
-          lastName: comment.Author_Last_Name,
-          profileImage:
-            comment.Author_Forum_Image && comment.Author_Forum_Image.trim()
-              ? comment.Author_Forum_Image
-              : this.defaultAuthorImage,
-        }),
-        // If you are storing vote records in a Map (see below), check whether votes exist:
-        isCommentVoted: this.votedCommentIds.get(comment.ID)?.size > 0,
-      }));
+      return comments.map((comment) => {
+        // Process file content for this specific comment.
+        let fileContent = comment.File_Content;
+        if (typeof fileContent === "string") {
+          fileContent = fileContent.trim();
+          // If it starts with a '{' or '[', assume it's JSON.
+          if (fileContent.startsWith("{") || fileContent.startsWith("[")) {
+            try {
+              fileContent = JSON.parse(fileContent);
+            } catch (e) {
+              // If JSON parsing fails, fall back to treating it as a URL.
+              fileContent = { link: fileContent };
+            }
+          } else {
+            // Remove extra wrapping quotes if present.
+            if (
+              (fileContent.startsWith('"') && fileContent.endsWith('"')) ||
+              (fileContent.startsWith("'") && fileContent.endsWith("'"))
+            ) {
+              fileContent = fileContent.substring(1, fileContent.length - 1);
+            }
+            // Wrap the plain URL into an object.
+            fileContent = { link: fileContent };
+          }
+        }
+        return {
+          id: comment.ID,
+          author_id: comment.Author_ID,
+          content: comment.Comment,
+          date: Formatter.formatTimestamp(comment.Date_Added),
+          CommentVotesCount: comment.Member_Comment_Upvotes_DataTotal_Count,
+          forLoggedInUserImage: this.defaultLoggedInAuthorImage,
+          file_type: comment.File_Type,
+          file_content: fileContent,
+          author: Formatter.formatAuthor({
+            firstName: comment.Author_First_Name,
+            lastName: comment.Author_Last_Name,
+            profileImage:
+              comment.Author_Forum_Image && comment.Author_Forum_Image.trim()
+                ? comment.Author_Forum_Image
+                : this.defaultAuthorImage,
+          }),
+          isCommentVoted: this.votedCommentIds.get(comment.ID)?.size > 0,
+        };
+      });
     } catch (error) {
       console.error("Error fetching comments:", error);
       return [];

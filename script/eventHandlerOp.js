@@ -499,7 +499,6 @@ document.addEventListener("click", function (e) {
     return;
   }
 });
-
 // -------------------------------
 // Delegated Change Listener for File Inputs
 // -------------------------------
@@ -625,7 +624,6 @@ document.addEventListener("change", function (e) {
     }
   }
 });
-
 // -------------------------------
 // Delegated Change Listener for File Inputs
 // -------------------------------
@@ -834,7 +832,6 @@ document.addEventListener("click", async (e) => {
     replyForm.classList.remove("state-disabled");
   }
 });
-
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------

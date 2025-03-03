@@ -872,7 +872,8 @@ sl-dialog::part(panel) {
 }
 
 /* Ensure the canvas fills the wave container */
-#audioWaveCanvas {
+#audioWaveCanvas,
+#audioWaveCanvasComment {
   width: 100%;
   height: 100%;
   display: block;
