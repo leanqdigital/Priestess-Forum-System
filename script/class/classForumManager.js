@@ -176,20 +176,10 @@ class ForumManager {
       filters.push(`{ andWhere: ${dynamicFilter} }`);
     }
     if (this.searchTerm && this.searchTerm.trim() !== "") {
-      const parts = this.searchTerm.trim().split(/\s+/);
-      let authorFirstPattern, authorLastPattern;
-      if (parts.length === 1) {
-        authorFirstPattern = `%${parts[0]}%`;
-        authorLastPattern = `%${parts[0]}%`;
-      } else {
-        authorFirstPattern = `%${parts[0]}%`;
-        authorLastPattern = `%${parts[parts.length - 1]}%`;
-      }
       filters.push(`{
         andWhere: {
           Author: [
-            { where: { first_name: $searchPatternAuthorFirst, _OPERATOR_: like } },
-            { orWhere: { last_name: $searchPatternAuthorLast, _OPERATOR_: like } }
+            { where: { display_name: $searchPatternDisplayName, _OPERATOR_: like } }
           ]
         }
       }`);
@@ -211,7 +201,7 @@ class ForumManager {
             this.needsUserId() ? ", $id: PriestessContactID" : ""
           }${
       this.searchTerm && this.searchTerm.trim() !== ""
-        ? ", $searchPatternAuthorFirst: TextScalar, $searchPatternAuthorLast: TextScalar, $searchPatternPostCopy: LongtextScalar"
+        ? ", $searchPatternDisplayName: TextScalar, $searchPatternPostCopy: LongtextScalar"
         : ""
     }
         ) {
@@ -250,14 +240,7 @@ class ForumManager {
     }
 
     if (this.searchTerm && this.searchTerm.trim() !== "") {
-      const parts = this.searchTerm.trim().split(/\s+/);
-      if (parts.length === 1) {
-        variables.searchPatternAuthorFirst = `%${parts[0]}%`;
-        variables.searchPatternAuthorLast = `%${parts[0]}%`;
-      } else {
-        variables.searchPatternAuthorFirst = `%${parts[0]}%`;
-        variables.searchPatternAuthorLast = `%${parts[parts.length - 1]}%`;
-      }
+      variables.searchPatternDisplayName = `%${this.searchTerm.trim()}%`;
       variables.searchPatternPostCopy = `%${this.searchTerm.trim()}%`;
     }
 
