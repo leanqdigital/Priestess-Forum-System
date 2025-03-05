@@ -1654,6 +1654,8 @@ class ForumManager {
                   ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
                   Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
                   Disable_New_Comments: field(arg: ["disable_new_comments"])
+                  Author_Forum_Image: field(arg: ["Author", "forum_image"])
+                  Author_Display_Name: field(arg: ["Author", "display_name"])
                 }
               }
               `,
@@ -1687,8 +1689,8 @@ class ForumManager {
             id: fetchedPost.ID,
             author_id: fetchedPost.Author_ID,
             author: {
-              name: `${fetchedPost.Author_First_Name} ${fetchedPost.Author_Last_Name}`,
-              profileImage: fetchedPost.Author_Profile_Image || DEFAULT_AVATAR,
+              name: fetchedPost.Author_Display_Name,
+              profileImage: fetchedPost.Author_Forum_Image || DEFAULT_AVATAR,
             },
             date: Formatter.formatTimestamp(fetchedPost.Date_Added),
             content: fetchedPost.Post_Copy,

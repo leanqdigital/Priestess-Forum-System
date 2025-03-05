@@ -88,8 +88,8 @@ class PostModalManager {
         <div class="flex flex-col gap-4 px-6">
             <div class="flex items-center">
                 <div class="flex items-center gap-2">
-                    <div class="author-image-container">
-                        <img class="w-[32px] h-[32px] rounded-full" src="${
+                    <div class="author-image-container size-8 profile-image-wrapper">
+                        <img class="rounded-full rounded-full size-full object-cover" src="${
                           post.author.profileImage
                         }">
                     </div>
