@@ -309,6 +309,18 @@ class MediaFormHandler {
                     </div>
                 </div>
               `;
+            // Select the container for the recorded audio
+            const playPauseButton =
+              this.config.audioPreviewWrapper.querySelector(
+                '[data-audio-button="recorded"]'
+              );
+            const audioElement =
+              this.config.audioPreviewWrapper.querySelector("audio");
+            if (playPauseButton && audioElement) {
+              playPauseButton.addEventListener("click", () => {
+                this.togglePlayPause(audioElement, playPauseButton);
+              });
+            }
           }
           this.currentRecordedAudioFile = audioFile;
         };
@@ -331,7 +343,7 @@ class MediaFormHandler {
         this.showFileControls("audio");
         this.setupWaveform(stream, this.config.waveWrapper);
       })
-      .catch((err));
+      .catch(err);
   }
 
   showFileControls(fileType) {
@@ -543,6 +555,17 @@ class MediaFormHandler {
             </div>
           </div>
           `;
+        const playPauseButtonUpload =
+          this.config.audioPreviewWrapper.querySelector(
+            '[data-audio-button="uploaded"]'
+          );
+        const audioElementUpload =
+          this.config.audioPreviewWrapper.querySelector("audio");
+        if (playPauseButtonUpload && audioElementUpload) {
+          playPauseButtonUpload.addEventListener("click", () => {
+            this.togglePlayPause(audioElementUpload, playPauseButtonUpload);
+          });
+        }
       }
       this.showFileControls("audio");
       if (this.config.audioPreviewWrapper) {
