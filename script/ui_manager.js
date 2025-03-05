@@ -59,7 +59,6 @@ class UIManager {
     message = "Are you sure you want to delete this?"
   ) {
     return new Promise((resolve) => {
-      // Remove existing modal if any
       document.getElementById("delete-confirmation-modal")?.remove();
 
       const modalHTML = `
@@ -81,9 +80,7 @@ class UIManager {
             </div>
         `;
 
-      // Append modal to <body> to make sure it's always on top
       document.body.insertAdjacentHTML("beforeend", modalHTML);
-      // Event listeners
       document.querySelectorAll(".cancel-delete-method").forEach((button) => {
         button.addEventListener("click", () => {
           document.getElementById("delete-confirmation-modal").remove();
@@ -103,34 +100,30 @@ class UIManager {
 
 document.addEventListener("DOMContentLoaded", () => {
   window.forumManager = new ForumManager();
+  // window.modalManager = new PostModalManager();
   const filterButtons = document.querySelectorAll(".filter-button");
-
-  // Set initial active class to "Recent Posts" button
   const defaultActiveButton = document.querySelector(`[data-filter="recent"]`);
   defaultActiveButton.classList.add("active");
-  defaultActiveButton.setAttribute("variant", "primary"); // Shoelace Primary Style
+  defaultActiveButton.setAttribute("variant", "primary");
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      // Remove active state from all buttons
       const filterType = button.dataset.filter;
       forumManager.handleFilterChange(filterType);
       filterButtons.forEach((btn) => {
         btn.classList.remove("active");
-        btn.setAttribute("variant", "default"); // Reset to default variant
+        btn.setAttribute("variant", "default");
       });
-
-      // Add active state to clicked button
       button.classList.add("active");
-      button.setAttribute("variant", "primary"); // Shoelace Primary Style
+      button.setAttribute("variant", "primary");
     });
   });
 
   document.querySelectorAll(".sort-button").forEach((button) => {
     button.addEventListener("click", (e) => {
       const sortType = e.currentTarget.dataset.sort;
-      forumManager.currentSort = sortType; // Update sort type
-      forumManager.loadInitialPosts(); // Reload and sort posts
+      forumManager.currentSort = sortType;
+      forumManager.loadInitialPosts();
     });
   });
 
@@ -172,41 +165,36 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-// Use a timeout if needed (e.g., to wait for dynamic content to load)
 let formatPreiview = function formatPreiview() {
   setTimeout(() => {
-    // Select only posts that haven't been processed yet
-    const posts = document.querySelectorAll(
-      ".content-container:not([data-preview-loaded])"
-    );
+    const posts = document.querySelectorAll(".content-container");
     const urlRegex =
-      /(https?:\/\/(?:www\.)?(youtube\.com|youtu\.be|loom\.com)\/\S+)/gi;
+      /(https?:\/\/(?:www\.)?(youtube\.com|youtu\.be|loom\.com|vimeo\.com)\/\S+)/gi;
 
     posts.forEach((post) => {
-      // Mark this post as processed to avoid duplicate processing later
-      post.dataset.previewLoaded = "true";
-
-      // Get the HTML content of the current post
       let content = post.innerHTML;
-      // Find all matching URLs
       const matches = content.match(urlRegex);
       if (matches) {
         matches.forEach((rawUrl) => {
           let url = rawUrl;
           if (url.includes("youtube") || url.includes("youtu.be")) {
             url = transformYoutubeUrl(url);
-            createPreviewContainer(url, post);
           } else if (url.includes("loom.com")) {
             url = transformLoomUrl(url);
+          } else if (url.includes("vimeo.com")) {
+            url = transformVimeoUrl(url);
+          }
+          if (!post.querySelector(`[data-preview-url="${url}"]`)) {
             createPreviewContainer(url, post);
           }
         });
       }
     });
 
-    // Helper function to create preview container with skeleton loader
     function createPreviewContainer(url, post) {
-      // Create the iframe
+      if (post.querySelector(`[data-preview-url="${url}"]`)) {
+        return;
+      }
       const iframe = document.createElement("iframe");
       iframe.src = url;
       iframe.setAttribute("frameborder", "0");
@@ -217,15 +205,14 @@ let formatPreiview = function formatPreiview() {
       iframe.style.width = "100%";
       iframe.style.height = "100%";
 
-      // Create the container using the padding-bottom trick for 16:9 aspect ratio
       const container = document.createElement("div");
       container.classList.add("preview-container");
       container.style.position = "relative";
-      container.style.paddingBottom = "56.25%"; // 16:9 ratio
+      container.style.paddingBottom = "56.25%";
       container.style.height = "0";
       container.style.marginTop = "16px";
+      container.setAttribute("data-preview-url", url);
 
-      // Create skeleton loader element
       const skeleton = document.createElement("div");
       skeleton.classList.add("skeleton-loader");
       skeleton.style.position = "absolute";
@@ -233,14 +220,12 @@ let formatPreiview = function formatPreiview() {
       skeleton.style.left = "0";
       skeleton.style.width = "100%";
       skeleton.style.height = "100%";
-      skeleton.style.backgroundColor = "#e0e0e0"; // light gray background
+      skeleton.style.backgroundColor = "#e0e0e0";
       skeleton.style.animation = "pulse 1.5s infinite";
 
-      // Append the skeleton loader and iframe to the container
       container.appendChild(skeleton);
       container.appendChild(iframe);
 
-      // Remove skeleton when iframe has finished loading
       iframe.addEventListener("load", () => {
         skeleton.remove();
       });
@@ -248,18 +233,29 @@ let formatPreiview = function formatPreiview() {
       post.appendChild(container);
     }
 
-    // Helper function: transforms a YouTube URL into an embed URL
     function transformYoutubeUrl(url) {
-      var regExp =
-        /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      var match = url.match(regExp);
-      if (match && match[1].length === 11) {
-        return "https://www.youtube.com/embed/" + match[1];
+      try {
+        const urlObj = new URL(url);
+        let videoId;
+        if (urlObj.hostname === "youtu.be") {
+          videoId = urlObj.pathname.slice(1);
+        } else if (urlObj.hostname.includes("youtube.com")) {
+          videoId = urlObj.searchParams.get("v");
+        }
+        if (videoId && videoId.length === 11) {
+          return "https://www.youtube.com/embed/" + videoId;
+        }
+      } catch (e) {
+        var regExp =
+          /^.*(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        if (match && match[1].length === 11) {
+          return "https://www.youtube.com/embed/" + match[1];
+        }
       }
       return url;
     }
 
-    // Helper function: transforms a Loom URL into an embed URL
     function transformLoomUrl(url) {
       var regExp = /loom\.com\/share\/([a-f0-9]+)/;
       var match = url.match(regExp);
@@ -268,5 +264,61 @@ let formatPreiview = function formatPreiview() {
       }
       return url;
     }
-  }, 3000); // Adjust the timeout duration as needed
+
+    function transformVimeoUrl(url) {
+      if (url.includes("player.vimeo.com/video/")) {
+        return url;
+      }
+      var regExp = /vimeo\.com\/(\d+)\/(\w+)/;
+      var match = url.match(regExp);
+      if (match && match[1] && match[2]) {
+        return "https://player.vimeo.com/video/" + match[1] + "?h=" + match[2];
+      }
+      return url;
+    }
+  }, 3000);
 };
+
+function linkifyElement(element) {
+  const urlRegex = /(\b(https?:\/\/|www\.)\S+\b)/gi;
+  const walker = document.createTreeWalker(
+    element,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+  const textNodes = [];
+  while (walker.nextNode()) {
+    textNodes.push(walker.currentNode);
+  }
+  textNodes.forEach((textNode) => {
+    const text = textNode.nodeValue;
+    if (urlRegex.test(text)) {
+      const fragment = document.createDocumentFragment();
+      let lastIndex = 0;
+      text.replace(urlRegex, (match, p1, offset) => {
+        if (offset > lastIndex) {
+          fragment.appendChild(
+            document.createTextNode(text.substring(lastIndex, offset))
+          );
+        }
+        const a = document.createElement("a");
+        a.href = match.startsWith("http") ? match : "http://" + match;
+        a.textContent = match;
+        a.classList.add("custom-link-class");
+        a.classList.add("line-clamp-1");
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        fragment.appendChild(a);
+        lastIndex = offset + match.length;
+        return match;
+      });
+      if (lastIndex < text.length) {
+        fragment.appendChild(
+          document.createTextNode(text.substring(lastIndex))
+        );
+      }
+      textNode.parentNode.replaceChild(fragment, textNode);
+    }
+  });
+}

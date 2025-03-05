@@ -17,7 +17,6 @@
  * @property {ontraportS3UploadParamsInputs} inputs - See
  * the [ontraportS3UploadParamsInputs typedef]{@link ontraportS3UploadParamsInputs}.
  */
-
 /**
  * @typedef ontraportS3UploadParamsAttributes
  * @type {Object}
@@ -510,5 +509,3 @@ function processFileFields(toSubmit, filesToUpload, awsParamHash, awsParamUrl) {
     });
   });
 }
-
-

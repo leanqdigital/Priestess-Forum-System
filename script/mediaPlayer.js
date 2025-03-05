@@ -1,9 +1,6 @@
 class MediaFormHandler {
   constructor(config) {
-    // Save a reference to the provided elements (or you can accept selectors and query them here)
     this.config = config;
-
-    // State variables
     this.currentFileType = null;
     this.currentRecordedAudioFile = null;
     this.mediaRecorder = null;
@@ -15,12 +12,9 @@ class MediaFormHandler {
     this.dataArray = null;
     this.bufferLength = null;
     this.animationId = null;
-
-    // Initialize event bindings
     this.init();
   }
 
-  // ----------------- Utility Methods -----------------
   formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -40,7 +34,6 @@ class MediaFormHandler {
   }
 
   resetForm() {
-    // Reset text editor, file input values and preview wrappers
     if (this.config.editor) this.config.editor.innerHTML = "";
     if (this.config.imageField) this.config.imageField.value = "";
     if (this.config.uploadAudioField) this.config.uploadAudioField.value = "";
@@ -56,7 +49,6 @@ class MediaFormHandler {
     if (this.config.fileControls)
       this.config.fileControls.classList.add("hidden");
 
-    // Reset recording state and show back the upload buttons/options
     this.resetRecordingState();
     if (this.config.uploadImageBtn)
       this.config.uploadImageBtn.classList.remove("hidden");
@@ -66,9 +58,7 @@ class MediaFormHandler {
       this.config.audioOptionsWrapper.classList.remove("hidden");
   }
 
-  // ----------------- Initialization & Event Bindings -----------------
   init() {
-    // Bind upload button clicks to trigger file input selection
     if (this.config.uploadImageBtn && this.config.imageUploadInput) {
       this.config.uploadImageBtn.addEventListener("click", () => {
         this.config.imageUploadInput.click();
@@ -85,7 +75,6 @@ class MediaFormHandler {
       });
     }
 
-    // Bind file input change events
     if (this.config.imageUploadInput) {
       this.config.imageUploadInput.addEventListener("change", (e) =>
         this.handleImageUpload(e)
@@ -102,7 +91,6 @@ class MediaFormHandler {
       );
     }
 
-    // Bind recording controls if provided
     if (this.config.recordAudioBtn) {
       this.config.recordAudioBtn.addEventListener("click", () => {
         if (!this.mediaRecorder || this.mediaRecorder.state !== "recording") {
@@ -124,7 +112,6 @@ class MediaFormHandler {
     if (this.config.deleteRecordingBtn) {
       this.config.deleteRecordingBtn.addEventListener("click", () => {
         if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
-          // Override onstop to prevent preview creation during deletion.
           this.mediaRecorder.onstop = () => {};
         }
         this.resetAudioRecording();
@@ -202,10 +189,8 @@ class MediaFormHandler {
     }
   }
 
-  // ----------------- Recording Methods -----------------
   startAudioRecording() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      console.error("getUserMedia not supported");
       return;
     }
     let audioConstraint = true;
@@ -228,9 +213,6 @@ class MediaFormHandler {
           if (MediaRecorder.isTypeSupported("audio/mp4")) {
             options = { mimeType: "audio/mp4" };
           } else {
-            console.warn(
-              "Safari does not support audio/mp4; audio recording may fail. Consider using a polyfill."
-            );
           }
         } else if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           options = { mimeType: "audio/webm" };
@@ -329,7 +311,6 @@ class MediaFormHandler {
               `;
           }
           this.currentRecordedAudioFile = audioFile;
-          console.log("Recorded duration:", recordingDuration);
         };
 
         this.mediaRecorder.start();
@@ -350,9 +331,7 @@ class MediaFormHandler {
         this.showFileControls("audio");
         this.setupWaveform(stream, this.config.waveWrapper);
       })
-      .catch((err) =>
-        console.error("Failed to get user media for audio recording:", err)
-      );
+      .catch((err));
   }
 
   showFileControls(fileType) {
@@ -368,7 +347,6 @@ class MediaFormHandler {
   }
 
   setupWaveform(stream, waveWrapper) {
-    // Create or find the canvas element within the provided wrapper
     let canvas = waveWrapper.querySelector("canvas#audioWaveCanvas");
     if (!canvas) {
       canvas = document.createElement("canvas");
@@ -377,7 +355,6 @@ class MediaFormHandler {
     }
     const canvasCtx = canvas.getContext("2d");
 
-    // Resize the canvas to fit its container
     const resizeCanvas = () => {
       canvas.width = waveWrapper.offsetWidth;
       canvas.height = waveWrapper.offsetHeight;
@@ -385,7 +362,6 @@ class MediaFormHandler {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Create an AudioContext and AnalyserNode to capture and analyze the stream
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const source = this.audioCtx.createMediaStreamSource(stream);
     this.analyser = this.audioCtx.createAnalyser();
@@ -394,7 +370,6 @@ class MediaFormHandler {
     this.dataArray = new Uint8Array(this.bufferLength);
     source.connect(this.analyser);
 
-    // Begin drawing the waveform
     this.drawWaveform(canvasCtx, canvas.width, canvas.height);
   }
 
@@ -475,11 +450,9 @@ class MediaFormHandler {
     }
   }
 
-  // ----------------- File Input Handlers -----------------
   handleImageUpload(e) {
     const file = e.target.files[0];
     if (file) {
-      // Clear any other file inputs and their previews
       if (this.config.audioUploadInput) this.config.audioUploadInput.value = "";
       if (this.config.audioPreviewWrapper)
         this.config.audioPreviewWrapper.innerHTML = "";
@@ -504,7 +477,6 @@ class MediaFormHandler {
   handleAudioUpload(e) {
     const file = e.target.files[0];
     if (file) {
-      // Clear image and video inputs and their previews
       if (this.config.imageUploadInput) this.config.imageUploadInput.value = "";
       if (this.config.imagePreviewWrapper)
         this.config.imagePreviewWrapper.innerHTML = "";
@@ -582,7 +554,6 @@ class MediaFormHandler {
   handleVideoUpload(e) {
     const file = e.target.files[0];
     if (file) {
-      // Clear image and audio inputs and their previews
       if (this.config.imageUploadInput) this.config.imageUploadInput.value = "";
       if (this.config.imagePreviewWrapper)
         this.config.imagePreviewWrapper.innerHTML = "";
@@ -596,7 +567,7 @@ class MediaFormHandler {
         this.config.videoPreviewWrapper.innerHTML = "";
         const video = document.createElement("video");
         video.controls = true;
-        video.width = 300; // adjust as needed
+        video.width = 300;
         video.classList.add("rounded");
         const source = document.createElement("source");
         source.src = videoURL;

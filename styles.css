@@ -897,3 +897,9 @@ sl-dialog::part(panel) {
 .formHighlight {
   border: 1px solid var(--secondary) !important;
 }
+
+.custom-link-class{
+  color: var(--secondary);
+  text-decoration: underline;
+  font-weight: 500;
+}

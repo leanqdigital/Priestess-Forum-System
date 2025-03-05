@@ -1,4 +1,5 @@
 const tabs = document.querySelectorAll(".tab-Button");
+
 const textElement = document.querySelector(".post-title-text");
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {

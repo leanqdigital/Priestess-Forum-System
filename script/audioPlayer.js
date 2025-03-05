@@ -25,7 +25,6 @@ function playAudio(id) {
   forwardBtn.addEventListener(`click`, () => {
     audio.currentTime += 10;
   });
-
   audio.addEventListener(`timeupdate`, () => {
     progressBar.value = (audio.currentTime / audio.duration) * 100;
     currentTimeDisplay.textContent = formatTime(audio.currentTime);
@@ -42,7 +41,6 @@ function playAudio(id) {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? "0" : ``}${secs}`;
   }
-
   audio.addEventListener(`loadedmetadata`, () => {
     totalTimeDisplay.textContent = "-" + formatTime(audio.duration);
   });

@@ -20,10 +20,9 @@ class Formatter {
 
   static formatAuthor(authorData) {
     return {
-      name:
-        [authorData.firstName, authorData.lastName].filter(Boolean).join(" ") ||
-        "Anonymous",
+      name: [authorData.firstName, authorData.lastName].filter(Boolean).join(" ") || "Anonymous",
       profileImage: authorData.profileImage || CONFIG.api.defaultAuthorImage,
+      authorDisplayName: authorData.displayName || "Anonymous",
     };
   }
 }

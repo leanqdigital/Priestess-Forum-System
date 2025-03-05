@@ -2,7 +2,8 @@ tailwind.config = {
     theme: {
         extend: {
             colors: {
-                primary: "var(--primary)",
+                
+                primary: "var(--primary)", 
                 "primary-200": "var(--primary-200)",
                 "primary-100": "var(--primary-100)",
                 "primary-300": "var(--primary-300)",

@@ -1,6 +1,7 @@
 class ForumManager {
   constructor() {
     this.userId = CONFIG.api.userId;
+    this.authorDisplayName = CONFIG.api.authorDisplayName;
     this.firstName = CONFIG.api.firstName;
     this.lastName = CONFIG.api.lastName;
     this.fullName = CONFIG.api.fullName;
@@ -53,25 +54,21 @@ class ForumManager {
         CONFIG.selectors.postsContainer
       );
 
-      // Show skeleton loaders while waiting
       if (isInitialLoad) {
         postContainer.innerHTML = this.getSkeletonLoader(5);
       } else {
         postContainer.insertAdjacentHTML("beforeend", this.getSkeletonLoader());
       }
 
-      // Build and run query
       const { query, variables } = this.buildQuery();
       const dataPromise = ApiService.query(query, variables);
       await new Promise((resolve) => setTimeout(resolve, 700));
       const data = await dataPromise;
 
-      // Remove all skeleton loaders
       document
         .querySelectorAll(".skeleton-loader")
         .forEach((el) => el.remove());
 
-      // If no posts were returned, update UI accordingly
       if (!data || !data.calcForumPosts || data.calcForumPosts.length === 0) {
         this.hasMorePosts = false;
         if (isInitialLoad) {
@@ -87,32 +84,26 @@ class ForumManager {
         return;
       }
 
-      // Map each returned post to include the unified file fields
       const posts = data.calcForumPosts.map((post) => {
         let fileContent = post.File_Content;
         if (typeof fileContent === "string") {
           fileContent = fileContent.trim();
-          // If it starts with a '{', it's likely a JSON string
           if (fileContent.startsWith("{")) {
             try {
               fileContent = JSON.parse(fileContent);
             } catch (e) {
-              // Fallback: if parsing fails, treat it as a URL string
               fileContent = { link: fileContent };
             }
           } else {
-            // Sometimes the URL string might have extra quotes.
             if (
               (fileContent.startsWith('"') && fileContent.endsWith('"')) ||
               (fileContent.startsWith("'") && fileContent.endsWith("'"))
             ) {
               fileContent = fileContent.substring(1, fileContent.length - 1);
             }
-            // Wrap the plain URL string into an object so your template works as expected.
             fileContent = { link: fileContent };
           }
         } else {
-          // fileContent is already an object
           fileContent = post.File_Content;
         }
         const postId = String(post.ID);
@@ -133,6 +124,7 @@ class ForumManager {
               post.Author_Forum_Image && post.Author_Forum_Image.trim()
                 ? post.Author_Forum_Image
                 : this.defaultAuthorImage,
+            displayName: post.Author_Display_Name,
           }),
           date: Formatter.formatTimestamp(post.Date_Added),
           title: post.Post_Title,
@@ -155,6 +147,11 @@ class ForumManager {
       }
       this.updateBookmarkIcons();
       formatPreiview();
+      const contentContainers =
+        postContainer.querySelectorAll(".content-container");
+      contentContainers.forEach((container) => {
+        linkifyElement(container);
+      });
     } catch (error) {
       document
         .querySelectorAll(".skeleton-loader")
@@ -171,8 +168,6 @@ class ForumManager {
     const sortCondition = this.buildSortCondition();
     const dynamicFilter = this.buildFilterCondition();
     const filters = [];
-
-    // Static course filter
     filters.push(
       `{ where: { Related_Course: [{ where: { id: "${courseID}" } }] } }`
     );
@@ -180,13 +175,8 @@ class ForumManager {
     if (dynamicFilter) {
       filters.push(`{ andWhere: ${dynamicFilter} }`);
     }
-
-    // If there is a search term, build filters for Author and post_copy
     if (this.searchTerm && this.searchTerm.trim() !== "") {
-      // Split the search term on whitespace
       const parts = this.searchTerm.trim().split(/\s+/);
-      // If only one word, use it for both first and last names;
-      // if multiple words, assume first and last words are the names.
       let authorFirstPattern, authorLastPattern;
       if (parts.length === 1) {
         authorFirstPattern = `%${parts[0]}%`;
@@ -195,8 +185,6 @@ class ForumManager {
         authorFirstPattern = `%${parts[0]}%`;
         authorLastPattern = `%${parts[parts.length - 1]}%`;
       }
-
-      // Build filter for Author (nested) and for post_copy (top-level)
       filters.push(`{
         andWhere: {
           Author: [
@@ -211,18 +199,12 @@ class ForumManager {
         }
       }`);
     }
-
-    // Build the query filters string
     const queryFilters = `[ ${filters.join(", ")} ]`;
-
-    // Build the argument list
     let args = [];
     args.push(`query: ${queryFilters}`);
     args.push(`limit: $limit, offset: $offset`);
     if (sortCondition) args.push(sortCondition);
     const argsString = args.join(", ");
-
-    // Construct the final query string with separate variables for author and post
     let query = `query calcForumPosts(
           $limit: IntScalar,
           $offset: IntScalar${
@@ -255,10 +237,9 @@ class ForumManager {
             File_Content: field(arg: ["file_content"])
             Disable_New_Comments: field(arg: ["disable_new_comments"])
             Author_Forum_Image: field(arg: ["Author", "forum_image"])
+            Author_Display_Name: field(arg: ["Author", "display_name"])
           }
         }`;
-
-    // Build the variables object
     let variables = {
       limit: this.postsLimit,
       offset: this.postsOffset,
@@ -342,8 +323,6 @@ class ForumManager {
         postElement.classList.remove("opacity-50", "pointer-events-none");
         return;
       }
-
-      // Show processing state
       postElement.classList.add("animate-pulse");
 
       const query = `
@@ -357,7 +336,6 @@ class ForumManager {
       const response = await ApiService.query(query, variables);
 
       if (response?.deleteForumPost?.id) {
-        // Add removal animation
         postElement.classList.add(
           "opacity-0",
           "transition-opacity",
@@ -369,7 +347,6 @@ class ForumManager {
     } catch (error) {
       UIManager.showError("Failed to delete post. Please try again.");
     } finally {
-      // Ensure styles are reset even if error occurs after confirmation
       postElement?.classList.remove(
         "animate-pulse",
         "opacity-50",
@@ -398,10 +375,9 @@ class ForumManager {
         return;
       }
 
-      // ✅ Only update savedPostIds if data exists
       this.savedPostIds.clear();
       data.calcOContactSavedPosts.forEach(({ ID, Saved_Post_ID }) => {
-        this.savedPostIds.set(String(Saved_Post_ID), ID); // Convert to string
+        this.savedPostIds.set(String(Saved_Post_ID), ID);
       });
     } catch (error) {}
   }
@@ -456,7 +432,6 @@ class ForumManager {
         `Post ${isBookmarked ? "removed from" : "added to"} bookmarks`
       );
     } catch (error) {
-      console.error("Error in toggleBookmark:", error); // Log the error for debugging
       UIManager.showError(
         `Failed to ${isBookmarked ? "remove" : "save"} bookmark`
       );
@@ -469,11 +444,9 @@ class ForumManager {
   }
 
   async createBookmark(postId) {
-    // Prevent duplicate bookmarks
     if (this.savedPostIds.has(postId)) {
       throw new Error("Post is already bookmarked.");
     }
-
     const query = `
         mutation createOContactSavedPost($payload: OContactSavedPostCreateInput) {
           createOContactSavedPost(payload: $payload) {
@@ -499,8 +472,7 @@ class ForumManager {
         await this.deleteBookmark(id);
       }
     } catch (error) {
-      console.error("Error in deleteMultipleBookmarks:", error); // Log the error for debugging
-      throw error; // Re-throw the error to be caught by the outer try-catch block
+      throw error;
     }
   }
 
@@ -584,10 +556,9 @@ class ForumManager {
     const isVoted = this.votedPostIds.has(postId);
 
     try {
-      // Disable buttons and set opacity
       buttons.forEach((button) => {
         button.disabled = true;
-        button.style.opacity = "0.5"; // Add this line
+        button.style.opacity = "0.5";
       });
 
       if (isVoted) {
@@ -608,10 +579,9 @@ class ForumManager {
     } catch (error) {
       UIManager.showError(`Failed to ${isVoted ? "unlike" : "like"}`);
     } finally {
-      // Re-enable buttons and reset opacity
       buttons.forEach((button) => {
         button.disabled = false;
-        button.style.opacity = "1"; // Add this line
+        button.style.opacity = "1";
       });
     }
   }
@@ -659,14 +629,12 @@ class ForumManager {
   }
 
   updateVoteUI(postId, updatedVoteCount) {
-    // Select vote buttons that are either the element itself or nested within another element
     const voteButtons = document.querySelectorAll(
       `[data-post-id="${postId}"].vote-button, [data-post-id="${postId}"] .vote-button`
     );
     voteButtons.forEach((button) => {
       const isVoted = this.votedPostIds.has(postId);
       button.innerHTML = this.getVoteSVG(isVoted);
-      // Assuming the vote count element is the next sibling:
       button.nextElementSibling.textContent = updatedVoteCount;
     });
   }
@@ -756,34 +724,32 @@ class ForumManager {
             File_Type: field(arg: ["file_type"])
             File_Content: field(arg: ["file_content"])
             Author_Forum_Image: field(arg: ["Author", "forum_image"])
+            Author_Display_Name: field(arg: ["Author", "display_name"])
             Author_ID: field(arg: ["author_id"])
           }
         }
       `;
+
       const data = await ApiService.query(query);
       const comments = data?.calcForumComments || [];
+
       return comments.map((comment) => {
-        // Process file content for this specific comment.
         let fileContent = comment.File_Content;
         if (typeof fileContent === "string") {
           fileContent = fileContent.trim();
-          // If it starts with a '{' or '[', assume it's JSON.
           if (fileContent.startsWith("{") || fileContent.startsWith("[")) {
             try {
               fileContent = JSON.parse(fileContent);
             } catch (e) {
-              // If JSON parsing fails, fall back to treating it as a URL.
               fileContent = { link: fileContent };
             }
           } else {
-            // Remove extra wrapping quotes if present.
             if (
               (fileContent.startsWith('"') && fileContent.endsWith('"')) ||
               (fileContent.startsWith("'") && fileContent.endsWith("'"))
             ) {
               fileContent = fileContent.substring(1, fileContent.length - 1);
             }
-            // Wrap the plain URL into an object.
             fileContent = { link: fileContent };
           }
         }
@@ -803,56 +769,52 @@ class ForumManager {
               comment.Author_Forum_Image && comment.Author_Forum_Image.trim()
                 ? comment.Author_Forum_Image
                 : this.defaultAuthorImage,
+            displayName: comment.Author_Display_Name,
           }),
           isCommentVoted: this.votedCommentIds.get(comment.ID)?.size > 0,
         };
       });
     } catch (error) {
-      console.error("Error fetching comments:", error);
       return [];
     }
   }
 
-  // --- CREATE A COMMENT WITH OPTIMISTIC RENDERING ---
   async createComment(postId, content, mentions, fileType, uploadedFile) {
-    // Create a temporary comment ID for optimistic rendering.
     const tempCommentId = `temp-${Date.now()}`;
 
-    // If a file is provided, create a local preview URL.
     let previewFileContent = null;
     if (uploadedFile) {
-      // This object structure should match what your template expects.
       previewFileContent = {
         link: URL.createObjectURL(uploadedFile),
         type: uploadedFile.type,
       };
     }
 
-    // Build a temporary comment object including the preview (if available).
     const tempComment = {
       id: tempCommentId,
       content: content,
       CommentVotesCount: "0",
       date: "Just now",
-      file_content: previewFileContent, // will be null if no file selected
+      file_content: previewFileContent,
       file_type: fileType,
       author: {
-        name: this.fullName,
+        authorDisplayName: this.authorDisplayName,
         profileImage: this.defaultLoggedInAuthorImage,
       },
     };
-
-    // Render the temporary comment using your comment template.
     const template = $.templates("#comment-template");
     const commentsContainer = document.getElementById(
       "modal-comments-container"
     );
+    const emptyMessage = commentsContainer.querySelector(".empty-message");
+    if (emptyMessage) {
+      emptyMessage.remove();
+    }
     commentsContainer.insertAdjacentHTML(
       "beforeend",
       template.render(tempComment)
     );
 
-    // Find the temporary comment element and disable it.
     let commentElement = commentsContainer.querySelector(
       `[data-comment-id="${tempCommentId}"]`
     );
@@ -860,21 +822,19 @@ class ForumManager {
       commentElement.classList.add("state-disabled");
     }
 
-    let newComment; // to hold the mutation result
+    let newComment;
     let fileData = null;
     const fileFields = [];
     if (uploadedFile) {
       fileFields.push({
         fieldName: "file_content",
-        file: uploadedFile, // Use the correct variable here.
+        file: uploadedFile,
       });
     }
 
     try {
-      // If a file was selected, process it (for example, to upload to S3).
       if (fileFields.length > 0) {
         const toSubmitFields = {};
-        // processFileFields is assumed to handle the upload and populate "toSubmitFields".
         await processFileFields(
           toSubmitFields,
           fileFields,
@@ -885,13 +845,10 @@ class ForumManager {
           typeof toSubmitFields.file_content === "string"
             ? JSON.parse(toSubmitFields.file_content)
             : toSubmitFields.file_content;
-        // Ensure fileData has proper metadata.
         fileData.name = fileData.name || uploadedFile.name;
         fileData.size = fileData.size || uploadedFile.size;
         fileData.type = fileData.type || uploadedFile.type;
       }
-
-      // Build and execute the mutation to create the comment.
       const mutationQuery = `
         mutation createForumComment($payload: ForumCommentCreateInput!) {
           createForumComment(payload: $payload) {
@@ -912,7 +869,6 @@ class ForumManager {
           forum_post_id: postId,
           Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
           file_type: fileType,
-          // Pass the processed fileData (if any); otherwise, null.
           file_content: fileData,
         },
       };
@@ -928,7 +884,6 @@ class ForumManager {
     }
 
     try {
-      // Delay briefly to allow backend indexing.
       await new Promise((resolve) => setTimeout(resolve, 500));
       const fetchQuery = `
     query calcForumComments($id: PriestessForumCommentID) {
@@ -937,11 +892,14 @@ class ForumManager {
         Author_First_Name: field(arg: ["Author", "first_name"])
         Author_Last_Name: field(arg: ["Author", "last_name"])
         Author_Profile_Image: field(arg: ["Author", "profile_image"])
+        Author_ID: field(arg: ["author_id"])
         Date_Added: field(arg: ["created_at"])
         Comment: field(arg: ["comment"])
         Member_Comment_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Comment_Upvotes_Data", "id"] }])
         File_Type: field(arg: ["file_type"])
         File_Content: field(arg: ["file_content"])
+        Author_Display_Name: field(arg: ["Author", "display_name"])
+        Author_Forum_Image: field(arg: ["Author", "forum_image"])
       }
     }
   `;
@@ -950,44 +908,40 @@ class ForumManager {
         id: newComment.id,
       });
       const actualComment = fetchResponse.calcForumComments[0];
-
-      // Check that the file_content returned from the API is a valid object with a link.
       const validFileContent =
         actualComment.File_Content &&
         typeof actualComment.File_Content === "object" &&
         typeof actualComment.File_Content.link === "string" &&
         actualComment.File_Content.link.trim().length > 0;
-
-      // Use the API value if valid; otherwise, fall back to the optimistic preview.
       const finalFileContent = validFileContent
         ? actualComment.File_Content
         : previewFileContent;
-
-      // Prepare the updated comment object.
       const updatedComment = {
         id: actualComment.ID,
         content:
           actualComment.Comment && actualComment.Comment.trim().length > 0
             ? actualComment.Comment
-            : content, // fall back to the original content
+            : content,
         author: {
-          name: `${actualComment.Author_First_Name} ${actualComment.Author_Last_Name}`,
+          authorDisplayName: actualComment.Author_Display_Name,
           profileImage: actualComment.Author_Forum_Image?.trim()
             ? actualComment.Author_Forum_Image
             : DEFAULT_AVATAR,
         },
         CommentVotesCount: actualComment.Member_Comment_Upvotes_DataTotal_Count,
-        file_content: finalFileContent, // use our valid file content (or preview)
+        file_content: finalFileContent,
         file_type: actualComment.File_Type,
         date: Formatter.formatTimestamp(actualComment.Date_Added),
+        author_id: actualComment.Author_ID,
       };
-
-      // Re-render the comment with complete data.
       commentElement.outerHTML = template.render(updatedComment);
-      // Update any data attributes (e.g., for voting) with the real comment ID.
       const updatedEl = document.querySelector(
         `[data-comment-id="${updatedComment.id}"]`
       );
+
+      const commentContentContainer =
+        updatedEl.querySelector(".content-container");
+      linkifyElement(commentContentContainer);
       if (updatedEl) {
         const voteButton = updatedEl.querySelector(".vote-button");
         if (voteButton) {
@@ -995,17 +949,58 @@ class ForumManager {
         }
       }
     } catch (fetchError) {
-      // If fetching updated data fails, update the comment element minimally.
       commentElement.dataset.commentId = newComment.id;
       commentElement.classList.remove("state-disabled");
-      console.error(
-        "Failed to fetch updated comment data, but the comment was created:",
-        fetchError
+    }
+  }
+
+  async deleteComment(commentId) {
+    const commentElement = document.querySelector(
+      `[data-target-comment="${commentId}"]`
+    );
+    if (!commentElement) return;
+    commentElement.classList.add("state-disabled");
+    try {
+      commentElement.classList.add("opacity-50", "pointer-events-none");
+
+      const confirmed = await UIManager.showDeleteConfirmation();
+
+      if (!confirmed) {
+        commentElement.classList.remove("opacity-50", "pointer-events-none");
+        return;
+      }
+      commentElement.classList.add("animate-pulse");
+
+      const query = `
+        mutation deleteForumComment($id: PriestessForumCommentID) {
+            deleteForumComment(query: [{ where: { id: $id } }]) {
+            id
+            }
+        }
+        `;
+      const variables = { id: commentId };
+      const response = await ApiService.query(query, variables);
+
+      if (response?.deleteForumComment?.id) {
+        commentElement.classList.add(
+          "opacity-0",
+          "transition-opacity",
+          "duration-300"
+        );
+        setTimeout(() => commentElement.remove(), 300);
+        UIManager.showSuccess("Comment deleted successfully");
+      }
+    } catch (error) {
+      UIManager.showError("Failed to delete comment. Please try again.");
+    } finally {
+      replyElement?.classList.remove(
+        "animate-pulse",
+        "opacity-50",
+        "pointer-events-none"
       );
     }
   }
 
-  // --- FETCH THE VOTE COUNT FOR A COMMENT ---
   async fetchCommentVoteCount(commentId) {
     const query = `
     query {
@@ -1043,52 +1038,41 @@ class ForumManager {
       const votes = data?.calcMemberCommentUpvotesForumCommentUpvotesMany || [];
       return votes;
     } catch (error) {
-      console.error("Error fetching vote for comment:", error);
       return [];
     }
   }
 
-  // --- TOGGLE VOTE ON A COMMENT (Vote/Unvote) ---
   async toggleCommentVote(commentId) {
-    // Get all vote buttons for the comment.
     const buttons = document.querySelectorAll(
       `.vote-button[data-comment-id="${commentId}"]`
     );
 
-    // Check if the user has already voted.
     const voteRecords = await this.fetchVoteForComment(commentId);
     const isCommentVoted = voteRecords.length > 0;
 
     try {
-      // Disable vote buttons during processing.
       buttons.forEach((button) => {
         button.disabled = true;
         button.style.opacity = "0.5";
       });
 
       if (isCommentVoted) {
-        // Remove the vote.
         await this.deleteCommentVote(commentId);
         this.votedCommentIds.delete(commentId);
       } else {
-        // Create a new vote.
         const voteId = await this.createCommentVote(commentId);
         if (!this.votedCommentIds.has(commentId)) {
           this.votedCommentIds.set(commentId, new Set());
         }
         this.votedCommentIds.get(commentId).add(voteId);
       }
-
-      // Update the vote button icon and vote count.
       await this.updateCommentVoteUI(commentId);
       UIManager.showSuccess(`Comment ${isCommentVoted ? "unliked" : "liked"}`);
     } catch (error) {
       UIManager.showError(
         `Failed to ${isCommentVoted ? "unlike" : "like"} comment`
       );
-      console.error("Error in toggleCommentVote:", error);
     } finally {
-      // Re-enable buttons.
       buttons.forEach((button) => {
         button.disabled = false;
         button.style.opacity = "1";
@@ -1096,7 +1080,6 @@ class ForumManager {
     }
   }
 
-  // --- CREATE A NEW COMMENT VOTE ---
   async createCommentVote(commentId) {
     const query = `
     mutation createMemberCommentUpvotesForumCommentUpvotes(
@@ -1119,11 +1102,9 @@ class ForumManager {
     return response.createMemberCommentUpvotesForumCommentUpvotes.id;
   }
 
-  // --- DELETE COMMENT VOTE(S) ---
   async deleteCommentVote(commentId) {
     let voteIds = this.votedCommentIds.get(commentId);
     if (!voteIds || voteIds.size === 0) {
-      // If no local record exists, fetch the votes.
       const voteRecords = await this.fetchVoteForComment(commentId);
       voteRecords.forEach((vote) => {
         if (!this.votedCommentIds.has(commentId)) {
@@ -1154,12 +1135,9 @@ class ForumManager {
         )
       )
     );
-
-    // Remove the local record.
     this.votedCommentIds.delete(commentId);
   }
 
-  // --- UPDATE COMMENT VOTE UI (Icon and Count) ---
   async updateCommentVoteUI(commentId) {
     const commentElements = document.querySelectorAll(
       `[data-comment-id="${commentId}"]`
@@ -1176,13 +1154,10 @@ class ForumManager {
         if (voteCountElement) {
           voteCountElement.textContent = count;
         }
-      } catch (error) {
-        console.error("Error fetching vote count:", error);
-      }
+      } catch (error) {}
     });
   }
 
-  // --- GET THE SVG FOR THE VOTE BUTTON ---
   getCommentVoteSVG(isVoted) {
     return `
       <svg class = "${
@@ -1236,6 +1211,7 @@ class ForumManager {
             File_Content: field(arg: ["file_content"])
             Author_Forum_Image: field(arg: ["Author", "forum_image"])
             Author_ID: field(arg: ["author_id"])
+            Author_Display_Name: field(arg: ["Author", "display_name"])
           }
         }
       `;
@@ -1260,6 +1236,7 @@ class ForumManager {
               reply.Author_Forum_Image && reply.Author_Forum_Image.trim()
                 ? reply.Author_Forum_Image
                 : this.defaultAuthorImage,
+            displayName: reply.Author_Display_Name,
           }),
         })) || []
       );
@@ -1269,10 +1246,7 @@ class ForumManager {
   }
 
   async createReply(commentId, content, mentions, fileType, uploadedFile) {
-    // Generate a temporary reply ID for optimistic rendering.
     const tempReplyId = `temp-${Date.now()}`;
-
-    // If a file is provided, create a local preview URL.
     let previewFileContent = null;
     if (uploadedFile) {
       previewFileContent = {
@@ -1281,20 +1255,19 @@ class ForumManager {
       };
     }
 
-    // Build the optimistic reply object.
     const tempReply = {
       id: tempReplyId,
       content: content,
       date: "Just now",
       file_type: fileType,
-      file_content: previewFileContent, // may be null if no file attached
+      file_content: previewFileContent,
+      author_id: this.userId,
       author: {
-        name: this.fullName,
+        authorDisplayName: this.authorDisplayName,
         profileImage: this.defaultLoggedInAuthorImage,
       },
     };
 
-    // Locate the replies container inside the comment element.
     const repliesContainer = document.querySelector(
       `[data-comment-id="${commentId}"] .replies-container`
     );
@@ -1302,20 +1275,17 @@ class ForumManager {
       throw new Error("Replies container not found for comment: " + commentId);
     }
 
-    // Render the temporary reply using the reply template.
     const template = $.templates("#reply-template");
     repliesContainer.insertAdjacentHTML(
       "beforeend",
       template.render(tempReply)
     );
 
-    // Find the temporary reply element and disable it.
     const replyElement =
       repliesContainer.querySelector(`[data-reply-id="${tempReplyId}"]`) ||
       repliesContainer.firstElementChild;
     replyElement.classList.add("state-disabled");
 
-    // Prepare to process the file if one was uploaded.
     let fileData = null;
     const fileFields = [];
     if (uploadedFile) {
@@ -1326,7 +1296,6 @@ class ForumManager {
     }
     if (fileFields.length > 0) {
       const toSubmitFields = {};
-      // processFileFields is assumed to handle the file upload and populate toSubmitFields.
       await processFileFields(
         toSubmitFields,
         fileFields,
@@ -1337,13 +1306,11 @@ class ForumManager {
         typeof toSubmitFields.file_content === "string"
           ? JSON.parse(toSubmitFields.file_content)
           : toSubmitFields.file_content;
-      // Ensure fileData has the expected metadata.
       fileData.name = fileData.name || uploadedFile.name;
       fileData.size = fileData.size || uploadedFile.size;
       fileData.type = fileData.type || uploadedFile.type;
     }
 
-    // Build the mutation query for creating the reply.
     const mutationQuery = `
       mutation createForumComment($payload: ForumCommentCreateInput!) {
         createForumComment(payload: $payload) {
@@ -1362,28 +1329,25 @@ class ForumManager {
         parent_comment_id: commentId,
         Comment_or_Reply_Mentions: mentions.map((id) => ({ id: Number(id) })),
         file_type: fileType,
-        file_content: fileData, // will be null if no file was attached
+        file_content: fileData,
       },
     };
 
     try {
-      // Execute the GraphQL mutation.
       const response = await ApiService.query(mutationQuery, variables);
       const newReply = response.createForumComment;
-
-      // Update the temporary reply element with the new reply's real ID.
       replyElement.dataset.replyId = newReply.id;
-      // Update any vote or delete button data attributes.
       const voteButton = replyElement.querySelector(".vote-button");
       const deleteButton = replyElement.querySelector(".delete-reply-btn");
       if (voteButton) voteButton.dataset.replyId = newReply.id;
       if (deleteButton) deleteButton.dataset.replyId = newReply.id;
       replyElement.classList.remove("state-disabled");
-
-      // (Optional) You might re-fetch full reply details here to update the optimistic reply.
+      formatPreiview();
+      const replyContentContainer =
+        replyElement.querySelector(".content-container");
+      linkifyElement(replyContentContainer);
     } catch (error) {
       UIManager.showError("Failed to post reply");
-      // Remove the optimistic reply element if an error occurs.
       replyElement.remove();
     }
   }
@@ -1395,18 +1359,14 @@ class ForumManager {
     replyElement.classList.add("state-disabled");
 
     try {
-      // Show visual effects
       replyElement.classList.add("opacity-50", "pointer-events-none");
 
       const confirmed = await UIManager.showDeleteConfirmation();
 
       if (!confirmed) {
-        // Reset styles if not confirmed
         replyElement.classList.remove("opacity-50", "pointer-events-none");
         return;
       }
-
-      // Show processing state
       replyElement.classList.add("animate-pulse");
 
       const query = `
@@ -1420,7 +1380,6 @@ class ForumManager {
       const response = await ApiService.query(query, variables);
 
       if (response?.deleteForumComment?.id) {
-        // Add removal animation
         replyElement.classList.add(
           "opacity-0",
           "transition-opacity",
@@ -1432,7 +1391,6 @@ class ForumManager {
     } catch (error) {
       UIManager.showError("Failed to delete reply. Please try again.");
     } finally {
-      // Ensure styles are reset even if error occurs after confirmation
       replyElement?.classList.remove(
         "animate-pulse",
         "opacity-50",
@@ -1505,7 +1463,6 @@ class ForumManager {
         this.votedReplyIds.get(replyId).add(voteId);
         successMessage = "Comment liked";
       }
-      // Update both the vote icon and the vote count.
       await this.updateReplyVoteUI(replyId);
     } catch (error) {
       UIManager.showError(
@@ -1546,7 +1503,6 @@ class ForumManager {
   async deleteReplyVote(replyId) {
     let voteIds = this.votedReplyIds.get(replyId);
     if (!voteIds || voteIds.size === 0) {
-      // If no local record, try to fetch them first.
       const voteRecords = await this.fetchVoteForReply(replyId);
       voteRecords.forEach((vote) => {
         if (!this.votedReplyIds.has(replyId)) {
@@ -1583,8 +1539,6 @@ class ForumManager {
   async updateReplyVoteUI(replyId) {
     const replyElement = document.querySelector(`[data-reply-id="${replyId}"]`);
     if (!replyElement) return;
-
-    // Use a proper variable ($id) instead of an undefined commentId.
     const query = `
       query calcForumComments($id: PriestessForumCommentID) {
         calcForumComments(query: [{ where: { id: $id } }]) {
@@ -1600,12 +1554,8 @@ class ForumManager {
       if (voteCountElement) {
         voteCountElement.textContent = count;
       }
-    } catch (error) {
-      console.error("Failed to update vote count for reply", error);
-      // Optionally: return here or handle the error gracefully.
-    }
+    } catch (error) {}
 
-    // Update the vote icon based on the local state.
     const isVoted = this.votedReplyIds.has(replyId);
     const voteButton = replyElement.querySelector(".vote-button");
     if (voteButton) {
@@ -1688,7 +1638,6 @@ class ForumManager {
         const postElement = document.querySelector(`.postcard-${postId}`);
 
         try {
-          // Fetch post details with the provided GraphQL query.
           const response = await ApiService.query(
             `
               query calcForumPosts($id: PriestessForumPostID) {
@@ -1712,36 +1661,28 @@ class ForumManager {
           );
 
           const fetchedPost = response.calcForumPosts[0];
-
-          // Parse the file content.
           let fileContent = fetchedPost.File_Content;
           if (typeof fileContent === "string") {
             fileContent = fileContent.trim();
-            // If it starts with a '{', it's likely a JSON string.
             if (fileContent.startsWith("{")) {
               try {
                 fileContent = JSON.parse(fileContent);
               } catch (e) {
-                // Fallback: if parsing fails, treat it as a URL string.
                 fileContent = { link: fileContent };
               }
             } else {
-              // Remove extra quotes if present.
               if (
                 (fileContent.startsWith('"') && fileContent.endsWith('"')) ||
                 (fileContent.startsWith("'") && fileContent.endsWith("'"))
               ) {
                 fileContent = fileContent.substring(1, fileContent.length - 1);
               }
-              // Wrap the plain URL string in an object.
               fileContent = { link: fileContent };
             }
           } else {
-            // fileContent is already an object.
             fileContent = fetchedPost.File_Content;
           }
 
-          // Map the fetched post into your post object.
           const post = {
             id: fetchedPost.ID,
             author_id: fetchedPost.Author_ID,
@@ -1760,7 +1701,6 @@ class ForumManager {
 
           await PostModalManager.open(post);
         } catch (error) {
-          console.error("Error fetching post details:", error);
           UIManager.showError(
             "Failed to load post details. Please try again later."
           );
@@ -1782,6 +1722,13 @@ class ForumManager {
         this.deleteReply(replyId);
       }
 
+      if (e.target.closest(".delete-comment-btn")) {
+        const commentId = e.target.closest(".delete-comment-btn").dataset
+          .commentId;
+        console.log("Comment to delete is", commentId);
+        this.deleteComment(commentId);
+      }
+
       if (e.target.closest(".refresh-button")) {
         this.refreshPosts();
       }
@@ -1797,22 +1744,16 @@ class ForumManager {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
           const query = e.target.value.trim();
-
-          // Show/Hide the clearIcon and searchIcon based on input value
           if (query !== "") {
-            clearIcon.classList.remove("hidden"); // Show the clear icon
-            searchIcon.classList.add("hidden"); // Hide the search icon
+            clearIcon.classList.remove("hidden");
+            searchIcon.classList.add("hidden");
           } else {
-            clearIcon.classList.add("hidden"); // Hide the clear icon
-            searchIcon.classList.remove("hidden"); // Show the search icon
+            clearIcon.classList.add("hidden");
+            searchIcon.classList.remove("hidden");
           }
-
-          // Update the search term
           this.searchTerm = query;
-
-          // Call refreshPosts and then apply highlighting
           this.refreshPosts().then(() => {
-            removeHighlights(postsContainer); // Remove old highlights
+            removeHighlights(postsContainer);
             if (query) {
               highlightMatches(postsContainer, query);
             }
@@ -1820,25 +1761,20 @@ class ForumManager {
         }, 500);
       });
 
-      // Clear the input when the clearIcon is clicked
       clearIcon.addEventListener("click", () => {
-        searchInput.value = ""; // Clear the input field
-        clearIcon.classList.add("hidden"); // Hide the clear icon
-        searchIcon.classList.remove("hidden"); // Show the search icon
-        this.searchTerm = ""; // Reset the search term
-
-        // Refresh posts and remove highlights
+        searchInput.value = "";
+        clearIcon.classList.add("hidden");
+        searchIcon.classList.remove("hidden");
+        this.searchTerm = "";
         this.refreshPosts().then(() => {
           removeHighlights(postsContainer);
         });
       });
 
       function highlightMatches(element, query) {
-        // Split query on spaces and filter out empty strings
         const terms = query.split(/\s+/).filter(Boolean);
         if (element.nodeType === Node.TEXT_NODE) {
           let text = element.nodeValue;
-          // Escape regex special characters in each term
           const escapedTerms = terms.map((term) =>
             term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
           );
@@ -1846,7 +1782,6 @@ class ForumManager {
 
           if (regex.test(text)) {
             const span = document.createElement("span");
-            // Replace each term with a mark tag
             span.innerHTML = text.replace(regex, `<mark>$1</mark>`);
             element.replaceWith(span);
           }

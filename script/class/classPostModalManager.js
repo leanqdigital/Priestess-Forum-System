@@ -1,6 +1,7 @@
 class PostModalManager {
   static async open(post) {
     const modalContent = document.querySelector("#post-modal-content");
+
     let voteData = post.voted;
     let imageData = null,
       audioData = null,
@@ -448,6 +449,10 @@ class PostModalManager {
     </div>
 </div>
 `;
+    let modalContentContainer =
+      modalContent.querySelector(".content-container");
+    linkifyElement(modalContentContainer);
+
     const commentFormConfig = {
       editor: document.getElementById("comment-editor"),
       imageUploadInput: document.getElementById("comment-image-upload"),
@@ -481,7 +486,6 @@ class PostModalManager {
       waveWrapper: document.querySelector(".waveWrapperComment"),
       refreshBtn: document.getElementById("refresh-upload-comment"),
       deleteUploadBtn: document.getElementById("delete-upload-comment"),
-      // modal property is optional if your comment form is within a modal already handled elsewhere
       modal: null,
     };
     window.commentMediaFormHandler = new MediaFormHandler(commentFormConfig);
@@ -574,7 +578,6 @@ class PostModalManager {
           commentFormConfig.videoPreviewWrapper.innerHTML = "";
           formatPreiview();
         } catch (error) {
-          console.error("Error creating comment:", error);
           UIManager.showError("Failed to create comment. Please try again.");
         } finally {
           commentForm.classList.remove("state-disabled");
@@ -584,61 +587,41 @@ class PostModalManager {
     await PostModalManager.loadComments(post.id);
   }
 
-  static async confirmDeleteComment(commentId) {
-    const confirmed = await UIManager.showDeleteConfirmation(
-      "Are you sure you want to delete this comment?"
-    );
-    if (!confirmed) return;
-    try {
-      await PostModalManager.deleteComment(commentId);
-      document.querySelector(`[data-comment-id="${commentId}"]`).remove();
-      UIManager.showSuccess("Comment deleted successfully.");
-    } catch (error) {
-      UIManager.showError("Failed to delete comment.");
-    }
-  }
-
-  static async deleteComment(commentId) {
-    const query = `
-      mutation deleteForumComment($id: PriestessForumCommentID) {
-        deleteForumComment(query: [{ where: { id: $id } }]) {
-          id
-        }
-      }
-    `;
-    const variables = { id: commentId };
-    const toDeleteComment = document.querySelector(
-      `[data-comment-id="${commentId}"]`
-    );
-    toDeleteComment.classList.add("state-disabled");
-    await ApiService.query(query, variables);
-  }
-
   static async loadComments(postId) {
     try {
       const comments = await forumManager.fetchComments(postId);
+      const commentsContainer = document.getElementById(
+        "modal-comments-container"
+      );
+
+      if (!comments || comments.length === 0) {
+        const container = document.querySelector(
+          `.modal-comments-container-${postId}`
+        );
+        if (container) {
+          container.innerHTML = `
+            <div class="flex flex-col gap-6 items-center justify-center empty-message">
+              <div class="size-[200px]">
+                <img src="https://file.ontraport.com/media/815e881804d34ab797e0164d3147eac6.phpi2i7d9?Expires=4892956060&Signature=RWwlqEq5aGHRwoY5Qj6PRr1OrwGrpGx52h8-xquN4k3wcESh0eUUs2pz3zaRcSqMKKoFKQuERA58BSwA0VNAqAvNc4NMSTX3odMiC3J2VKgZ99qQCtIMm182soWKlYhjYdlY4iNvqi9M4WXRYQTm8yZtS1ShkUJd79zHKc~N1jRMLUUaPlKSwum7yUT1AAl4oK-emB11oUe--F9bom4dM~QWQUGNIMvI9rD~DT0EYElQraQFU9wopWMvMmLyqEHQPFhsAM~OmIyjH8O7q3mTT629fkQWKGFM-X6~rprLOf8h~CUq45CNSHsAe8UdNRC2r42OaSU-xkC2uQdCe1lnMQ__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA" alt="Empty Post" class="size-full object-contain">
+             </div>
+              <div class="p2 text-black">No comments available.</div>
+            </div>
+          `;
+        }
+        return [];
+      }
+
       await Promise.all(
         comments.map(async (comment) => {
           const voteRecords = await forumManager.fetchVoteForComment(
             comment.id
           );
           comment.isCommentVoted = voteRecords.length > 0;
-          // comment.voteCommentCount = voteRecords.length;
         })
       );
 
-      const commentsContainer = document.getElementById(
-        "modal-comments-container"
-      );
       const commentTemplate = $.templates("#comment-template");
       commentsContainer.innerHTML = commentTemplate.render(comments);
-
-      document.querySelectorAll(".delete-comment-btn").forEach((button) => {
-        button.addEventListener("click", (e) => {
-          const commentId = e.target.dataset.commentId;
-          PostModalManager.confirmDeleteComment(commentId);
-        });
-      });
 
       const replyEditors = commentsContainer.querySelectorAll(".reply-editor");
       replyEditors.forEach((editor) => {
@@ -649,6 +632,14 @@ class PostModalManager {
 
       loadRepliesForComments(comments);
       formatPreiview();
+      const commentContainer = document.querySelector(
+        `.modal-comments-container-${postId}`
+      );
+      const commentContentContainer =
+        commentContainer.querySelectorAll(".content-container");
+      commentContentContainer.forEach((container) => {
+        linkifyElement(container);
+      });
     } catch (error) {
       document.getElementById(
         "modal-comments-container"
@@ -680,6 +671,11 @@ class PostModalManager {
                 .join("");
             }
             formatPreiview();
+            const replyContentContainer =
+              container.querySelectorAll(".content-container");
+            replyContentContainer.forEach((container) => {
+              linkifyElement(container);
+            });
           } catch (error) {}
         })
       );

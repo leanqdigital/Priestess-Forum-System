@@ -32,7 +32,6 @@ window.mediaFormHandler = new MediaFormHandler(postFormConfig);
 
 document.getElementById("submit-post").addEventListener("click", async (e) => {
   e.preventDefault();
-  // Get HTML content from the editor
   const htmlContent = window.mediaFormHandler.config.editor.innerHTML.trim();
   const tempContainer = document.createElement("div");
   tempContainer.innerHTML = htmlContent;
@@ -56,7 +55,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     }
   });
 
-  // Get file(s) from media form handler configuration
   const imageFile = window.mediaFormHandler.config.imageUploadInput.files[0];
   const audioFile =
     window.mediaFormHandler.config.audioUploadInput.files[0] ||
@@ -81,12 +79,10 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     return;
   }
 
-  // Hide modal and reset the form UI
   if (window.mediaFormHandler.config.modal)
     window.mediaFormHandler.config.modal.hide();
   window.mediaFormHandler.resetForm();
 
-  // Create temporary post for immediate UI feedback.
   const tempPost = {
     id: `temp-${Date.now()}`,
     author_id: window.forumManager.userId,
@@ -96,7 +92,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
       : null,
     file_tpe: uploadedFile ? fileType : null,
     author: {
-      name: window.forumManager.fullName,
+      authorDisplayName: window.forumManager.authorDisplayName,
       profileImage: window.forumManager.defaultLoggedInAuthorImage,
     },
     date: "Just now",
@@ -123,7 +119,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     fileData.type = fileData.type || uploadedFile.type;
   }
 
-  // Declare newPost in outer scope for later usage
   let newPost;
   try {
     const response = await ApiService.query(
@@ -154,7 +149,6 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     newPost = response.createForumPost;
     postElement.dataset.postId = newPost.id;
   } catch (error) {
-    console.error("Error during post creation:", error);
     window.UIManager.showError("Failed to post. Please try again.");
     postContainer.removeChild(postElement);
     return;
@@ -177,6 +171,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           ForumCommentsTotalCount: countDistinct(args: [{ field: ["ForumComments", "id"] }])
           Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
           Disable_New_Comments: field(arg: ["disable_new_comments"])
+          Author_Display_Name: field(arg: ["Author", "display_name"])
         }
       }
       `,
@@ -185,7 +180,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     const actualPost = fetchResponse.calcForumPosts[0];
     postElement.querySelector(".vote-button").dataset.postId = actualPost.ID;
     postElement.querySelector(".post-author-name").textContent =
-      actualPost.Author_First_Name + " " + actualPost.Author_Last_Name;
+      actualPost.Author_Display_Name;
     postElement.querySelector(".post-author-image").src =
       actualPost.Author_Forum_Image?.trim()
         ? actualPost.Author_Forum_Image
@@ -201,8 +196,11 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
     postElement.querySelector(".load-comments-btn").dataset.postId =
       actualPost.ID;
     postElement.dataset.postId = actualPost.ID;
+    formatPreiview();
+    let postCopyContentContainer =
+      postElement.querySelector(".content-container");
+    linkifyElement(postCopyContentContainer);
   } catch (fetchError) {
-    console.error("Error fetching post details:", fetchError);
   } finally {
     window.mediaFormHandler.config.editor.innerHTML = "";
     postElement.classList.remove("state-disabled");
@@ -330,7 +328,9 @@ function initReplyFormEvents(targetId, replyForm) {
       uploadImageBtn: replyWrapper.querySelector(".upload-image-button-reply"),
       uploadAudioBtn: replyWrapper.querySelector("#upload-audio-button-reply"),
       uploadVideoBtn: replyWrapper.querySelector("#upload-video-button-reply"),
-      audioOptionsWrapper: replyWrapper.querySelector(".replyAudioOptionsWrapper"),
+      audioOptionsWrapper: replyWrapper.querySelector(
+        ".replyAudioOptionsWrapper"
+      ),
       imagePreviewWrapper:
         replyWrapper.querySelector("#image-preview-wrapper-reply") ||
         replyWrapper.querySelector(".image-preview-wrapper-reply"),
@@ -577,7 +577,6 @@ function attachReplyControls(replyWrapper) {
         );
         if (videoWrapper) videoWrapper.innerHTML = "";
       } catch (error) {
-        console.error("Error creating reply:", error);
         UIManager.showError("Failed to create reply. Please try again.");
       } finally {
         replyWrapper.classList.remove("state-disabled");

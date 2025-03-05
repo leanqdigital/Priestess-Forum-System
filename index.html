@@ -16,7 +16,7 @@
 <body class="page-background"
     x-data="{ openCommentModal: false, openAudioOptions: false, openCommentAudioOptions: false, openReplyAudioOptions: false}"
     x-bind:class="{ 'overflow-hidden': openCommentModal }">
-    <div class="rounded-full w-12 h-12 bg-secondary hover:bg-secondary-100 fixed bottom-[2rem] right-[2rem] flex items-center justify-center cursor-pointer z-[999]"
+    <div class="rounded-full w-12 h-12 bg-secondary hover:bg-secondary-100 fixed bottom-[2rem] right-[2rem] flex items-center justify-center cursor-pointer z-[999] max-[500px]:hidden"
         @click="window.scrollTo({ top: 0, behavior: 'smooth' });">
         <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -131,7 +131,7 @@
                     <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                         alt="Profile" class="size-full object-cover rounded-full">
                 </div>
-                <h3 class="page-text">Dipesh Adhikari</h3>
+                <h3 class="page-text">dpes44</h3>
             </div>
 
             <div id="post-editor"
@@ -511,7 +511,8 @@
                     <div class="size-8 profile-image-wrapper">
                         <img alt="{{:author.name}}" src="{{:author.profileImage}}" class="rounded-full size-full object-cover post-author-image">
                     </div>
-                    <h2 class="page-text h2 post-author-name">{{:author.name}}</h2>
+                    <!-- <h2 class="page-text h2 post-author-name">{{:author.authorDisplayName}}</h2> -->
+                    <h2 class="page-text h2 post-author-name">{{:author.authorDisplayName}}</h2>
                     <div class="h-[15.13px] w-[2px] post-card-header-divider"></div>
                     <time class="o3 page-text">{{:date}}</time>
                     {{if featured_post === true}}
@@ -697,14 +698,14 @@
     </script>
 
     <script type="text/html" id="comment-template">
-        <div class="flex w-full items-start gap-2" data-comment-id="{{:id}}">
+        <div class="flex w-full items-start gap-2" data-comment-id="{{:id}}" data-target-comment="{{:id}}">
             <div class="size-6 profile-image-wrapper">
-                <img src="{{:author.profileImage}}" alt="{{:author.name}}" class="size-full rounded-full object-cover" />
+                <img src="{{:author.profileImage}}" alt="{{:author.authorDisplayName}}" class="size-full rounded-full object-cover" />
             </div>
             <div class="flex flex-col gap-2 w-full toHighLightCard">
                 <div class="flex w-full flex-col gap-2 rounded p-2 commentCard">
                     <div class="flex items-center justify-between">
-                        <h4 class="page-text">{{:author.name}}</h4>
+                        <h4 class="page-text">{{:author.authorDisplayName}}</h4>
                         {{if author_id == "171031"}}
                         <div x-data="{ editDeletePost: false, openedWithKeyboard: false }" class="relative w-fit"
                             x-on:keydown.esc.window="editDeletePost = false, openedWithKeyboard = false">
@@ -1008,12 +1009,12 @@
     <script type="text/html" id="reply-template">
         <div class="flex w-full gap-2 reply" data-reply-id="{{:id}}">
             <div class="size-6 profile-image-wrapper">
-                <img src="{{:author.profileImage}}" alt="{{:author.name}}" class="size-full rounded-full object-cover" />
+                <img src="{{:author.profileImage}}" alt="{{:author.authorDisplayName}}" class="size-full rounded-full object-cover" />
             </div>
             <div class="flex flex-col gap-2 w-full toHighLightCard">
                 <div class="flex w-full flex-col gap-2 rounded bg-white border border-grey-200 p-2">
                     <div class="flex items-center justify-between">
-                        <h4 class="page-text">{{:author.name}}</h4>
+                        <h4 class="page-text">{{:author.authorDisplayName   }}</h4>
                         {{if author_id == "171031"}}
                         <div x-data="{ editDeletePost: false, openedWithKeyboard: false }" class="relative w-fit" x-on:keydown.esc.window="editDeletePost = false, openedWithKeyboard = false">
                             <div class="size-4 cursor-pointer" x-on:click="editDeletePost = ! editDeletePost"
@@ -1152,6 +1153,7 @@
         const LOGGED_IN_USER_FIRST_NAME = "Dpes";
         const LOGGED_IN_USER_LAST_NAME = "Adikari";
         const LOGGED_IN_USER_FULL_NAME = "Dpes Adikari";
+        const LOGGED_IN_AUTHOR_DISPLAY_NAME = "dpes44";
 
         const LOGGED_IN_USER_PROFILE_IMAGE_LINK = "https://i.ontraport.com/22612.7af9e9baa3d56ef7636bd6db2600bc6f.PNG";
         const DEFAULT_AVATAR = "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA";
@@ -1170,6 +1172,7 @@
                 defaultAuthorImage: DEFAULT_AVATAR,
                 defaultLoggedInAuthorImage: LOGGED_IN_USER_PROFILE_IMAGE_LINK?.trim() ? LOGGED_IN_USER_PROFILE_IMAGE_LINK : DEFAUL_AVATAR,
                 currentCourseId: courseID,
+                authorDisplayName: LOGGED_IN_AUTHOR_DISPLAY_NAME,
             },
             pagination: {
                 postsPerPage: 4,
@@ -1200,7 +1203,6 @@
     <script>
         $.views.helpers({
             toJSON: function (val) {
-                // If val is undefined or null, return an empty string.
                 return val != null ? JSON.stringify(val) : "";
             }
         });

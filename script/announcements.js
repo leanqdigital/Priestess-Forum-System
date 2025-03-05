@@ -1,16 +1,10 @@
-// Your API key and endpoints
 const API_KEY = "U6F6ofQc_Oes9BimgiEs5";
 const WS_ENDPOINT = `wss://priestess.vitalstats.app/api/v1/graphql?apiKey=${API_KEY}`;
 const HTTP_ENDPOINT = `https://priestess.vitalstats.app/api/v1/graphql`;
 
-// Set the logged-in user's contact ID – ensure this is a number.
-const LOGGED_IN_CONTACT_ID = CONFIG.api.userId; // Example value
-console.log(LOGGED_IN_CONTACT_ID);
-// courseIdToCheck is used to handle dynamic UI behavior.
+const LOGGED_IN_CONTACT_ID = CONFIG.api.userId;
 let courseIdToCheck = CONFIG.api.currentCourseId;
 
-// -----------------------------------------------------------
-// Fetch Registered Courses of Logged in Member
 const REGISTERD_COURSES_QUERY = `
 query calcRegisteredMembersRegisteredCoursesMany(
   $id: PriestessContactID
@@ -27,10 +21,8 @@ query calcRegisteredMembersRegisteredCoursesMany(
     Registered_Course_ID: field(arg: ["registered_course_id"])
   }
 }
-
 `;
 
-// Step 1: Fetch registered courses for the logged-in user.
 function fetchRegisteredCourses() {
   return fetch(HTTP_ENDPOINT, {
     method: "POST",
@@ -47,16 +39,13 @@ function fetchRegisteredCourses() {
     .then((data) => {
       const courses =
         data.data.calcRegisteredMembersRegisteredCoursesMany || [];
-      // Return an array of course IDs (converted to numbers)
       return courses.map((course) => Number(course.Registered_Course_ID));
     })
     .catch((error) => {
-      console.error("Error fetching registered courses:", error);
       return [];
     });
 }
-// -----------------------------------------------------------
-// NEW SUBSCRIPTION QUERY using the updated structure
+
 const SUBSCRIPTION_QUERY = `
 subscription subscribeToCalcAnnouncements(
   $author_id: PriestessContactID
@@ -219,11 +208,8 @@ subscription subscribeToCalcAnnouncements(
     Type: field(arg: ["type"])
   }
 }
-
 `;
 
-// -----------------------------------------------------------
-// Query to fetch read status data
 const READ_QUERY = `
   query calcOReadContactReadAnnouncements {
     calcOReadContactReadAnnouncements {
@@ -233,7 +219,6 @@ const READ_QUERY = `
   }
 `;
 
-// Mutation to mark a single announcement as read.
 const MARK_READ_MUTATION = `
   mutation createOReadContactReadAnnouncement(
     $payload: OReadContactReadAnnouncementCreateInput = null
@@ -245,8 +230,6 @@ const MARK_READ_MUTATION = `
   }
 `;
 
-// -----------------------------------------------------------
-// Notification Containers & Buttons (for multiple areas)
 const containerNavbar = document.getElementById(
   "parentNotificationTemplatesInNavbar"
 );
@@ -259,8 +242,6 @@ if (containerBody) notificationsContainers.push(containerBody);
 
 const markAllButtons = document.querySelectorAll(".mark-all-button");
 
-// -----------------------------------------------------------
-// Variables to track notifications
 let socket;
 let keepAliveInterval;
 const displayedNotifications = new Set();
@@ -268,26 +249,20 @@ const cardMap = new Map();
 const readAnnouncements = new Set();
 const pendingAnnouncements = new Set();
 
-// -----------------------------------------------------------
-// Helper: Get post details from a notification object
 function getPostDetails(notification) {
   let postId = null,
     courseId = null,
     courseName = null;
   if (notification.Post_ID != null) {
-    // New post announcement
     postId = notification.Post_ID;
     courseId = notification.Post_Related_Course_ID;
     courseName = notification.Course_Course_name;
   } else if (notification.Comment_ID != null) {
-    // Comment or reply announcement
     if (notification.ForumComment_Forum_Post_ID) {
-      // Reply: use parent's forum post id.
       postId = notification.ForumComment_Forum_Post_ID;
       courseId = notification.ForumPost_Related_Course_ID1;
       courseName = notification.Course_Course_name1 || null;
     } else if (notification.Comment_Forum_Post_ID) {
-      // Comment scenario.
       postId = notification.Comment_Forum_Post_ID;
       courseId = notification.ForumPost_Related_Course_ID;
       courseName = notification.Course_Course_name1;
@@ -296,7 +271,6 @@ function getPostDetails(notification) {
   return { postId, courseId, courseName };
 }
 
-// Helper: Convert Unix timestamp (seconds) to a relative time string.
 function timeAgo(unixTimestamp) {
   const now = new Date();
   const date = new Date(unixTimestamp * 1000);
@@ -319,12 +293,9 @@ function timeAgo(unixTimestamp) {
   return "Just now";
 }
 
-// New helper to override title and content based on custom fields.
 function getCustomTitleAndContent(notification) {
-  let title = notification.Title; // default fallback
-  let content = notification.Content; // default fallback
-
-  // If post-related fields are available, use them.
+  let title = notification.Title;
+  let content = notification.Content;
   if (notification.Contact_Contact_ID1) {
     const creatorId = Number(notification.Contact_Contact_ID1);
     if (creatorId !== Number(LOGGED_IN_CONTACT_ID)) {
@@ -335,7 +306,6 @@ function getCustomTitleAndContent(notification) {
       content = `${notification.Contact_First_Name1} ${notification.Contact_Last_Name1} mentioned you in a post`;
     }
   } else if (notification.Contact_Contact_ID) {
-    // Otherwise if comment-related fields are available, use them.
     const creatorId = Number(notification.Contact_Contact_ID);
     if (creatorId !== Number(LOGGED_IN_CONTACT_ID)) {
       title = "A new comment has been created";
@@ -348,8 +318,6 @@ function getCustomTitleAndContent(notification) {
   return { title, content };
 }
 
-// -----------------------------------------------------------
-// Create a notification card element.
 function createNotificationCard(notification, isRead) {
   const card = document.createElement("div");
   card.className = "notification flex justify-between gap-2 load-comments-btn";
@@ -374,7 +342,6 @@ function createNotificationCard(notification, isRead) {
     card.setAttribute("data-comment-id", String(notification.Comment_ID));
   }
 
-  // Use our helper to override title and content
   const { title, content } = getCustomTitleAndContent(notification);
 
   card.innerHTML = `
@@ -388,12 +355,10 @@ function createNotificationCard(notification, isRead) {
       <div class="text-xs leading-none">${content}</div>
     </div>
   `;
-  // Click handler: mark as read and handle redirection or modal open.
   card.addEventListener("click", function () {
     const id = Number(card.getAttribute("data-id"));
     const postIdAttr = card.getAttribute("data-post-id");
     if (!postIdAttr) {
-      console.log("No post found");
       return;
     }
 
@@ -410,10 +375,6 @@ function createNotificationCard(notification, isRead) {
       ? Number(courseIdToCheck.trim())
       : null;
 
-    console.log("Current Course ID:", currentCourseId);
-    console.log("Notification Course ID:", notifCourseId);
-    console.log("Post ID:", postIdAttr);
-
     if (
       currentCourseId &&
       notifCourseId !== null &&
@@ -421,13 +382,11 @@ function createNotificationCard(notification, isRead) {
     ) {
       const commentId = card.getAttribute("data-comment-id");
       if (commentId) {
-        console.log("Comment id is", commentId);
         openCommentModal = true;
         setTimeout(() => {
           const commentEl = document.querySelector(
             `[data-comment-id="${commentId}"] .commentCard`
           );
-          console.log("Comment Element is", commentEl);
           if (commentEl) {
             commentEl.scrollIntoView({ behavior: "smooth", block: "center" });
             commentEl.classList.add("highlight");
@@ -435,7 +394,7 @@ function createNotificationCard(notification, isRead) {
               commentEl.classList.remove("highlight");
             }, 5000);
           }
-        }, 1000);
+        }, 3000);
         return;
       }
       return;
@@ -448,7 +407,6 @@ function createNotificationCard(notification, isRead) {
       if (commentId) {
         redirectUrl += `&cid=${commentId}`;
       }
-      console.log("Redirecting to:", redirectUrl);
       window.location.href = redirectUrl;
       return;
     }
@@ -457,8 +415,6 @@ function createNotificationCard(notification, isRead) {
   return card;
 }
 
-// -----------------------------------------------------------
-// Update "No notifications" message based on current notifications.
 function updateNoNotificationsMessage() {
   const notificationContainers = document.querySelectorAll(
     "#parentNotificationTemplatesInNavbar, #parentNotificationTemplatesInBody"
@@ -482,7 +438,6 @@ function updateNoNotificationsMessage() {
   });
 }
 
-// Process a single announcement notification.
 function processNotification(notification) {
   const id = Number(notification.ID);
   if (displayedNotifications.has(id)) return;
@@ -499,8 +454,6 @@ function processNotification(notification) {
   updateRedDot();
 }
 
-// -----------------------------------------------------------
-// Update notification read status styling.
 function updateNotificationReadStatus() {
   cardMap.forEach((cards, id) => {
     cards.forEach((card) => {
@@ -518,14 +471,12 @@ function updateNotificationReadStatus() {
   updateNoNotificationsMessage();
 }
 
-// Update the red dot indicator based on unread notifications.
 function updateRedDot() {
   const redDot = document.querySelector(".red-dot");
   if (!redDot) return;
   const unreadCount = Array.from(displayedNotifications).filter(
     (id) => !readAnnouncements.has(id)
   ).length;
-  console.log("Unread count is", unreadCount);
   if (unreadCount > 0) {
     redDot.classList.remove("hidden");
   } else {
@@ -533,8 +484,6 @@ function updateRedDot() {
   }
 }
 
-// -----------------------------------------------------------
-// Disable and re-enable UI for notifications during async updates.
 function disableNotificationUI(announcementId) {
   const cards = cardMap.get(announcementId);
   if (cards) {
@@ -557,7 +506,6 @@ function enableNotificationUI(announcementId) {
   }
 }
 
-// Mark a single announcement as read.
 function markAsRead(announcementId) {
   if (
     pendingAnnouncements.has(announcementId) ||
@@ -596,12 +544,10 @@ function markAsRead(announcementId) {
     })
     .catch((error) => {
       pendingAnnouncements.delete(announcementId);
-      console.error("Error marking notification as read:", error);
       enableNotificationUI(announcementId);
     });
 }
 
-// Mark all unread announcements as read.
 async function markAllAsRead() {
   const unreadAnnouncementIds = [...displayedNotifications].filter(
     (id) => !readAnnouncements.has(id)
@@ -616,8 +562,6 @@ async function markAllAsRead() {
   markAllButtons.forEach((btn) => btn.classList.remove("disabled"));
 }
 
-// -----------------------------------------------------------
-// Fetch the read announcements for the logged-in user.
 function fetchReadData() {
   fetch(HTTP_ENDPOINT, {
     method: "POST",
@@ -644,30 +588,22 @@ function fetchReadData() {
         updateNoNotificationsMessage();
       }
     })
-    .catch((error) => {
-      console.error("Error fetching read data:", error);
-    });
+    .catch((error) => {});
 }
 
-// -----------------------------------------------------------
-// Send a KEEP_ALIVE message over the WebSocket.
 function sendKeepAlive() {
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
   }
 }
 
-// Connect to the WebSocket and subscribe for announcements for each registered course.
 function connect() {
   socket = new WebSocket(WS_ENDPOINT, "vitalstats");
 
   socket.onopen = () => {
     socket.send(JSON.stringify({ type: "connection_init" }));
     keepAliveInterval = setInterval(sendKeepAlive, 28000);
-
-    // Fetch registered courses and subscribe for each course's announcements.
     fetchRegisteredCourses().then((registeredCourseIds) => {
-      console.log("Registered Course IDs:", registeredCourseIds);
       registeredCourseIds.forEach((courseId, index) => {
         const subscriptionId = `sub-${courseId}-${index}`;
         socket.send(
@@ -686,14 +622,11 @@ function connect() {
         );
       });
     });
-
-    // Fetch the read announcements on page load.
     fetchReadData();
   };
 
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(data, "EventData");
     if (data.type !== "GQL_DATA") return;
     if (!data.payload || !data.payload.data) return;
     const result = data.payload.data.subscribeToCalcAnnouncements;
@@ -706,16 +639,11 @@ function connect() {
     clearInterval(keepAliveInterval);
   };
 
-  socket.onerror = (error) => {
-    console.error("WebSocket error:", error);
-  };
+  socket.onerror = (error) => {};
 }
 
-// -----------------------------------------------------------
-// Attach event listeners for "Mark all as read" buttons.
 markAllButtons.forEach((btn) => {
   btn.addEventListener("click", markAllAsRead);
 });
 
-// Start the connection.
 connect();

@@ -21,7 +21,6 @@ class ContactService {
       `;
 
       const variables = { registered_course_id: courseID };
-      console.log(variables);
 
       const data = await ApiService.query(query, variables);
 

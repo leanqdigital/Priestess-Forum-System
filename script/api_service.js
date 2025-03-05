@@ -1,7 +1,6 @@
 class ApiService {
   static async query(query, variables = {}) {
     try {
-
       const response = await fetch(CONFIG.api.endpoint, {
         method: "POST",
         headers: {
@@ -17,8 +16,8 @@ class ApiService {
       const { data, errors } = await response.json();
 
       if (errors) {
-        const errorMessages = Array.isArray(errors) 
-          ? errors.map((e) => e.message).join("\n") 
+        const errorMessages = Array.isArray(errors)
+          ? errors.map((e) => e.message).join("\n")
           : errors.message || "Unknown error";
         throw new Error(errorMessages);
       }
