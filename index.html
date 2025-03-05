@@ -13,9 +13,46 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 
-<body class="page-background"
-    x-data="{ openCommentModal: false, openAudioOptions: false, openCommentAudioOptions: false, openReplyAudioOptions: false}"
-    x-bind:class="{ 'overflow-hidden': openCommentModal }">
+<body class="page-background" x-data="(() => ({ 
+    openCommentModal: false, 
+    openAudioOptions: false, 
+    openCommentAudioOptions: false, 
+    openReplyAudioOptions: false, 
+    imagePreviewModal: false, 
+    ...modalComponent() 
+}))()" x-bind:class="{ ' overflow-hidden': openCommentModal }">
+
+    <!-- Modal Overlay -->
+    <div x-cloak x-show="imagePreviewModal" x-transition.opacity.duration.200ms
+        x-trap.inert.noscroll="imagePreviewModal" @keydown.esc.window="imagePreviewModal = false"
+        @click.self="imagePreviewModal = false"
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md p-6 lg:p-8 max-[800px]:p-0"
+        role="dialog" aria-modal="true" aria-labelledby="defaultModalTitle">
+
+        <div class="absolute top-0 left-0 w-full text-white px-4 py-2 flex items-center justify-between z-40">
+            <div class="h-9 w-full justify-between items-center flex">
+                <div class="text-white h3" x-text="modalData.title || 'Image Preview'"></div>
+                <div class="h-9 justify-end items-center gap-6 flex">
+                    <div @click="imagePreviewModal = false" class="cursor-pointer size-5">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M18.0892 16.9094C18.1666 16.9868 18.228 17.0787 18.2699 17.1799C18.3118 17.281 18.3334 17.3894 18.3334 17.4989C18.3334 17.6084 18.3118 17.7168 18.2699 17.818C18.228 17.9191 18.1666 18.0111 18.0892 18.0885C18.0118 18.1659 17.9199 18.2273 17.8187 18.2692C17.7176 18.3111 17.6092 18.3327 17.4997 18.3327C17.3902 18.3327 17.2818 18.3111 17.1806 18.2692C17.0794 18.2273 16.9875 18.1659 16.9101 18.0885L10.0001 11.1774L3.09005 18.0885C2.93369 18.2448 2.72162 18.3327 2.5005 18.3327C2.27937 18.3327 2.06731 18.2448 1.91095 18.0885C1.75459 17.9321 1.66675 17.7201 1.66675 17.4989C1.66675 17.2778 1.75459 17.0657 1.91095 16.9094L8.82202 9.99935L1.91095 3.08932C1.75459 2.93296 1.66675 2.72089 1.66675 2.49977C1.66675 2.27864 1.75459 2.06657 1.91095 1.91022C2.06731 1.75386 2.27937 1.66602 2.5005 1.66602C2.72162 1.66602 2.93369 1.75386 3.09005 1.91022L10.0001 8.82129L16.9101 1.91022C17.0665 1.75386 17.2785 1.66602 17.4997 1.66602C17.7208 1.66602 17.9329 1.75386 18.0892 1.91022C18.2456 2.06657 18.3334 2.27864 18.3334 2.49977C18.3334 2.72089 18.2456 2.93296 18.0892 3.08932L11.1781 9.99935L18.0892 16.9094Z"
+                                fill="white" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Content -->
+        <div x-show="imagePreviewModal"
+            x-transition:enter="transition ease-out duration-200 delay-100 motion-reduce:transition-opacity"
+            x-transition:enter-start="opacity-0 scale-50" x-transition:enter-end="opacity-100 scale-100"
+            class="relative w-full max-w-[900px]  overflow-hidden flex flex-col items-center p-4">
+            <!-- Centered Image -->
+            <img :src="modalData.imageUrl" class="max-w-full  object-contain">
+        </div>
+    </div>
+
     <div class="rounded-full w-12 h-12 bg-secondary hover:bg-secondary-100 fixed bottom-[2rem] right-[2rem] flex items-center justify-center cursor-pointer z-[999] max-[500px]:hidden"
         @click="window.scrollTo({ top: 0, behavior: 'smooth' });">
         <svg width="17" height="20" viewBox="0 0 17 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -550,7 +587,7 @@
             <div class="post-content flex flex-col gap-4 w-full max-h-max">
                 <div class="p-2 page-text !font-[350] post-copy-content content-container">{{:content}}</div>
                 {{if file_tpe === "Image" && file_content}}
-                    <div class="post-image-wrapper">
+                    <div title = "View Image" class="post-image-wrapper cursor-pointer" @click="imagePreviewModal = true; modalData = { imageUrl: '{{:file_content.link}}', title: 'Preview', filename: 'previewImage' }">
                     <img src="{{:file_content.link}}" alt="Post Image" class="size-full object-contain">
                     </div>
                 {{/if}}
@@ -734,9 +771,8 @@
                         {{/if}}
                     </div>
                     <div class="p2 page-text !font-[350] post-copy-content content-container">{{:content}}</div>
-                    <!-- Display attached file, if available -->
                     {{if file_type === "Image" && file_content}}
-                    <div class="comment-file-image my-2">
+                    <div title = "View Image" class="comment-file-image my-2 cursor-pointer" @click="imagePreviewModal = true; modalData = { imageUrl: '{{:file_content.link}}', title: 'Preview', filename: 'previewImage' }">
                         <img src="{{:file_content.link}}" alt="Comment image" class="w-[200px] object-contain rounded">
                     </div>
                     {{/if}}
@@ -1036,11 +1072,10 @@
                         {{/if}}
                     </div>
                     <div class="p2 page-text !font-[350] post-copy-content content-container">{{:content}}</div>
-                    <!-- Display attached file, if available -->
                     {{if file_type === "Image" && file_content}}
-                        <div class="comment-file-image my-2">
+                    <div title = "View Image" class="comment-file-image my-2 cursor-pointer" @click="imagePreviewModal = true; modalData = { imageUrl: '{{:file_content.link}}', title: 'Preview', filename: 'previewImage' }">
                         <img src="{{:file_content.link}}" alt="Comment image" class="w-[200px] object-contain rounded">
-                        </div>
+                    </div>
                     {{/if}}
 
                     {{if file_type === "Audio" && file_content}}
@@ -1197,6 +1232,22 @@
         document.addEventListener('DOMContentLoaded', function () {
             new MediaElementPlayer('player1');
         });
+    </script>
+
+    <script>
+        function modalComponent() {
+            return {
+                imagePreviewModal: false,
+                modalData: {
+                    title: '',
+                    imgUrl: '',
+                },
+                openModal(title, imgUrl) {
+                    this.modalData.title = title;
+                    this.modalData.imgUrl = imgUrl;
+                }
+            };
+        }
     </script>
 
     <script>

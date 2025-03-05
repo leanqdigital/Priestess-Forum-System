@@ -31,7 +31,8 @@ class PostModalManager {
     ${
       post.file_tpe === "Image" && imageData
         ? `
-    <div class="w-full h-full border-r-[10px] border-[#000000] flex-1 max-[900px]:hidden">
+    <div title = "View Image" class="w-full h-full border-r-[10px] border-[#000000] flex-1 max-[900px]:hidden cursor-pointer" 
+    @click="imagePreviewModal = true; modalData = { imageUrl: ' ${imageData.link}', title: 'Preview', filename: 'previewImage' }">
         ${
           imageData
             ? `
@@ -118,7 +119,8 @@ class PostModalManager {
                 ${
                   post.file_tpe === "Image" && imageData
                     ? `
-                <div class="w-full h-full flex-1 min-[900px]:hidden">
+                <div title = "View Image" class="w-full h-full flex-1 min-[900px]:hidden cursor-pointer"
+                @click="imagePreviewModal = true; modalData = { imageUrl: ' ${imageData.link}', title: 'Preview', filename: 'previewImage' }">
                     ${
                       imageData
                         ? `
