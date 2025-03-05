@@ -4,6 +4,7 @@ const HTTP_ENDPOINT = `https://priestess.vitalstats.app/api/v1/graphql`;
 
 const LOGGED_IN_CONTACT_ID = CONFIG.api.userId;
 let courseIdToCheck = CONFIG.api.currentCourseId;
+const aggregatedNotifications = new Map();
 
 const REGISTERD_COURSES_QUERY = `
 query calcRegisteredMembersRegisteredCoursesMany(
@@ -46,68 +47,58 @@ function fetchRegisteredCourses() {
     });
 }
 
+// =================== NEW SUBSCRIPTION QUERY ===================
 const SUBSCRIPTION_QUERY = `
 subscription subscribeToCalcAnnouncements(
-  $author_id: PriestessContactID
   $related_course_id: PriestessCourseID
+  $author_id: PriestessContactID
   $id: PriestessContactID
-  $limit: IntScalar
-  $offset: IntScalar
 ) {
   subscribeToCalcAnnouncements(
     query: [
       {
-        where: {
-          Post: [
-            {
-              where: {
-                author_id: $author_id
-                _OPERATOR_: neq
-              }
+        whereGroup: [
+          { where: { announcement__type: "Post" } }
+          {
+            andWhere: {
+              Post: [
+                {
+                  where: {
+                    related_course_id: $related_course_id
+                  }
+                }
+              ]
             }
-            {
-              andWhere: {
-                related_course_id: $related_course_id
-              }
-            }
-          ]
-        }
-      }
-      {
-        orWhere: {
-          Post: [
-            {
-              where: {
-                author_id: $author_id
-                _OPERATOR_: neq
-              }
-            }
-            {
-              andWhere: {
-                Mentioned_Users: [{ where: { id: $id } }]
-              }
-            }
-            {
-              andWhere: {
-                related_course_id: $related_course_id
-              }
-            }
-          ]
-        }
-      }
-      {
-        orWhere: {
-          Comment: [
-            {
-              whereGroup: [
+          }
+          {
+            andWhere: {
+              Post: [
                 {
                   where: {
                     author_id: $author_id
                     _OPERATOR_: neq
                   }
                 }
+              ]
+            }
+          }
+          {
+            andWhere: {
+              Post: [
+                { where: { post_type: "Notification" } }
+              ]
+            }
+          }
+        ]
+      }
+      {
+        orWhereGroup: [
+          { where: { announcement__type: "Comment" } }
+          {
+            andWhere: {
+              Comment: [
                 {
-                  andWhere: {
+                  where: {
                     Forum_Post: [
                       {
                         where: {
@@ -119,142 +110,107 @@ subscription subscribeToCalcAnnouncements(
                 }
               ]
             }
-            {
-              orWhere: {
-                Comment_or_Reply_Mentions: [
-                  { where: { id: $id } }
-                  {
-                    andWhere: {
-                      ForumComments: [
-                        {
-                          where: {
-                            author_id: $author_id
-                            _OPERATOR_: neq
-                          }
-                        }
-                      ]
-                    }
+          }
+          {
+            andWhere: {
+              Comment: [
+                {
+                  where: {
+                    author_id: $author_id
+                    _OPERATOR_: neq
                   }
-                  {
-                    andWhere: {
-                      ForumComments: [
-                        {
-                          where: {
-                            Forum_Post: [
-                              {
-                                where: {
-                                  related_course_id: $related_course_id
-                                }
-                              }
-                            ]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
+                }
+              ]
             }
-          ]
-        }
+          }
+        ]
       }
       {
-        orWhere: {
-          Comment: [
-            {
-              where: {
-                author_id: $author_id
-                _OPERATOR_: neq
-              }
-            }
-            {
-              andWhere: {
-                Forum_Post: [
-                  {
-                    where: {
-                      related_course_id: $related_course_id
-                    }
+        orWhereGroup: [
+          { where: { announcement__type: "Post Mention" } }
+          {
+            andWhere: {
+              Post: [
+                {
+                  where: {
+                    related_course_id: $related_course_id
                   }
-                ]
-              }
+                }
+              ]
             }
-          ]
-        }
+          }
+          {
+            andWhere: {
+              Post: [
+                {
+                  where: {
+                    Mentioned_Users: [
+                      { where: { id: $id } }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+      {
+        orWhereGroup: [
+          { where: { announcement__type: "Comment Mention" } }
+          {
+            andWhere: {
+              Comment: [
+                {
+                  where: {
+                    Forum_Post: [
+                      {
+                        where: {
+                          related_course_id: $related_course_id
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+          {
+            andWhere: {
+              Comment: [
+                {
+                  where: {
+                    Comment_or_Reply_Mentions: [
+                      { where: { id: $id } }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
       }
     ]
-    limit: $limit
-    offset: $offset
     orderBy: [{ path: ["created_at"], type: desc }]
   ) {
     ID: field(arg: ["id"])
-    Title: field(arg: ["title"])
-    Content: field(arg: ["content"])
+    Announcement_Type: field(arg: ["announcement__type"])
     Date_Added: field(arg: ["created_at"])
     Post_ID: field(arg: ["post_id"])
-    Post_Related_Course_ID: field(
-      arg: ["Post", "related_course_id"]
-    )
-    Course_Course_name: field(
-      arg: ["Post", "Related_Course", "course_name"]
-    )
+    Post_Related_Course_ID: field(arg: ["Post", "related_course_id"])
+    Course_Course_name: field(arg: ["Post", "Related_Course", "course_name"])
+    Contact_Display_Name: field(arg: ["Post", "Author", "display_name"])
+    Contact_Contact_ID: field(arg: ["Post", "Mentioned_Users", "id"])
     Comment_ID: field(arg: ["comment_id"])
-    Comment_Forum_Post_ID: field(
-      arg: ["Comment", "forum_post_id"]
-    )
-    ForumPost_Related_Course_ID: field(
-      arg: ["Comment", "Forum_Post", "related_course_id"]
-    )
-    Course_Course_name1: field(
-      arg: [
-        "Comment"
-        "Forum_Post"
-        "Related_Course"
-        "course_name"
-      ]
-    )
-    ForumComment_Forum_Post_ID: field(
-      arg: ["Comment", "Parent_Comment", "forum_post_id"]
-    )
-    ForumPost_Related_Course_ID1: field(
-      arg: [
-        "Comment"
-        "Parent_Comment"
-        "Forum_Post"
-        "related_course_id"
-      ]
-    )
-    Course_Course_name2: field(
-      arg: [
-        "Comment"
-        "Forum_Post"
-        "Related_Course"
-        "course_name"
-      ]
-    )
-    Contact_Contact_ID: field(
-      arg: ["Comment", "Comment_or_Reply_Mentions", "id"]
-    )
-    Contact_Contact_ID1: field(
-      arg: ["Post", "Mentioned_Users", "id"]
-    )
-    Contact_First_Name: field(
-      arg: ["Comment", "Author", "first_name"]
-    )
-    Contact_Last_Name: field(
-      arg: ["Comment", "Author", "last_name"]
-    )
-    Contact_First_Name1: field(
-      arg: ["Post", "Author", "first_name"]
-    )
-    Contact_Last_Name1: field(
-      arg: ["Post", "Author", "last_name"]
-    )
-    Type: field(arg: ["type"])
+    Comment_Forum_Post_ID: field(arg: ["Comment", "forum_post_id"])
+    ForumPost_Related_Course_ID: field(arg: ["Comment", "Forum_Post", "related_course_id"])
+    Course_Course_name1: field(arg: ["Comment", "Forum_Post", "Related_Course", "course_name"])
+    Contact_Display_Name1: field(arg: ["Comment", "Author", "display_name"])
+    Contact_Contact_ID1: field(arg: ["Comment", "Comment_or_Reply_Mentions", "id"])
   }
 }
-
 `;
 
+// =================== READ & MUTATION QUERIES ===================
 const READ_QUERY = `
   query calcOReadContactReadAnnouncements {
     calcOReadContactReadAnnouncements {
@@ -278,9 +234,11 @@ const MARK_READ_MUTATION = `
 const containerNavbar = document.getElementById(
   "parentNotificationTemplatesInNavbar"
 );
+
 const containerBody = document.getElementById(
   "parentNotificationTemplatesInBody"
 );
+
 const notificationsContainers = [];
 if (containerNavbar) notificationsContainers.push(containerNavbar);
 if (containerBody) notificationsContainers.push(containerBody);
@@ -294,26 +252,76 @@ const cardMap = new Map();
 const readAnnouncements = new Set();
 const pendingAnnouncements = new Set();
 
+// =================== HELPER FUNCTIONS ===================
+
+// Update getPostDetails to use the new fields based on the announcement type.
 function getPostDetails(notification) {
   let postId = null,
     courseId = null,
     courseName = null;
-  if (notification.Post_ID != null) {
+  const announcementType = notification.Announcement_Type;
+  if (announcementType === "Post" || announcementType === "Post Mention") {
     postId = notification.Post_ID;
     courseId = notification.Post_Related_Course_ID;
     courseName = notification.Course_Course_name;
-  } else if (notification.Comment_ID != null) {
-    if (notification.ForumComment_Forum_Post_ID) {
-      postId = notification.ForumComment_Forum_Post_ID;
-      courseId = notification.ForumPost_Related_Course_ID1;
-      courseName = notification.Course_Course_name1 || null;
-    } else if (notification.Comment_Forum_Post_ID) {
-      postId = notification.Comment_Forum_Post_ID;
-      courseId = notification.ForumPost_Related_Course_ID;
-      courseName = notification.Course_Course_name1;
-    }
+  } else if (
+    announcementType === "Comment" ||
+    announcementType === "Comment Mention"
+  ) {
+    postId = notification.Comment_Forum_Post_ID;
+    courseId = notification.ForumPost_Related_Course_ID;
+    courseName = notification.Course_Course_name1;
   }
   return { postId, courseId, courseName };
+}
+
+// Custom title and content based on new conditions.
+function getCustomTitleAndContent(notification) {
+  const announcementType = notification.Announcement_Type;
+  if (announcementType === "Post") {
+    return {
+      title: `${notification.Course_Course_name} - A new notification has been added`,
+      content: `Important message from ${notification.Contact_Display_Name}`,
+    };
+  } else if (announcementType === "Comment") {
+    return {
+      title: `${notification.Course_Course_name1} - A new comment has been added`,
+      content: `${notification.Contact_Display_Name1} commented on a post`,
+    };
+  } else if (announcementType === "Post Mention") {
+    if (
+      Number(notification.Contact_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)
+    ) {
+      return {
+        title: `${notification.Course_Course_name} - You have been mentioned in a post`,
+        content: `${notification.Contact_Display_Name} mentioned you in a post`,
+      };
+    } else {
+      return {
+        title: `${notification.Course_Course_name} - A post has been created`,
+        content: `${notification.Contact_Display_Name} has created a post`,
+      };
+    }
+  } else if (announcementType === "Comment Mention") {
+    if (
+      Number(notification.Contact_Contact_ID1) === Number(LOGGED_IN_CONTACT_ID)
+    ) {
+      return {
+        title: `${notification.Course_Course_name1} - You have been mentioned in a comment`,
+        content: `${notification.Contact_Display_Name1} mentioned you in a comment`,
+      };
+    } else {
+      return {
+        title: `${notification.Course_Course_name1} - A new comment has been added`,
+        content: `${notification.Contact_Display_Name1} commented on a post`,
+      };
+    }
+  }
+  // Fallback in case none match.
+  return {
+    title: notification.Title || "",
+    content: notification.Content || "",
+  };
 }
 
 function timeAgo(unixTimestamp) {
@@ -336,31 +344,6 @@ function timeAgo(unixTimestamp) {
   if (interval >= 1)
     return interval + " min" + (interval > 1 ? "s" : "") + " ago";
   return "Just now";
-}
-
-function getCustomTitleAndContent(notification) {
-  let title = notification.Title;
-  let content = notification.Content;
-  if (notification.Contact_Contact_ID1) {
-    const creatorId = Number(notification.Contact_Contact_ID1);
-    if (creatorId !== Number(LOGGED_IN_CONTACT_ID)) {
-      title = "A new post has been created";
-      content = `${notification.Contact_First_Name1} ${notification.Contact_Last_Name1} has created a post`;
-    } else {
-      title = "You have been mentioned in a post";
-      content = `${notification.Contact_First_Name1} ${notification.Contact_Last_Name1} mentioned you in a post`;
-    }
-  } else if (notification.Contact_Contact_ID) {
-    const creatorId = Number(notification.Contact_Contact_ID);
-    if (creatorId !== Number(LOGGED_IN_CONTACT_ID)) {
-      title = "A new comment has been created";
-      content = `${notification.Contact_First_Name} ${notification.Contact_Last_Name} has added a comment`;
-    } else {
-      title = "You have been mentioned in a comment";
-      content = `${notification.Contact_First_Name} ${notification.Contact_Last_Name} mentioned you in a comment`;
-    }
-  }
-  return { title, content };
 }
 
 function createNotificationCard(notification, isRead) {
@@ -388,16 +371,19 @@ function createNotificationCard(notification, isRead) {
   }
 
   const { title, content } = getCustomTitleAndContent(notification);
+  console.log("Date added are", notification.Date_Added);
 
   card.innerHTML = `
     <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${
       isRead ? "" : "bg-unread"
     } hover:bg-secondary-100 hover:text-white">
       <div class="flex justify-between w-full gap-[4px]">
-        <div class="text-sm font-semibold leading-none">${title}</div>
-        <div class="text-xs leading-3">${timeAgo(notification.Date_Added)}</div>
+        <div class="text-sm font-semibold leading-none title">${title}</div>
+        <div class="text-xs leading-3 data-added line-clamp-1 text-nowrap">${timeAgo(
+          notification.Date_Added
+        )}</div>
       </div>
-      <div class="text-xs leading-none">${content}</div>
+      <div class="text-xs leading-none content">${content}</div>
     </div>
   `;
   card.addEventListener("click", function () {
@@ -460,6 +446,20 @@ function createNotificationCard(notification, isRead) {
   return card;
 }
 
+function updateNotificationCard(announcementId, updatedNotification) {
+  const cards = cardMap.get(announcementId);
+  if (!cards) return;
+  const { title, content } = getCustomTitleAndContent(updatedNotification);
+  cards.forEach((card) => {
+    const innerDiv = card.firstElementChild;
+    if (!innerDiv) return;
+    const titleDiv = innerDiv.querySelector(".title");
+    const contentDiv = innerDiv.querySelector(".content");
+    if (titleDiv) titleDiv.textContent = title;
+    if (contentDiv) contentDiv.textContent = content;
+  });
+}
+
 function updateNoNotificationsMessage() {
   const notificationContainers = document.querySelectorAll(
     "#parentNotificationTemplatesInNavbar, #parentNotificationTemplatesInBody"
@@ -485,13 +485,37 @@ function updateNoNotificationsMessage() {
 
 function processNotification(notification) {
   const id = Number(notification.ID);
-  if (displayedNotifications.has(id)) return;
+
+  if (aggregatedNotifications.has(id)) {
+    // Retrieve the existing aggregated record.
+    let aggregated = aggregatedNotifications.get(id);
+
+    // If the new notification has a mention update the relevant fields
+    if (
+      notification.Announcement_Type === "Post Mention" ||
+      notification.Announcement_Type === "Comment Mention"
+    ) {
+      aggregated.Contact_Contact_ID =
+        notification.Contact_Contact_ID || aggregated.Contact_Contact_ID;
+      aggregated.Contact_Contact_ID1 =
+        notification.Contact_Contact_ID1 || aggregated.Contact_Contact_ID1;
+      aggregated.Announcement_Type =
+        notification.Announcement_Type || aggregated.Announcement_Type;
+      aggregatedNotifications.set(id, aggregated);
+      updateNotificationCard(id, aggregated);
+    }
+    return; // Already processed; do not add a new card.
+  }
+
+  // First time processing this announcement.
+  aggregatedNotifications.set(id, notification);
   displayedNotifications.add(id);
   const isRead = readAnnouncements.has(id);
+
   const cards = [];
   notificationsContainers.forEach((container) => {
     const card = createNotificationCard(notification, isRead);
-    container.appendChild(card);
+    container.prepend(card);
     cards.push(card);
   });
   cardMap.set(id, cards);
@@ -677,7 +701,7 @@ function connect() {
     const result = data.payload.data.subscribeToCalcAnnouncements;
     if (!result) return;
     const notifications = Array.isArray(result) ? result : [result];
-    notifications.forEach(processNotification);
+    notifications.slice().reverse().forEach(processNotification);
   };
 
   socket.onclose = () => {
