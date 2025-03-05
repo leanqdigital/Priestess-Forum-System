@@ -420,7 +420,7 @@ class PostModalManager {
                                     class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
                                     Audio</button>
                                 <button id="record-audio-button-comment" type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
+                                    class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button hidden">Record
                                     Audio</button>
                             </div>
                         </div>
