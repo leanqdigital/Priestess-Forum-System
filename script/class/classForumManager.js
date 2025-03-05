@@ -618,7 +618,10 @@ class ForumManager {
     voteButtons.forEach((button) => {
       const isVoted = this.votedPostIds.has(postId);
       button.innerHTML = this.getVoteSVG(isVoted);
-      button.nextElementSibling.textContent = updatedVoteCount;
+      const voteCountEl = button.parentElement.querySelector(".postVoteCount");
+      if (voteCountEl) {
+        voteCountEl.textContent = updatedVoteCount;
+      }
     });
   }
 
@@ -1681,7 +1684,7 @@ class ForumManager {
             file_content: fileContent,
             PostVotesCount: fetchedPost.Member_Post_Upvotes_DataTotal_Count,
             PostCommentCount: fetchedPost.ForumCommentsTotalCount,
-            voted: false,
+            voted: forumManager.votedPostIds.has(String(fetchedPost.ID)) 
           };
 
           await PostModalManager.open(post);
