@@ -903,6 +903,7 @@ sl-dialog::part(panel) {
   text-decoration: underline;
   font-weight: 500;
 }
+
 /* Remove default styling */
 input[type="range"].progress {
   -webkit-appearance: none !important;
@@ -917,6 +918,7 @@ input[type="range"].progress::-webkit-slider-runnable-track {
   background: #ddd !important;
   border-radius: 3px !important;
 }
+
 input[type="range"].progress::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   width: 16px !important;
@@ -934,6 +936,7 @@ input[type="range"].progress::-moz-range-track {
   background: #ddd !important;
   border-radius: 3px !important;
 }
+
 input[type="range"].progress::-moz-range-thumb {
   width: 16px !important;
   height: 16px !important;
@@ -955,13 +958,14 @@ input[type="range"].progress::-webkit-slider-runnable-track {
   background: #ddd !important;
   border-radius: 3px !important;
 }
+
 input[type="range"].progress::-webkit-slider-thumb {
   -webkit-appearance: none !important;
   width: 16px !important;
   height: 16px !important;
-  background: #D4AF7A !important;
+  background: #d4af7a !important;
   border-radius: 50% !important;
-  margin-top: -6px !important; 
+  margin-top: -6px !important;
   cursor: pointer !important;
 }
 
@@ -971,10 +975,11 @@ input[type="range"].progress::-moz-range-track {
   background: #ddd !important;
   border-radius: 3px !important;
 }
+
 input[type="range"].progress::-moz-range-thumb {
   width: 16px !important;
   height: 16px !important;
-  background: #D4AF7A !important;
+  background: #d4af7a !important;
   border: none !important;
   border-radius: 50% !important;
   cursor: pointer !important;

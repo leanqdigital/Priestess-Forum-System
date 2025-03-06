@@ -53,6 +53,8 @@ subscription subscribeToCalcAnnouncements(
   $related_course_id: PriestessCourseID
   $author_id: PriestessContactID
   $id: PriestessContactID
+  $limit: IntScalar
+  $offset: IntScalar
 ) {
   subscribeToCalcAnnouncements(
     query: [
@@ -149,6 +151,12 @@ subscription subscribeToCalcAnnouncements(
                     ]
                   }
                 }
+                {
+                  andWhere: {
+                    author_id: $author_id
+                    _OPERATOR_: neq
+                  }
+                }
               ]
             }
           }
@@ -156,7 +164,9 @@ subscription subscribeToCalcAnnouncements(
       }
       {
         orWhereGroup: [
-          { where: { announcement__type: "Comment Mention" } }
+          {
+            where: { announcement__type: "Comment Mention" }
+          }
           {
             andWhere: {
               Comment: [
@@ -184,28 +194,60 @@ subscription subscribeToCalcAnnouncements(
                     ]
                   }
                 }
+                {
+                  andWhere: {
+                    ForumComments: [
+                      { where: { author_id: $author_id } }
+                    ]
+                  }
+                }
               ]
             }
           }
         ]
       }
     ]
+    limit: $limit
+    offset: $offset
     orderBy: [{ path: ["created_at"], type: desc }]
   ) {
     ID: field(arg: ["id"])
     Announcement_Type: field(arg: ["announcement__type"])
     Date_Added: field(arg: ["created_at"])
     Post_ID: field(arg: ["post_id"])
-    Post_Related_Course_ID: field(arg: ["Post", "related_course_id"])
-    Course_Course_name: field(arg: ["Post", "Related_Course", "course_name"])
-    Contact_Display_Name: field(arg: ["Post", "Author", "display_name"])
-    Contact_Contact_ID: field(arg: ["Post", "Mentioned_Users", "id"])
+    Post_Related_Course_ID: field(
+      arg: ["Post", "related_course_id"]
+    )
+    Course_Course_name: field(
+      arg: ["Post", "Related_Course", "course_name"]
+    )
+    Contact_Display_Name: field(
+      arg: ["Post", "Author", "display_name"]
+    )
+    Contact_Contact_ID: field(
+      arg: ["Post", "Mentioned_Users", "id"]
+    )
     Comment_ID: field(arg: ["comment_id"])
-    Comment_Forum_Post_ID: field(arg: ["Comment", "forum_post_id"])
-    ForumPost_Related_Course_ID: field(arg: ["Comment", "Forum_Post", "related_course_id"])
-    Course_Course_name1: field(arg: ["Comment", "Forum_Post", "Related_Course", "course_name"])
-    Contact_Display_Name1: field(arg: ["Comment", "Author", "display_name"])
-    Contact_Contact_ID1: field(arg: ["Comment", "Comment_or_Reply_Mentions", "id"])
+    Comment_Forum_Post_ID: field(
+      arg: ["Comment", "forum_post_id"]
+    )
+    ForumPost_Related_Course_ID: field(
+      arg: ["Comment", "Forum_Post", "related_course_id"]
+    )
+    Course_Course_name1: field(
+      arg: [
+        "Comment"
+        "Forum_Post"
+        "Related_Course"
+        "course_name"
+      ]
+    )
+    Contact_Display_Name1: field(
+      arg: ["Comment", "Author", "display_name"]
+    )
+    Contact_Contact_ID1: field(
+      arg: ["Comment", "Comment_or_Reply_Mentions", "id"]
+    )
   }
 }
 `;
