@@ -322,3 +322,17 @@ function linkifyElement(element) {
     }
   });
 }
+
+document.querySelectorAll(".audio-player").forEach((player) => {
+  const audio = player.querySelector("audio");
+  const progressBar = player.querySelector(".progress");
+  audio.addEventListener("loadedmetadata", () => {
+    progressBar.max = audio.duration;
+  });
+  audio.addEventListener("timeupdate", () => {
+    progressBar.value = audio.currentTime;
+  });
+  progressBar.addEventListener("input", (e) => {
+    audio.currentTime = e.target.value;
+  });
+});
