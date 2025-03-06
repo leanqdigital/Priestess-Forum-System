@@ -513,10 +513,6 @@ function attachReplyControls(replyWrapper) {
       e.preventDefault();
       const editor = replyWrapper.querySelector(".reply-editor");
       const content = editor.innerHTML.trim();
-      if (!content) {
-        UIManager.showError("Reply cannot be empty");
-        return;
-      }
       const imageFile = replyWrapper.querySelector(".reply-image-upload")
         .files[0];
       const audioFile =

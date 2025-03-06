@@ -21,7 +21,6 @@ class ApiService {
           : errors.message || "Unknown error";
         throw new Error(errorMessages);
       }
-
       return data;
     } catch (error) {
       throw error;

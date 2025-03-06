@@ -498,10 +498,6 @@ class PostModalManager {
         const commentForm = document.querySelector(".comment-form-wrapper");
         const editor = commentFormConfig.editor;
         const content = editor.innerHTML.trim();
-        if (!content) {
-          UIManager.showError("Comment cannot be empty");
-          return;
-        }
         const imageFile = commentFormConfig.imageUploadInput.files[0];
         const audioFile =
           commentFormConfig.audioUploadInput.files[0] ||
