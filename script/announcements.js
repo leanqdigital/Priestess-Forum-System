@@ -420,12 +420,10 @@ function createNotificationCard(notification, isRead) {
       isRead ? "" : "bg-unread"
     } hover:bg-secondary-100 hover:text-white">
       <div class="flex justify-between w-full gap-[4px]">
-        <div class="text-sm font-semibold leading-none title">${title}</div>
-        <div class="text-xs leading-3 data-added line-clamp-1 text-nowrap">${timeAgo(
-          notification.Date_Added
-        )}</div>
+        <div class="text-sm font-semibold leading-none titleText">${title}</div>
+        <div class="text-xs leading-3 data-added line-clamp-1 text-nowrap dateText">${timeAgo(notification.Date_Added)}</div>
       </div>
-      <div class="text-xs leading-none content">${content}</div>
+      <div class="text-xs leading-none contentText">${content}</div>
     </div>
   `;
   card.addEventListener("click", function () {
