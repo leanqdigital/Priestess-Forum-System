@@ -197,7 +197,12 @@ subscription subscribeToCalcAnnouncements(
                 {
                   andWhere: {
                     ForumComments: [
-                      { where: { author_id: $author_id } }
+                      {
+                        where: {
+                          author_id: $author_id
+                          _OPERATOR_: neq
+                        }
+                      }
                     ]
                   }
                 }
