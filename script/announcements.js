@@ -107,6 +107,9 @@ subscription subscribeToCalcAnnouncements(
                           related_course_id: $related_course_id
                         }
                       }
+                      {
+                        andWhere: { author_id: $author_id }
+                      }
                     ]
                   }
                 }
@@ -255,6 +258,7 @@ subscription subscribeToCalcAnnouncements(
     )
   }
 }
+
 `;
 
 // =================== READ & MUTATION QUERIES ===================
