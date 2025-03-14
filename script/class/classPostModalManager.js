@@ -25,7 +25,7 @@ class PostModalManager {
 
     modalContent.innerHTML = `
 <div
-    class="flex ${containerClass} max-h-[800px] max-[1300px]:w-[900px] max-[900px]:w-screen max-[900px]:h-screen relative">
+    class="flex ${containerClass} max-h-[80vh] max-[1300px]:w-[900px] max-[900px]:w-screen max-[900px]:h-screen relative">
 
 
     ${

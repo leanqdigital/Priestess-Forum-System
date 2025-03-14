@@ -258,7 +258,6 @@ subscription subscribeToCalcAnnouncements(
     )
   }
 }
-
 `;
 
 // =================== READ & MUTATION QUERIES ===================
@@ -337,7 +336,7 @@ function getCustomTitleAndContent(notification) {
   } else if (announcementType === "Comment") {
     return {
       title: `${notification.Course_Course_name1} - A new comment has been added`,
-      content: `${notification.Contact_Display_Name1} commented on a post`,
+      content: `${notification.Contact_Display_Name1} commented on your post`,
     };
   } else if (announcementType === "Post Mention") {
     if (
@@ -364,7 +363,7 @@ function getCustomTitleAndContent(notification) {
     } else {
       return {
         title: `${notification.Course_Course_name1} - A new comment has been added`,
-        content: `${notification.Contact_Display_Name1} commented on a post`,
+        content: `${notification.Contact_Display_Name1} commented on your post`,
       };
     }
   }
