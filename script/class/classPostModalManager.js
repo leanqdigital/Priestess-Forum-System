@@ -31,7 +31,7 @@ class PostModalManager {
     ${
       post.file_tpe === "Image" && imageData
         ? `
-    <div title = "View Image" class="w-full h-full border-r-[10px] border-[#000000] flex-1 max-[900px]:hidden cursor-pointer" 
+    <div title = "View Image" class="w-full h-auto flex items-center justify-center bg-black border-r-[10px] border-[#000000] flex-1 max-[900px]:hidden cursor-pointer" 
     @click="imagePreviewModal = true; modalData = { imageUrl: ' ${imageData.link}', title: 'Preview', filename: 'previewImage' }">
         ${
           imageData
@@ -39,7 +39,7 @@ class PostModalManager {
         <div class="flex flex-col gap-3 flex-1 w-full h-full">
             ${
               imageData
-                ? `<img class="w-full h-full object-cover" src="${imageData.link}" alt="Post Image">`
+                ? `<img class="w-full h-full object-contain" src="${imageData.link}" alt="Post Image">`
                 : ""
             }
         </div>
