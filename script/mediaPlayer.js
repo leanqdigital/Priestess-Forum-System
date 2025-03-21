@@ -16,17 +16,17 @@ class MediaFormHandler {
     this.init();
   }
 
-  formatTime(seconds){
+  formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-  };
+  }
 
   resetForm() {
     if (this.config.editor) this.config.editor.innerHTML = "";
-    if (this.config.imageField) this.config.imageField.value = "";
-    if (this.config.uploadAudioField) this.config.uploadAudioField.value = "";
-    if (this.config.videoField) this.config.videoField.value = "";
+    if (this.config.imageUploadInput) this.config.imageUploadInput.value = "";
+    if (this.config.audioUploadInput) this.config.audioUploadInput.value = "";
+    if (this.config.videoUploadInput) this.config.videoUploadInput.value = "";
     if (this.config.imagePreviewWrapper)
       this.config.imagePreviewWrapper.innerHTML = "";
     if (this.config.audioPreviewWrapper) {
@@ -39,6 +39,8 @@ class MediaFormHandler {
       this.config.fileControls.classList.add("hidden");
 
     this.resetRecordingState();
+    this.currentFileType = null;
+    this.currentRecordedAudioFile = null;
     if (this.config.uploadImageBtn)
       this.config.uploadImageBtn.classList.remove("hidden");
     if (this.config.uploadVideoBtn)
