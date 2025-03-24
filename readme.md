@@ -7,7 +7,7 @@ Components
 2.  Menus
 3.  Buttons - Solid/Outline/Plain/Icon Button : Type submit and button
 4.  Rich text editor
-5.  Audio player
+5.  Audio player 
 6.  Video player
 
 Layouts
