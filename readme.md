@@ -3,7 +3,7 @@ Content Hierarchy
     
 Components 
 
-1.  Navbar
+1.  Navbar 
 2.  Menus
 3.  Buttons - Solid/Outline/Plain/Icon Button : Type submit and button
 4.  Rich text editor
