@@ -1,7 +1,7 @@
 const API_KEY = "U6F6ofQc_Oes9BimgiEs5";
 const WS_ENDPOINT = `wss://priestess.vitalstats.app/api/v1/graphql?apiKey=${API_KEY}`;
 const HTTP_ENDPOINT = `https://priestess.vitalstats.app/api/v1/graphql`;
-
+let createdAt = CONFIG.api.dateAdded;
 const LOGGED_IN_CONTACT_ID = CONFIG.api.userId;
 let courseIdToCheck = CONFIG.api.currentCourseId;
 const aggregatedNotifications = new Map();
@@ -50,6 +50,7 @@ function fetchRegisteredCourses() {
 // =================== NEW SUBSCRIPTION QUERY ===================
 const SUBSCRIPTION_QUERY = `
 subscription subscribeToCalcAnnouncements(
+  $created_at: TimestampSecondsScalar
   $related_course_id: PriestessCourseID
   $author_id: PriestessContactID
   $id: PriestessContactID
@@ -58,159 +59,172 @@ subscription subscribeToCalcAnnouncements(
 ) {
   subscribeToCalcAnnouncements(
     query: [
+      { where: { created_at: $created_at, _OPERATOR_: gt } }
       {
-        whereGroup: [
-          { where: { announcement__type: "Post" } }
+        andWhereGroup: [
           {
-            andWhere: {
-              Post: [
-                {
-                  where: {
-                    related_course_id: $related_course_id
-                  }
-                }
-              ]
-            }
-          }
-          {
-            andWhere: {
-              Post: [
-                {
-                  where: {
-                    author_id: $author_id
-                    _OPERATOR_: neq
-                  }
-                }
-              ]
-            }
-          }
-          {
-            andWhere: {
-              Post: [
-                { where: { post_type: "Notification" } }
-              ]
-            }
-          }
-        ]
-      }
-      {
-        orWhereGroup: [
-          { where: { announcement__type: "Comment" } }
-          {
-            andWhere: {
-              Comment: [
-                {
-                  where: {
-                    Forum_Post: [
-                      {
-                        where: {
-                          related_course_id: $related_course_id
-                        }
+            whereGroup: [
+              { where: { announcement__type: "Post" } }
+              {
+                andWhere: {
+                  Post: [
+                    {
+                      where: {
+                        related_course_id: $related_course_id
                       }
-                      {
-                        andWhere: { author_id: $author_id }
+                    }
+                  ]
+                }
+              }
+              {
+                andWhere: {
+                  Post: [
+                    {
+                      where: {
+                        author_id: $author_id
+                        _OPERATOR_: neq
                       }
-                    ]
-                  }
+                    }
+                  ]
                 }
-              ]
-            }
+              }
+              {
+                andWhere: {
+                  Post: [
+                    { where: { post_type: "Notification" } }
+                  ]
+                }
+              }
+            ]
           }
           {
-            andWhere: {
-              Comment: [
-                {
-                  where: {
-                    author_id: $author_id
-                    _OPERATOR_: neq
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-      {
-        orWhereGroup: [
-          { where: { announcement__type: "Post Mention" } }
-          {
-            andWhere: {
-              Post: [
-                {
-                  where: {
-                    related_course_id: $related_course_id
-                  }
-                }
-              ]
-            }
-          }
-          {
-            andWhere: {
-              Post: [
-                {
-                  where: {
-                    Mentioned_Users: [
-                      { where: { id: $id } }
-                    ]
-                  }
-                }
-                {
-                  andWhere: {
-                    author_id: $author_id
-                    _OPERATOR_: neq
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-      {
-        orWhereGroup: [
-          {
-            where: { announcement__type: "Comment Mention" }
-          }
-          {
-            andWhere: {
-              Comment: [
-                {
-                  where: {
-                    Forum_Post: [
-                      {
-                        where: {
-                          related_course_id: $related_course_id
-                        }
+            orWhereGroup: [
+              { where: { announcement__type: "Comment" } }
+              {
+                andWhere: {
+                  Comment: [
+                    {
+                      where: {
+                        Forum_Post: [
+                          {
+                            where: {
+                              related_course_id: $related_course_id
+                            }
+                          }
+                          {
+                            andWhere: {
+                              author_id: $author_id
+                            }
+                          }
+                        ]
                       }
-                    ]
-                  }
+                    }
+                  ]
                 }
-              ]
-            }
+              }
+              {
+                andWhere: {
+                  Comment: [
+                    {
+                      where: {
+                        author_id: $author_id
+                        _OPERATOR_: neq
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
           {
-            andWhere: {
-              Comment: [
-                {
-                  where: {
-                    Comment_or_Reply_Mentions: [
-                      { where: { id: $id } }
-                    ]
-                  }
+            orWhereGroup: [
+              {
+                where: {
+                  announcement__type: "Post Mention"
                 }
-                {
-                  andWhere: {
-                    ForumComments: [
-                      {
-                        where: {
-                          author_id: $author_id
-                          _OPERATOR_: neq
-                        }
+              }
+              {
+                andWhere: {
+                  Post: [
+                    {
+                      where: {
+                        related_course_id: $related_course_id
                       }
-                    ]
-                  }
+                    }
+                  ]
                 }
-              ]
-            }
+              }
+              {
+                andWhere: {
+                  Post: [
+                    {
+                      where: {
+                        Mentioned_Users: [
+                          { where: { id: $id } }
+                        ]
+                      }
+                    }
+                    {
+                      andWhere: {
+                        author_id: $author_id
+                        _OPERATOR_: neq
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+          {
+            orWhereGroup: [
+              {
+                where: {
+                  announcement__type: "Comment Mention"
+                }
+              }
+              {
+                andWhere: {
+                  Comment: [
+                    {
+                      where: {
+                        Forum_Post: [
+                          {
+                            where: {
+                              related_course_id: $related_course_id
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+              {
+                andWhere: {
+                  Comment: [
+                    {
+                      where: {
+                        Comment_or_Reply_Mentions: [
+                          { where: { id: $id } }
+                        ]
+                      }
+                    }
+                    {
+                      andWhere: {
+                        ForumComments: [
+                          {
+                            where: {
+                              author_id: $author_id
+                              _OPERATOR_: neq
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         ]
       }
@@ -733,6 +747,7 @@ function connect() {
                 author_id: LOGGED_IN_CONTACT_ID,
                 id: LOGGED_IN_CONTACT_ID,
                 related_course_id: courseId,
+                created_at: createdAt,
               },
             },
           })
