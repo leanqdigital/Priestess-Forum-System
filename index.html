@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Priestess Forum System</title>
-    <link rel="stylesheet" href="styles.css">
 
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.87/dist/themes/light.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.16/mediaelementplayer.min.css">
@@ -184,7 +184,7 @@
 
     <!-- Create New Post Modal -->
     <sl-dialog id="postNewModal" style="color: red;" label="Start a post">
-        <section class="flex flex-col gap-4 bg-transparent">
+        <section class="flex flex-col gap-4 bg-transparent emoji-form">
             <div class="flex items-center gap-2">
                 <div class="size-6 profile-image-wrapper">
                     <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
@@ -195,7 +195,23 @@
 
             <div id="post-editor"
                 class="post-editor page-text p-4 min-h-[80px] editor border border-secondary rounded-[4px]"
-                contenteditable="true" style="font-size: 16px !important;"></div>
+                contenteditable="true" style="font-size: 16px !important;">
+            </div>
+
+            <div class="emojiButton cursor-pointer w-max">😀</div>
+            <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper">
+                <span class="text-2xl cursor-pointer">😀</span>
+                <span class="text-2xl cursor-pointer">😂</span>
+                <span class="text-2xl cursor-pointer">🥺</span>
+                <span class="text-2xl cursor-pointer">😍</span>
+                <span class="text-2xl cursor-pointer">🤔</span>
+                <span class="text-2xl cursor-pointer">😎</span>
+                <span class="text-2xl cursor-pointer">😜</span>
+                <span class="text-2xl cursor-pointer">😋</span>
+                <span class="text-2xl cursor-pointer">🙌</span>
+                <span class="text-2xl cursor-pointer">🥳</span>
+                <span class="text-2xl cursor-pointer">🥰</span>
+            </div>
 
             <div class="flex flex-col gap-3 fullAudioRecordingWrapper hidden">
                 <div class="o2 text-secondary">Audio Recording</div>
@@ -558,7 +574,7 @@
         </div>
         <!-- Loading Indicator -->
         <div id="loading-indicator" class="text-center hidden py-4">
-            <sl-spinner class="loading-spinner text-2xl"></sl-spinner>
+            <sl-spinner class="loading-spinner text-2xl cursor-pointer"></sl-spinner>
         </div>
     </div>
 
@@ -924,9 +940,23 @@
                     <div class="profile-image-wrapper size-6 max-[500px]:hidden">
                         <img class="size-full rounded-full block" src="{{:forLoggedInUserImage}}">
                     </div>
-                    <div id = "reply-form-wrapper-{{:id}}" class="reply-form-wrapper reply-form flex flex-col flex-1 p-2 rounded-[4px] border border-grey-200 bg-white">
+                    <div id = "reply-form-wrapper-{{:id}}" class="emoji-form reply-form-wrapper reply-form flex flex-col flex-1 p-2 rounded-[4px] border border-grey-200 bg-white">
                         <div id="reply-editor-{{:id}}" class="editor reply-editor page-text p-2 !border-none !focus-visible:border-none rounded"
                             contenteditable="true" style="font-size: 16px !important;"></div>
+                            <div class="emojiButton cursor-pointer absolute right-[2rem] w-max">😀</div>
+                            <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper">
+                                <span class="text-2xl cursor-pointer">😀</span>
+                                <span class="text-2xl cursor-pointer">😂</span>
+                                <span class="text-2xl cursor-pointer">🥺</span>
+                                <span class="text-2xl cursor-pointer">😍</span>
+                                <span class="text-2xl cursor-pointer">🤔</span>
+                                <span class="text-2xl cursor-pointer">😎</span>
+                                <span class="text-2xl cursor-pointer">😜</span>
+                                <span class="text-2xl cursor-pointer">😋</span>
+                                <span class="text-2xl cursor-pointer">🙌</span>
+                                <span class="text-2xl cursor-pointer">🥳</span>
+                                <span class="text-2xl cursor-pointer">🥰</span>
+                            </div>
                         <div class="flex flex-col gap-3 fullAudioRecordingWrapperReply hidden">
                             <div class="o2 text-secondary">Audio Recording</div>
                             <div class="flex p-3 items-center justify-between rounded border border-grey-200">
@@ -1248,6 +1278,7 @@
 
     </script>
 
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/1.0.5/jsrender.min.js"></script>
@@ -1256,13 +1287,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.16/mediaelement-and-player.min.js"></script>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             new MediaElementPlayer('player1');
         });
-    </script>
 
-    <script>
         function modalComponent() {
             return {
                 imagePreviewModal: false,
@@ -1276,15 +1306,40 @@
                 }
             };
         }
-    </script>
 
-    <script>
         $.views.helpers({
             toJSON: function (val) {
                 return val != null ? JSON.stringify(val) : "";
             }
         });
+
+        document.addEventListener('click', function (e) {
+            var emojiBtn = e.target.closest('.emojiButton');
+            if (emojiBtn) {
+                var container = emojiBtn.closest('.emoji-form');
+                if (container) {
+                    container.querySelector('.emojisWrapper').classList.toggle('hidden');
+                }
+                return;
+            }
+            var emojiSpan = e.target.closest('.emojisWrapper span');
+            if (emojiSpan) {
+                var container = emojiSpan.closest('.emoji-form');
+                if (container) {
+                    var editor = container.querySelector('.editor');
+                    editor.focus();
+                    document.execCommand('insertText', false, emojiSpan.textContent);
+                }
+            }
+        });
+
+        function resetEmojiForm() {
+            document.querySelectorAll(".emojisWrapper").forEach((wrapper) => {
+                wrapper.classList.add("hidden");
+            });
+        }
     </script>
+
 
     <!-- Your App Scripts -->
     <script src="script/class/classForumManager.js"></script>
@@ -1301,8 +1356,6 @@
     <script src="script/announcements.js"></script>
     <script src="script/handleFile.js"></script>
     <script src="script/audioPlayer.js"></script>
-
-
 </body>
 
 </html>

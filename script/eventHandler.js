@@ -32,6 +32,7 @@ window.mediaFormHandler = new MediaFormHandler(postFormConfig);
 
 document.getElementById("submit-post").addEventListener("click", async (e) => {
   e.preventDefault();
+  resetEmojiForm();
   const htmlContent = window.mediaFormHandler.config.editor.innerHTML.trim();
   const tempContainer = document.createElement("div");
   tempContainer.innerHTML = htmlContent;
@@ -511,6 +512,7 @@ function attachReplyControls(replyWrapper) {
   if (submitBtn) {
     submitBtn.addEventListener("click", async function (e) {
       e.preventDefault();
+      resetEmojiForm();
       const editor = replyWrapper.querySelector(".reply-editor");
       const content = editor.innerHTML.trim();
       const imageFile = replyWrapper.querySelector(".reply-image-upload")

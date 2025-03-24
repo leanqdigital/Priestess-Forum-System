@@ -32,7 +32,9 @@ class PostModalManager {
       post.file_tpe === "Image" && imageData
         ? `
     <div title = "View Image" class="w-full h-auto flex items-center justify-center bg-black border-r-[10px] border-[#000000] flex-1 max-[900px]:hidden cursor-pointer" 
-    @click="imagePreviewModal = true; modalData = { imageUrl: ' ${imageData.link}', title: 'Preview', filename: 'previewImage' }">
+    @click="imagePreviewModal = true; modalData = { imageUrl: ' ${
+      imageData.link
+    }', title: 'Preview', filename: 'previewImage' }">
         ${
           imageData
             ? `
@@ -120,7 +122,9 @@ class PostModalManager {
                   post.file_tpe === "Image" && imageData
                     ? `
                 <div title = "View Image" class="w-full h-full flex-1 min-[900px]:hidden cursor-pointer"
-                @click="imagePreviewModal = true; modalData = { imageUrl: ' ${imageData.link}', title: 'Preview', filename: 'previewImage' }">
+                @click="imagePreviewModal = true; modalData = { imageUrl: ' ${
+                  imageData.link
+                }', title: 'Preview', filename: 'previewImage' }">
                     ${
                       imageData
                         ? `
@@ -308,6 +312,7 @@ class PostModalManager {
               }">
              </div> 
             <div class="
+                    emoji-form
                     comment-form-wrapper
                     comment-form 
                     flex 
@@ -321,6 +326,20 @@ class PostModalManager {
                     bg-white
                     z-[9999]">
                 <div id="comment-editor" style="font-size: 16px !important;" class="editor comment-editor page-text p-2 !border-none !focus-visible:border-none rounded" contenteditable="true"></div>
+                <div class="emojiButton cursor-pointer absolute right-[2rem] w-max">😀</div>
+                <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper">
+                    <span class="text-2xl cursor-pointer">😀</span>
+                    <span class="text-2xl cursor-pointer">😂</span>
+                    <span class="text-2xl cursor-pointer">🥺</span>
+                    <span class="text-2xl cursor-pointer">😍</span>
+                    <span class="text-2xl cursor-pointer">🤔</span>
+                    <span class="text-2xl cursor-pointer">😎</span>
+                    <span class="text-2xl cursor-pointer">😜</span>
+                    <span class="text-2xl cursor-pointer">😋</span>
+                    <span class="text-2xl cursor-pointer">🙌</span>
+                    <span class="text-2xl cursor-pointer">🥳</span>
+                    <span class="text-2xl cursor-pointer">🥰</span>
+                </div>
                 <div class="flex flex-col gap-3 fullAudioRecordingWrapperComment hidden">
                 <div class="o2 text-secondary">Audio Recording</div>
                 <div class="flex p-3 items-center justify-between rounded-[12px] border border-grey-200">
@@ -426,7 +445,7 @@ class PostModalManager {
                                     class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
                                     Audio</button>
                                 <button id="record-audio-button-comment" type="button"
-                                    class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button hidden">Record
+                                    class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
                                     Audio</button>
                             </div>
                         </div>
@@ -499,6 +518,7 @@ class PostModalManager {
     document
       .getElementById("submit-comment")
       .addEventListener("click", async () => {
+        resetEmojiForm();
         const commentForm = document.querySelector(".comment-form-wrapper");
         const editor = commentFormConfig.editor;
         const content = editor.innerHTML.trim();

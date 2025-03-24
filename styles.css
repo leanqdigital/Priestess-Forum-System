@@ -984,3 +984,11 @@ input[type="range"].progress::-moz-range-thumb {
   border-radius: 50% !important;
   cursor: pointer !important;
 }
+
+#emoji-btn {
+  cursor: pointer;
+  font-size: 24px;
+  background: none;
+  border: none;
+  outline: none;
+}

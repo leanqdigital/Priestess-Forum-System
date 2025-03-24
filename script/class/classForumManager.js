@@ -1684,7 +1684,7 @@ class ForumManager {
             file_content: fileContent,
             PostVotesCount: fetchedPost.Member_Post_Upvotes_DataTotal_Count,
             PostCommentCount: fetchedPost.ForumCommentsTotalCount,
-            voted: forumManager.votedPostIds.has(String(fetchedPost.ID)) 
+            voted: forumManager.votedPostIds.has(String(fetchedPost.ID)),
           };
 
           await PostModalManager.open(post);
