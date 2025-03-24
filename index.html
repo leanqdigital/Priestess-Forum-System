@@ -198,8 +198,8 @@
                 contenteditable="true" style="font-size: 16px !important;">
             </div>
 
-            <div class="emojiButton cursor-pointer w-max">😀</div>
-            <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper">
+            <div class="emojiButton cursor-pointer w-max hideTypeField">😀</div>
+            <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper hideTypeField">
                 <span class="text-2xl cursor-pointer">😀</span>
                 <span class="text-2xl cursor-pointer">😂</span>
                 <span class="text-2xl cursor-pointer">🥺</span>
@@ -321,7 +321,7 @@
                         <button id="upload-audio-button" type="button"
                             class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
                             Audio</button>
-                        <button id="record-audio-button" type="button"
+                        <button id="record-audio-button hideTypeField" type="button"
                             class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
                             Audio</button>
                     </div>
@@ -335,7 +335,7 @@
 
 
                 <input type="file" id="post-video-upload" accept="video/*" style="display: none;">
-                <button id="upload-video-button" class="icon-button" type="button">
+                <button id="upload-video-button" class="icon-button hideTypeField" type="button">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M11.1107 4.88888V11.1111C11.1107 11.3468 11.0171 11.5729 10.8504 11.7396C10.6837 11.9063 10.4576 12 10.2219 12H2.22189C1.98615 12 1.76005 11.9063 1.59336 11.7396C1.42666 11.5729 1.33301 11.3468 1.33301 11.1111V4.88888C1.33301 4.65314 1.42666 4.42705 1.59336 4.26035C1.76005 4.09365 1.98615 4 2.22189 4H10.2219C10.4576 4 10.6837 4.09365 10.8504 4.26035C11.0171 4.42705 11.1107 4.65314 11.1107 4.88888ZM14.3329 4.90277C14.2702 4.88743 14.205 4.88554 14.1415 4.89722C14.078 4.9089 14.0177 4.93389 13.9646 4.97055L12.0985 6.21443C12.0681 6.23474 12.0431 6.26226 12.0259 6.29453C12.0086 6.3268 11.9996 6.36284 11.9996 6.39943V9.60053C11.9996 9.63712 12.0086 9.67316 12.0259 9.70543C12.0431 9.7377 12.0681 9.76522 12.0985 9.78553L13.9752 11.0366C14.0454 11.0835 14.1276 11.1094 14.212 11.1112C14.2964 11.1131 14.3796 11.0909 14.4518 11.0472C14.5187 11.0047 14.5735 10.9458 14.611 10.876C14.6486 10.8063 14.6676 10.7281 14.6663 10.6489V5.33333C14.6663 5.23476 14.6336 5.13897 14.5733 5.06103C14.5129 4.98309 14.4284 4.92742 14.3329 4.90277Z"
@@ -943,8 +943,8 @@
                     <div id = "reply-form-wrapper-{{:id}}" class="emoji-form reply-form-wrapper reply-form flex flex-col flex-1 p-2 rounded-[4px] border border-grey-200 bg-white">
                         <div id="reply-editor-{{:id}}" class="editor reply-editor page-text p-2 !border-none !focus-visible:border-none rounded"
                             contenteditable="true" style="font-size: 16px !important;"></div>
-                            <div class="emojiButton cursor-pointer absolute right-[2rem] w-max">😀</div>
-                            <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper">
+                            <div class="emojiButton cursor-pointer absolute right-[2rem] w-max hideTypeField">😀</div>
+                            <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper hideTypeField">
                                 <span class="text-2xl cursor-pointer">😀</span>
                                 <span class="text-2xl cursor-pointer">😂</span>
                                 <span class="text-2xl cursor-pointer">🥺</span>
@@ -1064,7 +1064,7 @@
                                         <button id="upload-audio-button-reply" type="button"
                                             class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
                                             Audio</button>
-                                        <button id="record-audio-button-reply" type="button"
+                                        <button id="record-audio-button-reply hideTypeField" type="button"
                                             class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
                                             Audio</button>
                                     </div>
@@ -1073,7 +1073,7 @@
 
                                 <input type="file" id="reply-video-upload" accept="video/*" style="display: none"
                                     class="reply-video-upload" />
-                                <button id="upload-video-button-reply" class="upload-video-button-reply icon-button"
+                                <button id="upload-video-button-reply" class="upload-video-button-reply icon-button hideTypeField"
                                     type="button">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
