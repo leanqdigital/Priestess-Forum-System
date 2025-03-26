@@ -1331,16 +1331,17 @@
                 if (container) {
                     var editor = container.querySelector('.editor');
                     editor.focus();
-                    document.execCommand('insertText', false, emojiSpan.textContent);
                     var range = document.createRange();
                     range.selectNodeContents(editor);
                     range.collapse(false);
                     var sel = window.getSelection();
                     sel.removeAllRanges();
                     sel.addRange(range);
+                    document.execCommand('insertText', false, emojiSpan.textContent);
                 }
             }
         });
+
 
 
         function resetEmojiForm() {
