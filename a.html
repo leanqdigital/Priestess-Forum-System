@@ -1,0 +1,1117 @@
+<script>
+    let FETCH_CLASSES_QUERY = `
+    query calcClasses {
+        calcClasses(query: [{ where: { teacher_id: ${CONTACTss_ID} } }]) {
+            ID: field(arg: ["id"])
+        }
+    }
+`;
+
+    let USER_PREFERENCES_QUERY = `
+    query calcContacts($id: AwcContactID) {
+        calcContacts(query: [{ where: { id: $id } }]) {
+            Turn_Off_All_Notifications: field(arg: ["turn__off__all__notifications"])
+            Posts: field(arg: ["posts"])
+            Post_Comments: field(arg: ["post__comments"])
+            Comments_On_My_Posts: field(arg: ["comments__on__my__posts"])
+            Submissions: field(arg: ["submissions"])
+            Submission_Comments: field(arg: ["submission__comments"])
+            Comments_On_My_Submissions: field(arg: ["comments__on__my__submissions"])
+            Announcements: field(arg: ["announcements"])
+            Announcement_Comments: field(arg: ["announcement__comments"])
+            Comments_On_My_Announcements: field(arg: ["comments__on__my__announcements"])
+            Announcement_Mentions: field(arg: ["announcement__mentions"])
+            Announcement_Comment_Mentions: field(arg: ["announcement__comment__mentions"])
+            Post_Mentions: field(arg: ["post__mentions"])
+            Post_Comment_Mentions: field(arg: ["post__comment__mentions"])
+            Submission_Mentions: field(arg: ["submission__mentions"])
+            Submission_Comment_Mentions: field(arg: ["submission__comment__mentions"]
+            )
+        }
+    }
+`
+        // Sample Data above query fetches
+        // {
+        //   "data": {
+        //     "calcContacts": [
+        //       {
+        //         "Turn_Off_All_Notifications": true, // Do not fetch notifications at all
+        //         "Posts": false, // Fetch type posts
+        //         "Post_Comments": false, // Fetch type post comments 
+        //         "Comments_On_My_Posts": false, // Fetch type post comments but check for comment author and it should match logged in user
+        //         "Submissions": false, // Fetch type submissions
+        //         "Submission_Comments": false, // Fetch type submission comments
+        //         "Comments_On_My_Submissions": false, // Fetch type submission comments but check for comment author and it should match logged in user
+        //         "Announcements": false, // Fetch type announcements 
+        //         "Announcement_Comments": false, // Fetch type announcement comments
+        //         "Comments_On_My_Announcements": false, // Fetch type announcement comments but check for comment author and it should match logged in user
+        //         "Announcement_Mentions": false, // Fetch type announcement mentions but mentions contact id should include logged in user id
+        //         "Announcement_Comment_Mentions": false, // Fetch type announcement comment mentions but mentions contact id should include logged in user id
+        //         "Post_Mentions": false, // Fetch type post mentions but mentions contact id should include logged in user id
+        //         "Post_Comment_Mentions": false, // Fetch type post comment mentions but mentions contact id should include logged in user id
+        //         "Submission_Mentions": false, // Fetch type submisson mentions but mentions contact id should include logged in user id
+        //         "Submission_Comment_Mentions": false // Fetch type submission comment mentions but mentions contact id should include logged in user id
+        //       }
+        //     ]
+        //   },
+        //   "extensions": {}
+        // }
+        ;
+
+    // The following query should be dyanmic based on above fetch preferences query. By checking true or false value in above query fields, we update the 
+    // below query.
+    let FETCH_NOTIFICATIONS_SUBSCRIPTION_QUERY = `
+        subscription subscribeToCalcAnnouncements(
+            $class_id: AwcClassID
+            $author_id: AwcContactID
+            $instructor_id: AwcContactID
+            $student_id: AwcContactID
+            $id: AwcContactID
+            $limit: IntScalar
+            $offset: IntScalar
+            ) {
+            subscribeToCalcAnnouncements(
+                query: [
+                { where: { class_id: $class_id } }
+                {
+                    andWhereGroup: [
+                    {
+                        whereGroup: [
+                        { where: { notification__type: "Posts" } }
+                        {
+                            andWhere: {
+                            Post: [
+                                {
+                                where: {
+                                    author_id: $author_id
+                                    _OPERATOR_: neq
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Post Comments"
+                            }
+                        }
+                        {
+                            andWhere: {
+                            Comment: [
+                                {
+                                where: {
+                                    author_id: $author_id
+                                    _OPERATOR_: neq
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Announcements"
+                            }
+                        }
+                        {
+                            andWhere: {
+                            instructor_id: $instructor_id
+                            _OPERATOR_: neq
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Announcement Comments"
+                            }
+                        }
+                        {
+                            andWhere: {
+                            ForumComments: [
+                                {
+                                where: {
+                                    author_id: $author_id
+                                    _OPERATOR_: neq
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: { notification__type: "Submissions" }
+                        }
+                        {
+                            orWhere: {
+                            Submissions: [
+                                {
+                                where: {
+                                    Student: [
+                                    {
+                                        where: {
+                                        student_id: $student_id
+                                        _OPERATOR_: neq
+                                        }
+                                    }
+                                    ]
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Submission Comments"
+                            }
+                        }
+                        {
+                            orWhere: {
+                            Submissions: [
+                                {
+                                where: {
+                                    ForumComments: [
+                                    {
+                                        where: {
+                                        author_id: $author_id
+                                        _OPERATOR_: neq
+                                        }
+                                    }
+                                    ]
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Post Mentions"
+                            }
+                        }
+                        {
+                            orWhere: {
+                            Post: [
+                                {
+                                where: {
+                                    Mentions: [{ where: { id: $id } }]
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Post Comment Mentions"
+                            }
+                        }
+                        {
+                            orWhere: {
+                            Post: [
+                                {
+                                where: {
+                                    ForumComments: [
+                                    {
+                                        where: {
+                                        Mentions: [
+                                            { where: { id: $id } }
+                                        ]
+                                        }
+                                    }
+                                    ]
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Submission Comment Mentions"
+                            }
+                        }
+                        {
+                            orWhere: {
+                            Submissions: [
+                                {
+                                where: {
+                                    ForumComments: [
+                                    {
+                                        where: {
+                                        Mentions: [
+                                            { where: { id: $id } }
+                                        ]
+                                        }
+                                    }
+                                    ]
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Announcement Mentions"
+                            }
+                        }
+                        {
+                            orWhere: {
+                            Mentions: [{ where: { id: $id } }]
+                            }
+                        }
+                        ]
+                    }
+                    {
+                        orWhereGroup: [
+                        {
+                            where: {
+                            notification__type: "Announcement Comment Mentions"
+                            }
+                        }
+                        {
+                            orWhere: {
+                            ForumComments: [
+                                {
+                                where: {
+                                    Mentions: [{ where: { id: $id } }]
+                                }
+                                }
+                            ]
+                            }
+                        }
+                        ]
+                    }
+                    ]
+                }
+                ]
+                limit: $limit
+                offset: $offset
+                orderBy: [{ path: ["created_at"], type: desc }]
+            ) {
+                ID: field(arg: ["id"])
+                Class_ID: field(arg: ["class_id"])
+                Class_Class_Name: field(arg: ["Class", "class_name"])
+                Notification_Type: field(arg: ["notification__type"])
+                Title: field(arg: ["title"])
+                Content: field(arg: ["content"])
+            }
+        }
+`;
+
+    const container = document.getElementById("parentNotificationTemplatesInBody");
+    const displayedNotifications = new Set();
+    const readAnnouncements = new Set();
+    const pendingAnnouncements = new Set();
+    const cardMap = new Map();
+    const notificationIDs = new Set();
+    const notificationData = [];
+
+    function getQueryParamss(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    const enrollID = getQueryParamss('eid');
+
+    function timeAgo(unixTimestamp) {
+        const now = new Date();
+        const date = new Date(unixTimestamp * 1000);
+        const seconds = Math.floor((now - date) / 1000);
+        let interval = Math.floor(seconds / 31536000);
+        if (interval >= 1) return interval + " year" + (interval > 1 ? "s" : "") + " ago";
+        interval = Math.floor(seconds / 2592000);
+        if (interval >= 1) return interval + " month" + (interval > 1 ? "s" : "") + " ago";
+        interval = Math.floor(seconds / 86400);
+        if (interval >= 1) return interval + " day" + (interval > 1 ? "s" : "") + " ago";
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) return interval + " hour" + (interval > 1 ? "s" : "") + " ago";
+        interval = Math.floor(seconds / 60);
+        if (interval >= 1) return interval + " min" + (interval > 1 ? "s" : "") + " ago";
+        return "Just now";
+    }
+
+    // Fetch Classes
+    async function fetchClassIds() {
+        const query = FETCH_CLASSES_QUERY;
+        try {
+            const response = await fetch(HTTP_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Api-Key": APIii_KEY,
+                },
+                body: JSON.stringify({ query }),
+            });
+            const result = await response.json();
+            if (result.data && result.data.calcClasses) {
+                return result.data.calcClasses.map(cls => cls.ID);
+            }
+            return [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+
+    async function initializeSocket() {
+        const classIds = await fetchClassIds();
+
+        if (!classIds || classIds.length === 0) {
+            return;
+        }
+
+        // Fetch notifications (announcements) for every class fetched
+        classIds.forEach((classId) => {
+            const socket = new WebSocket(WS_ENDPOINT, "vitalstats");
+            let keepAliveInterval;
+            socket.onopen = () => {
+                keepAliveInterval = setInterval(() => {
+                    if (socket.readyState === WebSocket.OPEN) {
+                        socket.send(JSON.stringify({ type: "KEEP_ALIVE" }));
+                    }
+                }, 28000);
+                socket.send(JSON.stringify({ type: "connection_init" }));
+                socket.send(
+                    JSON.stringify({
+                        id: `subscription_${classId}`,
+                        type: "GQL_START",
+                        payload: {
+                            query: FETCH_NOTIFICATIONS_SUBSCRIPTION_QUERY,
+                            variables: {
+                                author_id: LOGGED_IN_CONTACT_ID,
+                                id: LOGGED_IN_CONTACT_ID,
+                                class_id: classId,
+                                instructor_id: LOGGED_IN_CONTACT_ID,
+                                student_id: LOGGED_IN_CONTACT_ID,
+                            },
+                        },
+                    })
+                );
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type !== "GQL_DATA") return;
+                if (!data.payload || !data.payload.data) {
+
+                    return;
+                }
+
+                const result = data.payload.data.subscribeToCalcAnnouncements;
+
+                if (!result) {
+                    return;
+                }
+                const notifications = Array.isArray(result) ? result : [result];
+                const filteredNotifications = notifications.filter(notification => {
+                    const postAuthor = notification.Post_Author_ID;
+                    const commentAuthor = notification.Comment_Author_ID;
+                    const instID = notification.Instructor_ID;
+                    const userId = Number(CONTACTss_ID);
+                    if (postAuthor === userId || commentAuthor === userId || instID === userId) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+
+                if (filteredNotifications.length === 0) {
+                    return;
+                }
+
+                filteredNotifications.forEach(notification => {
+                    processNotification(notification);
+                    notificationIDs.add(Number(notification.ID));
+                    notificationData.push(notification);
+                });
+
+                updateMarkAllReadVisibility();
+            };
+
+            fetchReadDataForClass(classId);
+
+            socket.onclose = () => {
+                clearInterval(keepAliveInterval);
+                setTimeout(() => initializeSocket(), 2000);
+            };
+
+            socket.onerror = (error) => {
+
+            };
+        });
+    }
+
+    function createNotificationCard(notification, isRead) {
+        const card = document.createElement("div");
+        card.className = "notification-card cursor-pointer";
+        card.innerHTML = `
+            <div class="p-2  items-start gap-2 rounded justify-between notification-content w-full ${isRead ? "bg-white" : "bg-unread"} ${notification.Status === "Draft" ? "hidden" : "flex"}">
+                <div class="flex flex-col gap-1">
+                    <div class="text-[#414042] text-xs font-semibold">${notification.Title}</div>
+                    <div class="extra-small-text text-dark line-clamp-2">${notification.Content}</div>
+                    <div class="text-[#586A80] extra-small-text">${notification.Course_Course_Name}</div>
+                </div>
+                <div class="extra-small-text text-[#586A80] text-nowrap">${timeAgo(notification.Date_Added)}</div>
+            </div>
+    `;
+
+        card.addEventListener("click", async function () {
+            const id = Number(notification.ID);
+            const type = notification.Type;
+            const loader = document.getElementById("loader");
+            loader.classList.remove("fade-out");
+            if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+                await markAsRead(id);
+            }
+            if (type === 'Comment' || type === 'Post') {
+                window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=chats?current-post-id=${notification.Post_ID}`;
+            } else if (type === 'Submissions') {
+                openIframeModal(notification.Submissions_AWC_Teacher_s_Portal_Student_s_Submission_Details_Page_URL);
+            } else {
+                window.location.href = `https://courses.writerscentre.com.au/teacher/class/${notification.Class_Unique_ID}?selectedTab=announcements?data-announcement-template-id=${notification.ID}`;
+            }
+        });
+        return card;
+    }
+
+    function processNotification(notification) {
+        const container1 = document.getElementById("parentNotificationTemplatesInBody");
+        const container2 = document.getElementById("secondaryNotificationContainer");
+
+        const id = Number(notification.ID);
+        if (displayedNotifications.has(id)) return;
+        displayedNotifications.add(id);
+
+        const isRead = readAnnouncements.has(id);
+        const card = createNotificationCard(notification, isRead);
+        container1.prepend(card);
+        let cardClone = null;
+        if (container2) {
+            cardClone = createNotificationCard(notification, isRead);
+            container2.prepend(cardClone);
+        }
+        cardMap.set(id, { original: card, clone: cardClone });
+        updateNoNotificationMessages();
+        updateNoNotificationMessagesSec();
+    }
+
+    function updateNotificationReadStatus() {
+        cardMap.forEach((cards, id) => {
+            if (readAnnouncements.has(id)) {
+                [cards.original, cards.clone].forEach((card) => {
+                    if (card) {
+                        card.querySelector(".notification-content").classList.remove("bg-unread");
+                        card.querySelector(".notification-content").classList.add("bg-white");
+                    }
+                });
+            }
+        });
+    }
+
+    function updateMarkAllReadVisibility() {
+        let hasUnread = false;
+        cardMap.forEach(({ original }) => {
+            if (original && original.querySelector(".notification-content").classList.contains("bg-unread")) {
+                hasUnread = true;
+            }
+        });
+        const markAllReadElements = document.querySelectorAll(".hideMarkAllReadIfAllRead");
+        const redDot = document.getElementById("redDot");
+        markAllReadElements.forEach(el => {
+            el.classList.toggle("hidden", !hasUnread);
+        });
+        if (redDot) {
+            redDot.classList.toggle("hidden", !hasUnread);
+        }
+    }
+
+    async function markAsRead(announcementId) {
+        if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId)) return;
+        pendingAnnouncements.add(announcementId);
+
+        const variables = {
+            payload: {
+                read_announcement_id: announcementId,
+                read_contact_id: LOGGED_IN_CONTACT_ID,
+            },
+        };
+
+        try {
+            const response = await fetch(HTTP_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Api-Key": APIii_KEY,
+                },
+                body: JSON.stringify({
+                    query: MARK_READ_MUTATION,
+                    variables: variables,
+                }),
+            });
+
+            const data = await response.json();
+            pendingAnnouncements.delete(announcementId);
+            if (data.data && data.data.createOReadContactReadAnnouncement) {
+                readAnnouncements.add(announcementId);
+                updateNotificationReadStatus();
+                updateMarkAllReadVisibility();
+                updateNoNotificationMessages();
+                updateNoNotificationMessagesSec();
+            }
+        } catch (error) {
+            pendingAnnouncements.delete(announcementId);
+
+        }
+    }
+
+    function markAllAsRead() {
+        let hasUnread = false;
+
+        cardMap.forEach((cards, id) => {
+            if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
+                hasUnread = true;
+                markAsRead(id);
+            }
+        });
+        updateMarkAllReadVisibility();
+        updateNoNotificationMessages();
+        updateNoNotificationMessagesSec();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const markAllBtn = document.getElementById("markEveryAsRead");
+        if (markAllBtn) {
+            markAllBtn.addEventListener("click", markAllAsRead);
+
+        } else {
+
+        }
+    });
+
+    function fetchReadDataForClass(classId) {
+        fetch(HTTP_ENDPOINT, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Api-Key": APIii_KEY,
+            },
+            body: JSON.stringify({
+                query: READ_QUERY,
+                variables: { class_id: classId }
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.data && data.data.calcOReadContactReadAnnouncements) {
+                    const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
+                        ? data.data.calcOReadContactReadAnnouncements
+                        : [data.data.calcOReadContactReadAnnouncements];
+
+                    records.forEach((record) => {
+                        if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+                            readAnnouncements.add(Number(record.Read_Announcement_ID));
+                        }
+                    });
+
+                    updateNotificationReadStatus();
+                    updateNoNotificationMessages();
+                    updateNoNotificationMessagesSec();
+                }
+            })
+            .catch((error) => {
+
+            });
+    }
+
+    function updateNoNotificationMessages() {
+        const noAllMessage = document.getElementById("noAllMessage");
+        const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+        if (!noAllMessage || !noAnnouncementsMessage) return;
+
+        const visibleCards = [...cardMap.values()].filter(({ original }) =>
+            original && !original.classList.contains("hidden")
+        );
+
+        const hasNotifications = visibleCards.length > 0;
+        noAllMessage.classList.toggle("hidden", hasNotifications);
+        noAnnouncementsMessage.classList.add("hidden");
+    }
+
+    function updateNoNotificationMessagesSec() {
+        const noAllMessageSec = document.getElementById("noAllMessageSec");
+        const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
+        if (!noAllMessageSec || !noAnnouncementsMessageSec) return;
+        const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden")
+        );
+        noAllMessageSec.classList.toggle("hidden", hasVisible);
+        noAnnouncementsMessageSec.classList.add("hidden");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
+        const noAllMessage = document.getElementById("noAllMessage");
+        const showAllBtn = document.getElementById("allAnnouncements");
+        const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+        const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
+        const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
+
+        let showUnreadMode = false;
+        let showUnreadAllMode = false;
+
+        function toggleVisibilityAll() {
+            let hasData = false;
+
+            showUnreadAllMode = false;
+            showUnreadMode = false;
+
+            cardMap.forEach(({ original }) => {
+                if (original) {
+                    original.classList.remove("hidden");
+                    hasData = true;
+                }
+            });
+            noAllMessage.classList.toggle("hidden", hasData);
+            noAnnouncementsMessage.classList.add("hidden");
+        }
+
+        function toggleVisibilityByType(type) {
+            let hasAnnouncements = false;
+            showUnreadAllMode = false;
+            showUnreadMode = false;
+            cardMap.forEach(({ original }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+                const shouldShow = notification.Type === type;
+                if (original) {
+                    original.classList.toggle("hidden", !shouldShow);
+                }
+                if (shouldShow) hasAnnouncements = true;
+            });
+            noAnnouncementsMessage.classList.toggle("hidden", hasAnnouncements);
+            noAllMessage.classList.add("hidden");
+        }
+
+        function toggleUnreadAnnouncements() {
+            showUnreadMode = !showUnreadMode;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ original }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+
+                if (notification.Type === "Announcement") {
+                    const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
+
+                    if (original) {
+                        original.classList.toggle("hidden", showUnreadMode && !isUnread);
+                        if (!original.classList.contains("hidden")) {
+                            hasVisible = true;
+                        }
+                    }
+
+                    if (isUnread) hasUnread = true;
+                }
+            });
+            noAnnouncementsMessage.classList.toggle("hidden", hasVisible);
+            noAllMessage.classList.add("hidden");
+        }
+
+        function toggleUnreadNotifications() {
+            showUnreadAllMode = !showUnreadAllMode;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ original }) => {
+                const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
+
+                if (original) {
+                    original.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+                    if (!original.classList.contains("hidden")) {
+                        hasVisible = true;
+                    }
+                }
+                if (isUnread) hasUnread = true;
+            });
+            noAllMessage.classList.toggle("hidden", hasVisible);
+            noAnnouncementsMessage.classList.add("hidden");
+        }
+        onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
+        showAllBtn.addEventListener("click", toggleVisibilityAll);
+        showUnreadAnnounceBtn.addEventListener("click", toggleUnreadAnnouncements);
+        showUnreadAllNotification.addEventListener("click", toggleUnreadNotifications);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const onlySeeBtnSec = document.getElementById("OnlyseeAnnouncementsSec");
+        const noAllMessageSec = document.getElementById("noAllMessageSec");
+        const showAllBtnSec = document.getElementById("allAnnouncementsSec");
+        const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
+        const showUnreadAnnounceBtnSec = document.getElementById("showUnreadAnnouncementSec");
+        const showUnreadAllNotificationSec = document.getElementById("showUnreadAllNotificationSec");
+
+        let showUnreadModeSec = false;
+        let showUnreadAllModeSec = false;
+
+        function toggleVisibilityByTypeSec(type) {
+            let hasAnnouncements = false;
+            showUnreadAllModeSec = false;
+            showUnreadModeSec = false;
+            cardMap.forEach(({ clone }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+                const shouldShow = notification.Type === type;
+                if (clone) {
+                    clone.classList.toggle("hidden", !shouldShow);
+                }
+                if (shouldShow) hasAnnouncements = true;
+            });
+            noAnnouncementsMessageSec.classList.toggle("hidden", hasAnnouncements);
+            noAllMessageSec.classList.add("hidden");
+        }
+
+        function toggleVisibilityAllSec() {
+            let hasData = false;
+            showUnreadAllModeSec = false;
+            showUnreadModeSec = false;
+            cardMap.forEach(({ clone }) => {
+                if (clone) {
+                    clone.classList.remove("hidden");
+                    hasData = true;
+                }
+            });
+            noAllMessageSec.classList.toggle("hidden", hasData);
+            noAnnouncementsMessageSec.classList.add("hidden");
+        }
+
+        function toggleUnreadAnnouncementsSec() {
+            showUnreadModeSec = !showUnreadModeSec;
+            let hasUnread = false;
+            let hasVisible = false;
+
+            cardMap.forEach(({ clone }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+
+                if (notification.Type === "Announcement") {
+                    const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
+
+                    if (clone) {
+                        clone.classList.toggle("hidden", showUnreadModeSec && !isUnread);
+                        if (!clone.classList.contains("hidden")) {
+                            hasVisible = true;
+                        }
+                    }
+
+                    if (isUnread) hasUnread = true;
+                }
+            });
+            noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
+            noAllMessageSec.classList.add("hidden");
+        }
+
+        function toggleUnreadNotificationsSec() {
+            showUnreadAllModeSec = !showUnreadAllModeSec;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ clone }) => {
+                const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
+                if (clone) {
+                    clone.classList.toggle("hidden", showUnreadAllModeSec && !isUnread);
+                    if (!clone.classList.contains("hidden")) {
+                        hasVisible = true;
+                    }
+                }
+                if (isUnread) hasUnread = true;
+            });
+            noAllMessageSec.classList.toggle("hidden", hasVisible);
+            noAnnouncementsMessageSec.classList.add("hidden");
+        }
+
+        if (onlySeeBtnSec) {
+            onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
+        }
+
+        if (showAllBtnSec) {
+            showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
+        }
+
+        if (showUnreadAnnounceBtnSec) {
+            showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
+        }
+
+        if (showUnreadAllNotificationSec) {
+            showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
+        }
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        updateMarkAllReadVisibility();
+        updateNoNotificationMessages();
+        updateNoNotificationMessagesSec();
+    });
+
+    function updateNoNotificationMessages() {
+        const noAllMessage = document.getElementById("noAllMessage");
+        const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+        if (!noAllMessage || !noAnnouncementsMessage) return;
+
+        const visibleCards = [...cardMap.values()].filter(({ original }) =>
+            original && !original.classList.contains("hidden")
+        );
+        const hasNotifications = visibleCards.length > 0;
+        noAllMessage.classList.toggle("hidden", hasNotifications);
+        noAnnouncementsMessage.classList.add("hidden");
+    }
+
+    function updateNoNotificationMessagesSec() {
+        const noAllMessageSec = document.getElementById("noAllMessageSec");
+        const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
+        if (!noAllMessageSec || !noAnnouncementsMessageSec) return;
+        const hasVisible = [...cardMap.values()].some(({ clone }) => clone && !clone.classList.contains("hidden")
+        );
+        noAllMessageSec.classList.toggle("hidden", hasVisible);
+        noAnnouncementsMessageSec.classList.add("hidden");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const onlySeeBtn = document.getElementById("OnlyseeAnnouncements");
+        const noAllMessage = document.getElementById("noAllMessage");
+        const showAllBtn = document.getElementById("allAnnouncements");
+        const noAnnouncementsMessage = document.getElementById("noAnnouncementsMessage");
+        const showUnreadAnnounceBtn = document.getElementById("showUnreadAnnouncement");
+        const showUnreadAllNotification = document.getElementById("showUnreadAllNotification");
+
+        let showUnreadMode = false;
+        let showUnreadAllMode = false;
+
+        function toggleVisibilityAll() {
+            let hasData = false;
+            showUnreadAllMode = false;
+            showUnreadMode = false;
+
+            cardMap.forEach(({ original }) => {
+                if (original) {
+                    original.classList.remove("hidden");
+                    hasData = true;
+                }
+            });
+            noAllMessage.classList.toggle("hidden", hasData);
+            noAnnouncementsMessage.classList.add("hidden");
+        }
+
+        function toggleVisibilityByType(type) {
+            let hasAnnouncements = false;
+            showUnreadAllMode = false;
+            showUnreadMode = false;
+            cardMap.forEach(({ original }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+                const shouldShow = notification.Type === type;
+                if (original) {
+                    original.classList.toggle("hidden", !shouldShow);
+                }
+                if (shouldShow) hasAnnouncements = true;
+            });
+            noAnnouncementsMessage.classList.toggle("hidden", hasAnnouncements);
+            noAllMessage.classList.add("hidden");
+        }
+
+        function toggleUnreadAnnouncements() {
+            showUnreadMode = !showUnreadMode;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ original }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+                if (notification.Type === "Announcement") {
+                    const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
+                    if (original) {
+                        original.classList.toggle("hidden", showUnreadMode && !isUnread);
+                        if (!original.classList.contains("hidden")) {
+                            hasVisible = true;
+                        }
+                    }
+                    if (isUnread) hasUnread = true;
+                }
+            });
+            noAnnouncementsMessage.classList.toggle("hidden", hasVisible);
+            noAllMessage.classList.add("hidden");
+        }
+
+        function toggleUnreadNotifications() {
+            showUnreadAllMode = !showUnreadAllMode;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ original }) => {
+                const isUnread = original.querySelector(".notification-content").classList.contains("bg-unread");
+                if (original) {
+                    original.classList.toggle("hidden", showUnreadAllMode && !isUnread);
+                    if (!original.classList.contains("hidden")) {
+                        hasVisible = true;
+                    }
+                }
+                if (isUnread) hasUnread = true;
+            });
+            noAllMessage.classList.toggle("hidden", hasVisible);
+            noAnnouncementsMessage.classList.add("hidden");
+        }
+        onlySeeBtn.addEventListener("click", () => toggleVisibilityByType("Announcement"));
+        showAllBtn.addEventListener("click", toggleVisibilityAll);
+        showUnreadAnnounceBtn.addEventListener("click", toggleUnreadAnnouncements);
+        showUnreadAllNotification.addEventListener("click", toggleUnreadNotifications);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const onlySeeBtnSec = document.getElementById("OnlyseeAnnouncementsSec");
+        const noAllMessageSec = document.getElementById("noAllMessageSec");
+        const showAllBtnSec = document.getElementById("allAnnouncementsSec");
+        const noAnnouncementsMessageSec = document.getElementById("noAnnouncementsMessageSec");
+        const showUnreadAnnounceBtnSec = document.getElementById("showUnreadAnnouncementSec");
+        const showUnreadAllNotificationSec = document.getElementById("showUnreadAllNotificationSec");
+
+        let showUnreadModeSec = false;
+        let showUnreadAllModeSec = false;
+
+        function toggleVisibilityByTypeSec(type) {
+            let hasAnnouncements = false;
+
+            showUnreadAllModeSec = false;
+            showUnreadModeSec = false;
+
+            cardMap.forEach(({ clone }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+
+                const shouldShow = notification.Type === type;
+                if (clone) {
+                    clone.classList.toggle("hidden", !shouldShow);
+                }
+
+                if (shouldShow) hasAnnouncements = true;
+            });
+            noAnnouncementsMessageSec.classList.toggle("hidden", hasAnnouncements);
+            noAllMessageSec.classList.add("hidden");
+        }
+
+        function toggleVisibilityAllSec() {
+            let hasData = false;
+            showUnreadAllModeSec = false;
+            showUnreadModeSec = false;
+            cardMap.forEach(({ clone }) => {
+                if (clone) {
+                    clone.classList.remove("hidden");
+                    hasData = true;
+                }
+            });
+            noAllMessageSec.classList.toggle("hidden", hasData);
+            noAnnouncementsMessageSec.classList.add("hidden");
+        }
+
+        function toggleUnreadAnnouncementsSec() {
+            showUnreadModeSec = !showUnreadModeSec;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ clone }, id) => {
+                const notification = notificationData.find(n => Number(n.ID) === id);
+                if (!notification) return;
+                if (notification.Type === "Announcement") {
+                    const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
+                    if (clone) {
+                        clone.classList.toggle("hidden", showUnreadModeSec && !isUnread);
+                        if (!clone.classList.contains("hidden")) {
+                            hasVisible = true;
+                        }
+                    }
+                    if (isUnread) hasUnread = true;
+                }
+            });
+            noAnnouncementsMessageSec.classList.toggle("hidden", hasVisible);
+            noAllMessageSec.classList.add("hidden");
+        }
+
+        function toggleUnreadNotificationsSec() {
+            showUnreadAllModeSec = !showUnreadAllModeSec;
+            let hasUnread = false;
+            let hasVisible = false;
+            cardMap.forEach(({ clone }) => {
+                const isUnread = clone?.querySelector(".notification-content")?.classList.contains("bg-unread");
+                if (clone) {
+                    clone.classList.toggle("hidden", showUnreadAllModeSec && !isUnread);
+                    if (!clone.classList.contains("hidden")) {
+                        hasVisible = true;
+                    }
+                }
+                if (isUnread) hasUnread = true;
+            });
+            noAllMessageSec.classList.toggle("hidden", hasVisible);
+            noAnnouncementsMessageSec.classList.add("hidden");
+        }
+
+        if (onlySeeBtnSec) {
+            onlySeeBtnSec.addEventListener("click", () => toggleVisibilityByTypeSec("Announcement"));
+        }
+
+        if (showAllBtnSec) {
+            showAllBtnSec.addEventListener("click", toggleVisibilityAllSec);
+        }
+
+        if (showUnreadAnnounceBtnSec) {
+            showUnreadAnnounceBtnSec.addEventListener("click", toggleUnreadAnnouncementsSec);
+        }
+
+        if (showUnreadAllNotificationSec) {
+            showUnreadAllNotificationSec.addEventListener("click", toggleUnreadNotificationsSec);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        updateMarkAllReadVisibility();
+        updateNoNotificationMessages();
+        updateNoNotificationMessagesSec();
+    });
+
+    initializeSocket();
+</script>
+
+
+We are still working on managing notifications completely. 
+This will be little different from what we have and every queries will be dynamic based on user preferences. 
+The settigns page is already completed. 
+I need to check the preferences and update the query likewise. 
+Also I will not use title and content generated from automation as they seem to be in sufficient in different cases. 
+For example when multiple users are mentioned. 
+
+I already have query we need but need to be updat it slightly based on enrolment type because as per our new requirement, only online live and online tutor led 
+have access to course chat and announcements, so I will have to disable fetching for other enrolmnent type and also have settings page similarly adjusted.
+
+I would like to request you to run test after we complete this setup for all three portals.

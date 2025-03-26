@@ -321,8 +321,8 @@
                         <button id="upload-audio-button" type="button"
                             class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
                             Audio</button>
-                        <button id="record-audio-button hideTypeField" type="button"
-                            class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
+                        <button id="record-audio-button" type="button"
+                            class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button hideTypeField">Record
                             Audio</button>
                     </div>
                 </div>
@@ -1064,8 +1064,8 @@
                                         <button id="upload-audio-button-reply" type="button"
                                             class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Upload
                                             Audio</button>
-                                        <button id="record-audio-button-reply hideTypeField" type="button"
-                                            class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button">Record
+                                        <button id="record-audio-button-reply" type="button"
+                                            class="o3 cursor-pointer rounded p-[10px] text-left sort-option sort-button hideTypeField">Record
                                             Audio</button>
                                     </div>
                                 </div>
@@ -1332,9 +1332,16 @@
                     var editor = container.querySelector('.editor');
                     editor.focus();
                     document.execCommand('insertText', false, emojiSpan.textContent);
+                    var range = document.createRange();
+                    range.selectNodeContents(editor);
+                    range.collapse(false);
+                    var sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
                 }
             }
         });
+
 
         function resetEmojiForm() {
             document.querySelectorAll(".emojisWrapper").forEach((wrapper) => {
