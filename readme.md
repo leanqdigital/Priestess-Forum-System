@@ -1,5 +1,5 @@
 Content Hierarchy
-1. Post - > Comment - > Replies
+1. Post - > Comment - > Replies 
     
 Components  
 
