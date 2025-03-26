@@ -1,6 +1,6 @@
 Content Hierarchy
 1. Post - > Comment - > Replies 
-    
+     
 Components  
 
 1.  Navbar 
