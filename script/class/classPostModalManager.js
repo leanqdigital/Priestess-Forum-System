@@ -328,17 +328,11 @@ class PostModalManager {
                 <div id="comment-editor" style="font-size: 16px !important;" class="editor comment-editor page-text p-2 !border-none !focus-visible:border-none rounded" contenteditable="true"></div>
                 <div class="emojiButton cursor-pointer absolute right-[2rem] w-max">😀</div>
                 <div class="flex justify-between p-4 bg-white rounded-lg shadow-md hidden emojisWrapper">
-                    <span class="text-2xl cursor-pointer">😀</span>
-                    <span class="text-2xl cursor-pointer">😂</span>
-                    <span class="text-2xl cursor-pointer">🥺</span>
-                    <span class="text-2xl cursor-pointer">😍</span>
-                    <span class="text-2xl cursor-pointer">🤔</span>
-                    <span class="text-2xl cursor-pointer">😎</span>
-                    <span class="text-2xl cursor-pointer">😜</span>
-                    <span class="text-2xl cursor-pointer">😋</span>
-                    <span class="text-2xl cursor-pointer">🙌</span>
-                    <span class="text-2xl cursor-pointer">🥳</span>
-                    <span class="text-2xl cursor-pointer">🥰</span>
+                  <span class="text-2xl emoji cursor-pointer" tabindex="0">❤️</span>
+                  <span class="text-2xl emoji cursor-pointer" tabindex="0">🌹</span>
+                  <span class="text-2xl emoji cursor-pointer" tabindex="0">🙏</span>
+                  <span class="text-2xl emoji cursor-pointer" tabindex="0">😂</span>
+                  <span class="text-2xl emoji cursor-pointer" tabindex="0">🙌</span>
                 </div>
                 <div class="flex flex-col gap-3 fullAudioRecordingWrapperComment hidden">
                 <div class="o2 text-secondary">Audio Recording</div>
