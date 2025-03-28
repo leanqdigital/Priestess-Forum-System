@@ -126,7 +126,7 @@ class ForumManager {
                 : this.defaultAuthorImage,
             displayName: post.Author_Display_Name,
           }),
-          date: Formatter.formatTimestamp(post.Date_Added),
+          date: Formatter.formatTimestamp(post.Post_Publish_Date),
           title: post.Post_Title,
           content: post.Post_Copy,
           disableComments: post.Disable_New_Comments,
@@ -169,7 +169,10 @@ class ForumManager {
     const dynamicFilter = this.buildFilterCondition();
     const filters = [];
     filters.push(
-      `{ where: { Related_Course: [{ where: { id: "${courseID}" } }] } }`
+      `
+      { where: { Related_Course: [{ where: { id: "${courseID}" } }] } }
+      { andWhere: { post_status: "Published - Not flagged" } }
+       `
     );
 
     if (dynamicFilter) {
@@ -228,6 +231,7 @@ class ForumManager {
             Disable_New_Comments: field(arg: ["disable_new_comments"])
             Author_Forum_Image: field(arg: ["Author", "forum_image"])
             Author_Display_Name: field(arg: ["Author", "display_name"])
+            Post_Publish_Date: field(arg: ["post_publish_date"])
           }
         }`;
     let variables = {
@@ -1513,7 +1517,7 @@ class ForumManager {
               ) {
                 id
               }
-            }
+            }1
           `,
           { id }
         )
@@ -1642,6 +1646,8 @@ class ForumManager {
                   Disable_New_Comments: field(arg: ["disable_new_comments"])
                   Author_Forum_Image: field(arg: ["Author", "forum_image"])
                   Author_Display_Name: field(arg: ["Author", "display_name"])
+                  Post_Status: field(arg: ["post_status"])
+                  Post_Publish_Date: field(arg: ["post_publish_date"])
                 }
               }
               `,
@@ -1678,7 +1684,7 @@ class ForumManager {
               name: fetchedPost.Author_Display_Name,
               profileImage: fetchedPost.Author_Forum_Image || DEFAULT_AVATAR,
             },
-            date: Formatter.formatTimestamp(fetchedPost.Date_Added),
+            date: Formatter.formatTimestamp(fetchedPost.Post_Publish_Date),
             content: fetchedPost.Post_Copy,
             file_tpe: fetchedPost.File_Tpe,
             file_content: fileContent,

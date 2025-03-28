@@ -1,5 +1,6 @@
 class Formatter {
   static formatTimestamp(timestamp) {
+    if (!timestamp) return ""; // or return "No date available";
     const seconds = Math.floor((Date.now() - timestamp * 1000) / 1000);
     const intervals = [
       [31536000, "year"],
@@ -8,7 +9,6 @@ class Formatter {
       [3600, "hour"],
       [60, "minute"],
     ];
-
     for (const [secondsIn, unit] of intervals) {
       const interval = Math.floor(seconds / secondsIn);
       if (interval >= 1) {
@@ -17,6 +17,7 @@ class Formatter {
     }
     return `${seconds} seconds ago`;
   }
+  
 
   static formatAuthor(authorData) {
     return {

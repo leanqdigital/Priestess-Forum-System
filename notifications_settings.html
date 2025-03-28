@@ -13,7 +13,15 @@
 
 </head>
 
-<body class="page-background" x-data="{ openCommentModal: false }">
+<body class="page-background" x-data="{ 
+    openCommentModal: false,
+    pauseAll: false,
+    allPosts: false, 
+    allComments: false, 
+    commentsOnMyPosts: false, 
+    mentioned: false, 
+
+}">
     <header class="max-w-[680px] mx-auto py-10">
         <div class="w-full px-4 py-2 justify-between items-center inline-flex">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,43 +95,119 @@
     </header>
 
 
-    <div class="announcement-wrapper relative">
-        <div class="announcements max-w-[680px] mx-auto  flex-col overflow-hidden rounded-md bg-grey-300 p-4"
-            style="z-index:1">
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex gap-x-2 items-center">
-                        <svg class="hidden max-[600px]:block" width="18" height="15" viewBox="0 0 18 15" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M17.3332 7.27761C17.3332 7.46178 17.26 7.63841 17.1298 7.76864C16.9996 7.89887 16.8229 7.97203 16.6388 7.97203H3.03763L8.10257 13.0361C8.16709 13.1006 8.21827 13.1772 8.25319 13.2615C8.2881 13.3458 8.30608 13.4362 8.30608 13.5274C8.30608 13.6187 8.2881 13.709 8.25319 13.7933C8.21827 13.8776 8.16709 13.9542 8.10257 14.0187C8.03805 14.0832 7.96146 14.1344 7.87716 14.1693C7.79286 14.2042 7.70251 14.2222 7.61127 14.2222C7.52002 14.2222 7.42967 14.2042 7.34538 14.1693C7.26108 14.1344 7.18448 14.0832 7.11996 14.0187L0.870168 7.76892C0.805604 7.70442 0.754384 7.62784 0.719438 7.54353C0.684491 7.45923 0.666504 7.36887 0.666504 7.27761C0.666504 7.18635 0.684491 7.09599 0.719438 7.01169C0.754384 6.92739 0.805604 6.8508 0.870168 6.78631L7.11996 0.536512C7.25027 0.406211 7.42699 0.333008 7.61127 0.333008C7.79554 0.333008 7.97227 0.406211 8.10257 0.536512C8.23287 0.666814 8.30608 0.843541 8.30608 1.02782C8.30608 1.21209 8.23287 1.38882 8.10257 1.51912L3.03763 6.58319H16.6388C16.8229 6.58319 16.9996 6.65635 17.1298 6.78658C17.26 6.91681 17.3332 7.09344 17.3332 7.27761Z"
-                                fill="#636D88" />
-                        </svg>
-                        <div class="page-text text-lg font-semibold font-['Avenir LT Std'] leading-snug">
-                            Notification</div>
+    <div class="max-w-[680px] mx-auto p-4 bg-white rounded flex flex-col gap-4">
+        <div class="flex justify-between items-center">
+            <div class="flex justify-start items-start gap-2">
+                <div class="justify-start text-[#414042] text-base font-semibold font-['Avenir_LT_Std'] leading-none">
+                    Notification Settings</div>
+            </div>
+            <div class="flex justify-end items-center gap-6">
+                <div class="flex justify-start items-center gap-3">
+                    <div class="justify-start text-[#586a80] text-xs font-normal font-['Avenir_LT_Std'] leading-none">
+                        Pause all notification</div>
+                    <div class="showAllpauseAll" id="showUnreadAllNotification" x-transition="">
+                        <div class="transition ease-in-out duration-300 w-[28px] flex items-center h-4 px-[2px] rounded-full focus:outline-none cursor-pointer bg-[#BFBFBF]"
+                            :class="pauseAll ? 'bg-[#C29D68]' : 'bg-[#BFBFBF]'" x-on:click="pauseAll = !pauseAll">
+                            <div class="transition ease-in-out duration-300 rounded-full size-3 bg-white shadow transform"
+                                :class="{ 'translate-x-[12px]': pauseAll }"> </div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- And on the notifications page: -->
-                <div class="mark-all-button flex items-center gap-x-1 cursor-pointer" id="markAllAsReadButtonPage">
-                    <div class="page-text text-xs font-normal font-['Avenir LT Std'] leading-3 hover:underline">Mark
-                        all as read
-                    </div>
-                </div>
-
-                <div id="output">
-                    <div id="parentNotificationTemplatesInBody" class="flex flex-col gap-[4px]"></div>
                 </div>
             </div>
         </div>
+        <div
+            class="p-4 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-[#d3d7e2] flex flex-col justify-start items-start gap-4 w-full">
+            <div class="flex flex-col justify-center items-start gap-2 w-full">
+                <div class="flex justify-start items-center gap-[15px] w-full">
+                    <div class="flex-1 justify-start text-[#626c87] text-sm font-['Avenir_LT_Std'] leading-tight">Notify
+                        me of all Posts</div>
+
+                    <div x-transition="" role="switch" :aria-checked="(allPosts === 'Yes').toString()"
+                        aria-labelledby="toggleLabel" class="flex items-center justify-between"
+                        :class="pauseAllNotification === 'Yes' ? 'pointer-events-none opacity-50' : ''" x-on:click="allPosts = (allPosts === 'Yes' ? 'No' : 'Yes');
+                                             if(allPosts==='Yes'){
+                                             mentions = 'No';}">
+
+                        <div id="toggleSwitch"
+                            class="flex h-4 w-[28px] cursor-pointer items-center rounded-full bg-[#BFBFBF] px-[2px] transition duration-300 ease-in-out focus:outline-none"
+                            :class="allPosts === 'Yes' ? '!bg-[#C29D68]' : 'bg-[#BFBFBF]'">
+                            <div class="size-3 transform rounded-full bg-white shadow transition duration-300 ease-in-out"
+                                :class="{ 'translate-x-[12px]': allPosts === 'Yes' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center items-start gap-2 w-full">
+                <div class="flex justify-start items-center gap-[15px] w-full">
+                    <div class="flex-1 justify-start text-[#626c87] text-sm font-['Avenir_LT_Std'] leading-tight">Notify
+                        me of all Comments/Replies on Posts</div>
+
+                    <div x-transition="" role="switch" :aria-checked="(allComments === 'Yes').toString()"
+                        aria-labelledby="toggleLabel" class="flex items-center justify-between"
+                        :class="pauseAllNotification === 'Yes' ? 'pointer-events-none opacity-50' : ''" x-on:click="allComments = (allComments === 'Yes' ? 'No' : 'Yes');
+                                             if(allComments==='Yes'){
+                                             mentions = 'No';}">
+
+                        <div id="toggleSwitch"
+                            class="flex h-4 w-[28px] cursor-pointer items-center rounded-full bg-[#BFBFBF] px-[2px] transition duration-300 ease-in-out focus:outline-none"
+                            :class="allComments === 'Yes' ? '!bg-[#C29D68]' : 'bg-[#BFBFBF]'">
+                            <div class="size-3 transform rounded-full bg-white shadow transition duration-300 ease-in-out"
+                                :class="{ 'translate-x-[12px]': allComments === 'Yes' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center items-start gap-2 w-full">
+                <div class="flex justify-start items-center gap-[15px] w-full">
+                    <div class="flex-1 justify-start text-[#626c87] text-sm font-['Avenir_LT_Std'] leading-tight">Notify
+                        me of Comments/Replies on My Posts only</div>
+
+                    <div x-transition="" role="switch" :aria-checked="(commentsOnMyPosts === 'Yes').toString()"
+                        aria-labelledby="toggleLabel" class="flex items-center justify-between"
+                        :class="pauseAllNotification === 'Yes' ? 'pointer-events-none opacity-50' : ''" x-on:click="commentsOnMyPosts = (commentsOnMyPosts === 'Yes' ? 'No' : 'Yes');
+                                             if(commentsOnMyPosts==='Yes'){
+                                             mentions = 'No';}">
+
+                        <div id="toggleSwitch"
+                            class="flex h-4 w-[28px] cursor-pointer items-center rounded-full bg-[#BFBFBF] px-[2px] transition duration-300 ease-in-out focus:outline-none"
+                            :class="commentsOnMyPosts === 'Yes' ? '!bg-[#C29D68]' : 'bg-[#BFBFBF]'">
+                            <div class="size-3 transform rounded-full bg-white shadow transition duration-300 ease-in-out"
+                                :class="{ 'translate-x-[12px]': commentsOnMyPosts === 'Yes' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center items-start gap-2 w-full">
+                <div class="flex justify-start items-center gap-[15px] w-full">
+                    <div class="flex-1 justify-start text-[#626c87] text-sm font-['Avenir_LT_Std'] leading-tight">Notify
+                        me when I am Mentioned</div>
+
+                    <div x-transition="" role="switch" :aria-checked="(mentioned === 'Yes').toString()"
+                        aria-labelledby="toggleLabel" class="flex items-center justify-between"
+                        :class="pauseAllNotification === 'Yes' ? 'pointer-events-none opacity-50' : ''" x-on:click="mentioned = (mentioned === 'Yes' ? 'No' : 'Yes');
+                                             if(mentioned==='Yes'){
+                                             mentions = 'No';}">
+
+                        <div id="toggleSwitch"
+                            class="flex h-4 w-[28px] cursor-pointer items-center rounded-full bg-[#BFBFBF] px-[2px] transition duration-300 ease-in-out focus:outline-none"
+                            :class="mentioned === 'Yes' ? '!bg-[#C29D68]' : 'bg-[#BFBFBF]'">
+                            <div class="size-3 transform rounded-full bg-white shadow transition duration-300 ease-in-out"
+                                :class="{ 'translate-x-[12px]': mentioned === 'Yes' }"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+
+
 
     <script>
         const LOGGED_IN_USER_ID = "171031";
         const LOGGED_IN_USER_FIRST_NAME = "Dpes";
         const LOGGED_IN_USER_LAST_NAME = "Adikari";
         const LOGGED_IN_USER_FULL_NAME = "Dpes Adikari";
-        let courseID = "";
         const LOGGED_IN_USER_PROFILE_IMAGE_LINK = "https://i.ontraport.com/22612.7af9e9baa3d56ef7636bd6db2600bc6f.PNG";
         const DEFAUL_AVATAR = "https://file.ontraport.com/media/41ca85f5cdde4c12bf72c2c73747633f.phpkeya0n?Expires=4884400377&Signature=SnfrlziQIcYSbZ98OrH2guVWpO4BRcxatgk3lM~-mKaAencWy7e1yIuxDT4hQjz0hFn-fJ118InfvymhaoqgGxn63rJXeqJKB4JTkYauub5Jh5UO3z6S0o~RVMj8AMzoiImsvQoPuRK7KnuOAsGiVEmSsMHEiM69IWzi4dW~6pryIMSHQ9lztg1powm8b~iXUNG8gajRaQWxlTiSyhh-CV-7zkF-MCP5hf-3FAKtGEo79TySr5SsZApLjfOo-8W~F8aeXK8BGD3bX6T0U16HsVeu~y9gDCZ1lBbLZFh8ezPL~4gktRbgP59Us8XLyV2EKn6rVcQCsVVUk5tUVnaCJw__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA";
         const GRAPHQL_ENDPOINT = "https://priestess.vitalstats.app/api/v1/graphql";
@@ -138,7 +222,6 @@
                 lastName: LOGGED_IN_USER_LAST_NAME,
                 fullName: LOGGED_IN_USER_FULL_NAME,
                 defaultAuthorImage: LOGGED_IN_USER_PROFILE_IMAGE_LINK || DEFAUL_AVATAR,
-                currentCourseId: courseID,
             },
             pagination: {
                 postsPerPage: 5,
@@ -151,7 +234,7 @@
         };
         document.addEventListener("click", (event) => {
             if (event.target.closest(".bellIcon")) {
-                document.querySelector(".announcements").classList.toggle("hidden");
+                document.querySelector(".announcements").classList.pauseAll("hidden");
             }
             if (event.target.closest(".closeNotificationModal")) {
                 document.querySelector(".announcements").classList.add("hidden");
@@ -171,6 +254,37 @@
 
     <script src="script/tailwindConfig.js"></script>
     <script src="script/announcements.js"></script>
+
+    <script>
+        document.body.setAttribute('x-init', `
+            $watch('pauseAllNotification', v => {
+                const hiddenField = document.querySelector('.globalControllerField input[type="hidden"]');
+                const timeField = document.querySelector('.globalControllerTimeField input');
+                hiddenField.value = v;
+                if (v === 'Yes') {
+                    timeField.value = Date.now();
+                } else {
+                    timeField.value = '0';
+                }
+            });
+            $watch('allPosts', v => document.querySelector('.postsControllerField input[type="hidden"]').value = v);
+            $watch('allComments', v => document.querySelector('.mentionsControllerField input[type="hidden"]').value = v);
+            $watch('commentsOnMyPosts', v => document.querySelector('.mentionsControllerField input[type="hidden"]').value = v);
+            $watch('mentioned', v => document.querySelector('.mentionsControllerField input[type="hidden"]').value = v);
+
+        `);
+    </script>
 </body>
 
 </html>
+
+<div class="self-stretch inline-flex justify-end items-start gap-6">
+    <div data-size="Medium" data-state="Default" data-type="Outline"
+        class="px-4 py-2.5 rounded outline outline-1 outline-offset-[-1px] outline-[#c29d68] flex justify-center items-center gap-2">
+        <div>Reset All Settings</div>
+    </div>
+    <div data-size="Medium" data-state="Default" data-type="Primary"
+        class="px-4 py-2.5 bg-[#c29d68] rounded flex justify-center items-center gap-2">
+        <div>Save Changes</div>
+    </div>
+</div>

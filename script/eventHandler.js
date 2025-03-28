@@ -133,6 +133,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           file_content
           related_course_id
           Mentioned_Users { id }
+          post_publish_date 
+          post_status 
         }
       }
       `,
@@ -144,6 +146,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           related_course_id: courseID,
           file_tpe: uploadedFile ? fileType : null,
           file_content: fileData ? fileData : null,
+          post_publish_date: Date.now(),
+          post_status: "Published - Not flagged"
         },
       }
     );
@@ -173,6 +177,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           Member_Post_Upvotes_DataTotal_Count: countDistinct(args: [{ field: ["Member_Post_Upvotes_Data", "id"] }])
           Disable_New_Comments: field(arg: ["disable_new_comments"])
           Author_Display_Name: field(arg: ["Author", "display_name"])
+          Post_Status: field(arg: ["post_status"])
+          Post_Publish_Date: field(arg: ["post_publish_date"])
         }
       }
       `,

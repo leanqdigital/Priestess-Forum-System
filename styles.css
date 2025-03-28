@@ -992,3 +992,17 @@ input[type="range"].progress::-moz-range-thumb {
   border: none;
   outline: none;
 }
+
+.emoji {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    sans-serif;
+  font-size: 2rem;
+  cursor: pointer;
+  outline: none;
+  -webkit-text-stroke-width: 0;
+  text-stroke: 0;
+}
+
+.emoji:focus {
+  outline: none;
+}
