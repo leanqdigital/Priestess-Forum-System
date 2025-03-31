@@ -276,9 +276,9 @@ class ForumManager {
   buildSortCondition() {
     switch (this.currentSort) {
       case "latest":
-        return 'orderBy: [{ path: ["created_at"], type: desc }]';
+        return 'orderBy: [{ path: ["post_publish_date"], type: desc }]';
       case "oldest":
-        return 'orderBy: [{ path: ["created_at"], type: asc }]';
+        return 'orderBy: [{ path: ["post_publish_date"], type: asc }]';
       case "popular":
         return 'orderBy: [{ path: ["ForumCommentsIDCalc"], type: desc }]';
       default:
