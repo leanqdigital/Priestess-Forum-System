@@ -282,7 +282,7 @@ class ForumManager {
       case "popular":
         return 'orderBy: [{ path: ["ForumCommentsIDCalc"], type: desc }]';
       default:
-        return 'orderBy: [{ path: ["created_at"], type: desc }]';
+        return 'orderBy: [{ path: ["post_publish_date"], type: desc }]';
     }
   }
 
