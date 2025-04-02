@@ -77,25 +77,22 @@ document.addEventListener('DOMContentLoaded', function () {
             {
               orWhereGroup: [
                 { where: { announcement__type: "${POST_COMMENTS_TYPE}"} },
-                { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } }, 
-                { andWhere: { author_id: $author_id } } ] } } ] } },
+                { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } }, { andWhere: { author_id: $author_id } } ] } } ] } },
                 { andWhere: { Comment: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "${MENTION.post}"} },
+                { where: { announcement__type: "${MENTION.post}" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
-                { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, 
-                { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
+                { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
             {
               orWhereGroup: [
                 { where: { announcement__type: "${MENTION.comment}"} },
                 { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } } ] } } ] } },
-                { andWhere: { Comment: [ { where: { Comment_or_Reply_Mentions: [ { where: { id: $id } } ] } }, 
-                { andWhere: { ForumComments: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } } ] } }
+                { andWhere: { Comment: [ { where: { Comment_or_Reply_Mentions: [ { where: { id: $id } } ] } }, { andWhere: { ForumComments: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } } ] } }
               ]
             }
           ]
@@ -558,8 +555,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
   connect();
 });
-
-
-
 
 
