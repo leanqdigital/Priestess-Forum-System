@@ -52,236 +52,75 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const SUBSCRIPTION_QUERY = `
-subscription subscribeToCalcAnnouncements(
-  $created_at: TimestampSecondsScalar
-  $related_course_id: PriestessCourseID
-  $author_id: PriestessContactID
-  $id: PriestessContactID
-  $limit: IntScalar
-  $offset: IntScalar
-) {
-  subscribeToCalcAnnouncements(
-    query: [
-      {
-        andWhereGroup: [
-          {
-            whereGroup: [
-              {
-                where: {
-                  announcement__type: "${POSTS_TYPE}"
-                }
-              }
-              {
-                andWhere: {
-                  Post: [
-                    {
-                      where: {
-                        related_course_id: $related_course_id
-                      }
-                    }
-                  ]
-                }
-              }
-              {
-                andWhere: {
-                  Post: [
-                    {
-                      where: {
-                        author_id: $author_id
-                        _OPERATOR_: neq
-                      }
-                    }
-                  ]
-                }
-              }
-              {
-                andWhere: {
-                  Post: [
-                    { where: { post_type: "Notification" } }
-                  ]
-                }
-              }
-            ]
-          }
-          {
-            orWhereGroup: [
-              {
-                where: {
-                  announcement__type: "${POST_COMMENTS_TYPE}"
-                }
-              }
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        Forum_Post: [
-                          {
-                            where: {
-                              related_course_id: $related_course_id
-                            }
-                          }
-                          {
-                            andWhere: {
-                              author_id: $author_id
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        author_id: $author_id
-                        _OPERATOR_: neq
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-          {
-            orWhereGroup: [
-              {
-                where: {
-                  announcement__type: "${MENTION.post}"
-                }
-              }
-              {
-                andWhere: {
-                  Post: [
-                    {
-                      where: {
-                        related_course_id: $related_course_id
-                      }
-                    }
-                  ]
-                }
-              }
-              {
-                andWhere: {
-                  Post: [
-                    {
-                      where: {
-                        Mentioned_Users: [
-                          { where: { id: $id } }
-                        ]
-                      }
-                    }
-                    {
-                      andWhere: {
-                        author_id: $author_id
-                        _OPERATOR_: neq
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-          {
-            orWhereGroup: [
-              {
-                where: {
-                  announcement__type: "${MENTION.comment}"
-                }
-              }
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        Forum_Post: [
-                          {
-                            where: {
-                              related_course_id: $related_course_id
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        Comment_or_Reply_Mentions: [
-                          { where: { id: $id } }
-                        ]
-                      }
-                    }
-                    {
-                      andWhere: {
-                        ForumComments: [
-                          {
-                            where: {
-                              author_id: $author_id
-                              _OPERATOR_: neq
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    ]
-    limit: $limit
-    offset: $offset
-    orderBy: [{ path: ["created_at"], type: desc }]
+  subscription subscribeToCalcAnnouncements(
+    $created_at: TimestampSecondsScalar,
+    $related_course_id: PriestessCourseID,
+    $author_id: PriestessContactID,
+    $id: PriestessContactID,
+    $limit: IntScalar,
+    $offset: IntScalar
   ) {
-    ID: field(arg: ["id"])
-    Announcement_Type: field(arg: ["announcement__type"])
-    Date_Added: field(arg: ["created_at"])
-    Post_ID: field(arg: ["post_id"])
-    Post_Related_Course_ID: field(
-      arg: ["Post", "related_course_id"]
-    )
-    Course_Course_name: field(
-      arg: ["Post", "Related_Course", "course_name"]
-    )
-    Contact_Display_Name: field(
-      arg: ["Post", "Author", "display_name"]
-    )
-    Contact_Contact_ID: field(
-      arg: ["Post", "Mentioned_Users", "id"]
-    )
-    Comment_ID: field(arg: ["comment_id"])
-    Comment_Forum_Post_ID: field(
-      arg: ["Comment", "forum_post_id"]
-    )
-    ForumPost_Related_Course_ID: field(
-      arg: ["Comment", "Forum_Post", "related_course_id"]
-    )
-    Course_Course_name1: field(
-      arg: [
-        "Comment"
-        "Forum_Post"
-        "Related_Course"
-        "course_name"
-      ]
-    )
-    Contact_Display_Name1: field(
-      arg: ["Comment", "Author", "display_name"]
-    )
-    Contact_Contact_ID1: field(
-      arg: ["Comment", "Comment_or_Reply_Mentions", "id"]
-    )
+    subscribeToCalcAnnouncements(
+      query: [
+        { where: { created_at: $created_at, _OPERATOR_: gt } },
+        ${fetchUserDate}
+        {
+          andWhereGroup: [
+            {
+              whereGroup: [
+                { where: { announcement__type: "${POSTS_TYPE}" } },
+                { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
+                { andWhere: { Post: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } },
+                { andWhere: { Post: [ { where: { post_type: "Notification" } } ] } }
+              ]
+            },
+            {
+              orWhereGroup: [
+                { where: { announcement__type: "${POST_COMMENTS_TYPE}"} },
+                { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } }, 
+                { andWhere: { author_id: $author_id } } ] } } ] } },
+                { andWhere: { Comment: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } }
+              ]
+            },
+            {
+              orWhereGroup: [
+                { where: { announcement__type: "${MENTION.post}"} },
+                { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
+                { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, 
+                { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
+              ]
+            },
+            {
+              orWhereGroup: [
+                { where: { announcement__type: "${MENTION.comment}"} },
+                { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } } ] } } ] } },
+                { andWhere: { Comment: [ { where: { Comment_or_Reply_Mentions: [ { where: { id: $id } } ] } }, 
+                { andWhere: { ForumComments: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } } ] } }
+              ]
+            }
+          ]
+        }
+      ],
+      limit: $limit,
+      offset: $offset,
+      orderBy: [{ path: ["created_at"], type: desc }]
+    ) {
+      ID: field(arg: ["id"])
+      Announcement_Type: field(arg: ["announcement__type"])
+      Date_Added: field(arg: ["created_at"])
+      Post_ID: field(arg: ["post_id"])
+      Post_Related_Course_ID: field(arg: ["Post", "related_course_id"])
+      Course_Course_name: field(arg: ["Post", "Related_Course", "course_name"])
+      Contact_Display_Name: field(arg: ["Post", "Author", "display_name"])
+      Contact_Contact_ID: field(arg: ["Post", "Mentioned_Users", "id"])
+      Comment_ID: field(arg: ["comment_id"])
+      Comment_Forum_Post_ID: field(arg: ["Comment", "forum_post_id"])
+      ForumPost_Related_Course_ID: field(arg: ["Comment", "Forum_Post", "related_course_id"])
+      Course_Course_name1: field(arg: ["Comment", "Forum_Post", "Related_Course", "course_name"])
+      Contact_Display_Name1: field(arg: ["Comment", "Author", "display_name"])
+      Contact_Contact_ID1: field(arg: ["Comment", "Comment_or_Reply_Mentions", "id"])
+    }
   }
-}
   `;
 
 
@@ -719,8 +558,6 @@ subscription subscribeToCalcAnnouncements(
 
   connect();
 });
-
-  
 
 
 
