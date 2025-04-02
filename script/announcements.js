@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "${MENTION}" } },
+                { where: { announcement__type: "${POSTS_TYPE}" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
                 { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
