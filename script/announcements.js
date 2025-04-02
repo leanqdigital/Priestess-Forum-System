@@ -83,54 +83,13 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             {
             orWhereGroup: [
-              {
-                where: {
-                  announcement__type: "${MENTION.comment}"}
-                }
-              },
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        author_id: $author_id,
-                        _OPERATOR_: neq
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        Comment_or_Reply_Mentions: [
-                          { where: { id: $id } }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        Forum_Post: [
-                          {
-                            where: { related_course_id: $related_course_id }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
+              { where: { announcement__type: "${MENTION.comment}"} },
+              { andWhere: { Comment: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } },
+              { andWhere: { Comment: [ { where: { Comment_or_Reply_Mentions: [{ where: { id: $id } } ] } } ] } },
+              { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } } ] } } ]} }
             ]
           },
-            {
+          {
               orWhereGroup: [
                 { where: { announcement__type: "${MENTION.post}" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
