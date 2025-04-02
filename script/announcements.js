@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
             orWhereGroup: [
               {
                 where: {
-                  announcement__type: "Comment Mention"
+                  announcement__type: "${MENTION.comment}"}
                 }
               }
               {
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   Comment: [
                     {
                       where: {
-                        author_id: 1
+                        author_id: $author_id
                         _OPERATOR_: neq
                       }
                     }
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     {
                       where: {
                         Comment_or_Reply_Mentions: [
-                          { where: { id: 170367 } }
+                          { where: { id: $id } }
                         ]
                       }
                     }
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       where: {
                         Forum_Post: [
                           {
-                            where: { related_course_id: 34 }
+                            where: { related_course_id: $related_course_id }
                           }
                         ]
                       }
