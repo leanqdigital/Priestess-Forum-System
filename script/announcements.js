@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const SUBSCRIPTION_QUERY = `
   subscription subscribeToCalcAnnouncements(
+    $created_at: TimestampSecondsScalar,
     $related_course_id: PriestessCourseID,
     $author_id: PriestessContactID,
     $id: PriestessContactID,
@@ -61,6 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
   ) {
     subscribeToCalcAnnouncements(
       query: [
+        { where: { created_at: $created_at, _OPERATOR_: gt } },
+        ${fetchUserDate}
         {
           andWhereGroup: [
             {
