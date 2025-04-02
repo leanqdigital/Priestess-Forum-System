@@ -81,25 +81,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 { andWhere: { Comment: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
-{
+            {
             orWhereGroup: [
               {
                 where: {
                   announcement__type: "${MENTION.comment}"}
                 }
-              }
+              },
               {
                 andWhere: {
                   Comment: [
                     {
                       where: {
-                        author_id: $author_id
+                        author_id: $author_id,
                         _OPERATOR_: neq
                       }
                     }
                   ]
                 }
-              }
+              },
               {
                 andWhere: {
                   Comment: [
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                   ]
                 }
-              }
+              },
               {
                 andWhere: {
                   Comment: [
