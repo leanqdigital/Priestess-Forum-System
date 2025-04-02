@@ -62,7 +62,6 @@ subscription subscribeToCalcAnnouncements(
 ) {
   subscribeToCalcAnnouncements(
     query: [
-      { where: { created_at: $created_at, _OPERATOR_: gt } }
       {
         andWhereGroup: [
           {
@@ -191,23 +190,6 @@ subscription subscribeToCalcAnnouncements(
               {
                 where: {
                   announcement__type: "${MENTION.comment}"
-                }
-              }
-              {
-                andWhere: {
-                  Comment: [
-                    {
-                      where: {
-                        Forum_Post: [
-                          {
-                            where: {
-                              related_course_id: $related_course_id
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
                 }
               }
               {
@@ -720,6 +702,8 @@ subscription subscribeToCalcAnnouncements(
 
   connect();
 });
+
+  
 
 
 
