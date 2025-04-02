@@ -197,6 +197,23 @@ subscription subscribeToCalcAnnouncements(
                   Comment: [
                     {
                       where: {
+                        Forum_Post: [
+                          {
+                            where: {
+                              related_course_id: $related_course_id
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+              {
+                andWhere: {
+                  Comment: [
+                    {
+                      where: {
                         Comment_or_Reply_Mentions: [
                           { where: { id: $id } }
                         ]
