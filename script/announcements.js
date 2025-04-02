@@ -83,14 +83,14 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "${POSTS_TYPE}" } },
+                { where: { announcement__type: "${MENTION}" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
                 { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "${POST_COMMENTS_TYPE}"} },
+                { where: { announcement__type: "${MENTION}"} },
                 { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } } ] } } ] } },
                 { andWhere: { Comment: [ { where: { Comment_or_Reply_Mentions: [ { where: { id: $id } } ] } }, { andWhere: { ForumComments: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } } ] } }
               ]
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
         title: `${notification.Course_Course_name1} - A new comment has been added`,
         content: `${notification.Contact_Display_Name1} commented on your post`
       };
-    } else if (announcementType === "Post") {
+    } else if (announcementType === "Post Mention") {
       if (Number(notification.Contact_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
         return {
           title: `${notification.Course_Course_name} - You have been mentioned in a post`,
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
           content: `${notification.Contact_Display_Name} has created a post`
         };
       }
-    } else if (announcementType === "Comment") {
+    } else if (announcementType === "Comment Mention") {
       if (Number(notification.Contact_Contact_ID1) === Number(LOGGED_IN_CONTACT_ID)) {
         return {
           title: `${notification.Course_Course_name1} - You have been mentioned in a comment`,
