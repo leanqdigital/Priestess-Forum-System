@@ -16,14 +16,15 @@ document.addEventListener('DOMContentLoaded', function () {
   let courseIdToCheck = CONFIG.api.currentCourseId;
   const aggregatedNotifications = new Map();
 
+
   const REGISTERD_COURSES_QUERY = `
-query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
-  calcRegisteredMembersRegisteredCoursesMany(
-    query: [{ where: { Registered_Member: [{ where: { id: $id } }] } }]
-  ) {
-    Registered_Course_ID: field(arg: ["registered_course_id"])
-  }
-}
+    query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
+      calcRegisteredMembersRegisteredCoursesMany(
+        query: [{ where: { Registered_Member: [{ where: { id: $id } }] } }]
+      ) {
+        Registered_Course_ID: field(arg: ["registered_course_id"])
+      }
+    }
 `;
 
   function fetchRegisteredCourses() {
@@ -62,11 +63,12 @@ query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
     subscribeToCalcAnnouncements(
       query: [
         { where: { created_at: $created_at, _OPERATOR_: gt } },
+        ${fetchUserDate}
         {
           andWhereGroup: [
             {
               whereGroup: [
-                { where: { announcement__type: "Post" } },
+                { where: { announcement__type: "${POSTS_TYPE}" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
                 { andWhere: { Post: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } },
                 { andWhere: { Post: [ { where: { post_type: "Notification" } } ] } }
@@ -74,21 +76,21 @@ query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "Comment" } },
+                { where: { announcement__type: "${POST_COMMENTS_TYPE}"} },
                 { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } }, { andWhere: { author_id: $author_id } } ] } } ] } },
                 { andWhere: { Comment: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "Post Mention" } },
+                { where: { announcement__type: "${POSTS_TYPE}" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
                 { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
             {
               orWhereGroup: [
-                { where: { announcement__type: "Comment Mention" } },
+                { where: { announcement__type: "${POST_COMMENTS_TYPE}"} },
                 { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } } ] } } ] } },
                 { andWhere: { Comment: [ { where: { Comment_or_Reply_Mentions: [ { where: { id: $id } } ] } }, { andWhere: { ForumComments: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } } ] } }
               ]
@@ -181,7 +183,7 @@ query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
         title: `${notification.Course_Course_name1} - A new comment has been added`,
         content: `${notification.Contact_Display_Name1} commented on your post`
       };
-    } else if (announcementType === "Post Mention") {
+    } else if (announcementType === "Post") {
       if (Number(notification.Contact_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
         return {
           title: `${notification.Course_Course_name} - You have been mentioned in a post`,
@@ -193,7 +195,7 @@ query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
           content: `${notification.Contact_Display_Name} has created a post`
         };
       }
-    } else if (announcementType === "Comment Mention") {
+    } else if (announcementType === "Comment") {
       if (Number(notification.Contact_Contact_ID1) === Number(LOGGED_IN_CONTACT_ID)) {
         return {
           title: `${notification.Course_Course_name1} - You have been mentioned in a comment`,
@@ -553,3 +555,6 @@ query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
 
   connect();
 });
+
+
+
