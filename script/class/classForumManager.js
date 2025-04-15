@@ -130,6 +130,7 @@ class ForumManager {
           title: post.Post_Title,
           content: post.Post_Copy,
           disableComments: post.Disable_New_Comments,
+          authorDirectoryProfileUrl: post.Author_Directory_Profile_URL,
         };
       });
 
@@ -232,6 +233,7 @@ class ForumManager {
             Author_Forum_Image: field(arg: ["Author", "forum_image"])
             Author_Display_Name: field(arg: ["Author", "display_name"])
             Post_Publish_Date: field(arg: ["post_publish_date"])
+            Author_Directory_Profile_URL: field(arg: ["Author", "directory__profile_url"])
           }
         }`;
     let variables = {

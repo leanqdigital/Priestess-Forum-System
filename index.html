@@ -594,8 +594,9 @@
                     <div class="size-8 profile-image-wrapper">
                         <img alt="{{:author.name}}" src="{{:author.profileImage}}" class="rounded-full size-full object-cover post-author-image">
                     </div>
-                    <!-- <h2 class="page-text h2 post-author-name">{{:author.authorDisplayName}}</h2> -->
-                    <h2 class="page-text h2 post-author-name">{{:author.authorDisplayName}}</h2>
+                    <h2 class="h2 post-author-name">
+                        <a class = "text-[#c29d68] hover:underline" target = "_blank" href = "{{:authorDirectoryProfileUrl}}">{{:author.authorDisplayName}}</a>
+                    </h2>
                     <div class="h-[15.13px] w-[2px] post-card-header-divider"></div>
                     <time class="o3 page-text">{{:date}}</time>
                     {{if featured_post === true}}
