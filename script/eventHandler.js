@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.mediaFormHandler.mediaRecorder &&
       window.mediaFormHandler.mediaRecorder.state === "recording"
     ) {
-      window.mediaFormHandler.mediaRecorder.onstop = () => {};
+      window.mediaFormHandler.mediaRecorder.onstop = () => { };
     }
     window.mediaFormHandler.resetAudioRecording();
     window.mediaFormHandler.stopAudioRecording();
@@ -389,7 +389,7 @@ function attachReplyControls(replyWrapper) {
       e.preventDefault();
       const mh = replyWrapper.mediaHandler;
       if (mh.mediaRecorder && mh.mediaRecorder.state === "recording") {
-        mh.mediaRecorder.onstop = () => {};
+        mh.mediaRecorder.onstop = () => { };
       }
       mh.resetAudioRecording();
       mh.stopAudioRecording();
@@ -514,6 +514,7 @@ function attachReplyControls(replyWrapper) {
       if (vidBtn) vidBtn.classList.remove("hidden");
     });
   }
+
   const submitBtn = replyWrapper.querySelector("#submit-reply");
   if (submitBtn) {
     submitBtn.addEventListener("click", async function (e) {
