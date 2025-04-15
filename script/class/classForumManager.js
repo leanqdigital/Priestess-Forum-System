@@ -16,12 +16,15 @@ class ForumManager {
     this.votedPostIds = new Map();
     this.votedCommentIds = new Map();
     this.votedReplyIds = new Map();
+    this.activeFourmTag = CONFIG.api.activeFourmTag;
+    this.hasValidTag = false;
     this.init();
   }
 
   async init() {
     try {
       await this.fetchSavedPosts();
+      await this.fetchContactTag();
       await this.loadInitialPosts();
       await this.fetchVotes();
       await this.fetchVoteForComment();
@@ -31,6 +34,51 @@ class ForumManager {
       UIManager.showError("Failed to initialize forum.");
     }
   }
+
+  // Fetch Contact Tags
+  async fetchContactTag() {
+    let query = `
+      query calcContacts {
+        calcContacts(
+          query: [
+            { where: { id: "${this.userId}" } }
+            {
+              andWhere: {
+                TagsData: [
+                  {
+                    where: {
+                      Tag: [
+                        { where: { name: "${this.activeFourmTag}" } }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        ) {
+          TagName: field(arg: ["TagsData", "Tag", "name"])
+        }
+      }
+    `;
+    const dataPromise = ApiService.query(query);
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    let data = await dataPromise;
+
+    let tagNames = data?.calcContacts
+      ?.map((contact) => contact?.TagName)
+      .flat();
+    tagNames = String(tagNames);
+
+    // Set the hasValidTag flag based on comparison with activeFourmTag.
+    if (tagNames === this.activeFourmTag) {
+      this.hasValidTag = true;
+    } else {
+      this.hasValidTag = false;
+    }
+    return tagNames;
+  }
+  // Fetch Contact Tags
 
   //@@Full Post Method Start
   //-----------------------------------------------------------------------
@@ -48,12 +96,23 @@ class ForumManager {
   }
 
   async fetchAndRenderPosts(isInitialLoad = false) {
+    const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
+
+    // If the contact tag doesn't match the active forum tag, show the no-posts message
+    // and exit early.
+    if (!this.hasValidTag) {
+      postContainer.innerHTML = `
+        <div class="flex flex-col gap-6 items-center justify-center">
+          <div class="size-[200px]">
+            <img src="https://file.ontraport.com/media/815e881804d34ab797e0164d3147eac6.phpi2i7d9?Expires=4892956060&Signature=RWwlqEq5aGHRwoY5Qj6PRr1OrwGrpGx52h8-xquN4k3wcESh0eUUs2pz3zaRcSqMKKoFKQuERA58BSwA0VNAqAvNc4NMSTX3odMiC3J2VKgZ99qQCtIMm182soWKlYhjYdlY4iNvqi9M4WXRYQTm8yZtS1ShkUJd79zHKc~N1jRMLUUaPlKSwum7yUT1AAl4oK-emB11oUe--F9bom4dM~QWQUGNIMvI9rD~DT0EYElQraQFU9wopWMvMmLyqEHQPFhsAM~OmIyjH8O7q3mTT629fkQWKGFM-X6~rprLOf8h~CUq45CNSHsAe8UdNRC2r42OaSU-xkC2uQdCe1lnMQ__&Key-Pair-Id=APKAJVAAMVW6XQYWSTNA" alt="Empty Post" class="size-full object-contain">
+          </div>
+          <div class="p2 text-white">No posts available.</div>
+        </div>
+      `;
+      return;
+    }
     try {
       if (!this.hasMorePosts) return;
-      const postContainer = document.querySelector(
-        CONFIG.selectors.postsContainer
-      );
-
       if (isInitialLoad) {
         postContainer.innerHTML = this.getSkeletonLoader(5);
       } else {
@@ -173,6 +232,7 @@ class ForumManager {
       `
       { where: { Related_Course: [{ where: { id: "${courseID}" } }] } }
       { andWhere: { post_status: "Published - Not flagged" } }
+      { andWhere: { related__course__tag: "${this.activeFourmTag}"}}
        `
     );
 
@@ -673,7 +733,6 @@ class ForumManager {
     }
     return skeletons;
   }
-
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
   //-----------------------------------------------------------------------
