@@ -2,12 +2,38 @@ class ContactService {
   static async fetchContacts(courseID) {
     try {
       const query = `
-        query calcRegisteredMembersRegisteredCoursesMany($registered_course_id: PriestessCourseID) {
+        query calcRegisteredMembersRegisteredCoursesMany(
+        $registered_course_id: PriestessCourseID
+         $name: TextScalar
+        ) {
           calcRegisteredMembersRegisteredCoursesMany(
             query: [
               {
                 where: {
                   registered_course_id: $registered_course_id
+                }
+              }
+              {
+                andWhere: {
+                  Registered_Member: [
+                    {
+                      where: {
+                        TagsData: [
+                          {
+                            where: {
+                              Tag: [
+                                {
+                                  where: {
+                                    name: $name
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -22,7 +48,10 @@ class ContactService {
         }
       `;
 
-      const variables = { registered_course_id: courseID };
+      const variables = { 
+        registered_course_id: courseID,
+        name: CONFIG.api.activeFourmTag,
+      };
 
       const data = await ApiService.query(query, variables);
 
