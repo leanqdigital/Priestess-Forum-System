@@ -12,6 +12,7 @@ class MentionManager {
     const editor = document.getElementById("post-editor");
     this.tribute.attach(editor);
   }
+  
   static async fetchMentionContacts(text, cb) {
     try {
       const contacts = await ContactService.fetchContacts(courseID);

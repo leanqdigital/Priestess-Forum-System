@@ -1,13 +1,14 @@
 Content Hierarchy
-1. Post - > Comment - > Replies 
-      
-Components  
 
-1.  Navbar 
+1. Post - > Comment - > Replies
+
+Components
+
+1.  Navbar
 2.  Menus
 3.  Buttons - Solid/Outline/Plain/Icon Button : Type submit and button
 4.  Rich text editor
-5.  Audio player 
+5.  Audio player
 6.  Video player
 
 Layouts
@@ -70,14 +71,15 @@ Edit/Update
 
 Delete
 
-1. Delete post
-2. Delete comment
-3. Delete reply
-4. Delete vote for post
-5. Delete vote for comment
-6. Delete vote for reply
-7. Delete bookmark record
-8. Delete mentions of posts
-9. Delete mentions of comments
+1.  Delete post
+2.  Delete comment
+3.  Delete reply
+4.  Delete vote for post
+5.  Delete vote for comment
+6.  Delete vote for reply
+7.  Delete bookmark record
+8.  Delete mentions of posts
+9.  Delete mentions of comments
 10. Delete mentions of replies
 
+       

@@ -22,11 +22,11 @@ class ForumManager {
   async init() {
     try {
       await this.fetchSavedPosts();
+      await this.loadInitialPosts();
       await this.fetchVotes();
       await this.fetchVoteForComment();
       await this.fetchVoteForReply();
       this.initEventListeners();
-      await this.loadInitialPosts();
     } catch (error) {
       UIManager.showError("Failed to initialize forum.");
     }
