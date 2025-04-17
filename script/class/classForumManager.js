@@ -23,8 +23,8 @@ class ForumManager {
 
   async init() {
     try {
-      await this.fetchSavedPosts();
       await this.fetchContactTag();
+      await this.fetchSavedPosts();
       await this.loadInitialPosts();
       await this.fetchVotes();
       await this.fetchVoteForComment();
@@ -69,6 +69,7 @@ class ForumManager {
       ?.map((contact) => contact?.TagName)
       .flat();
     tagNames = String(tagNames);
+    console.log(tagNames);
 
     // Set the hasValidTag flag based on comparison with activeForumTag.
     if (tagNames === this.activeForumTag) {
@@ -96,7 +97,9 @@ class ForumManager {
   }
 
   async fetchAndRenderPosts(isInitialLoad = false) {
-    const postContainer = document.querySelector(CONFIG.selectors.postsContainer);
+    const postContainer = document.querySelector(
+      CONFIG.selectors.postsContainer
+    );
 
     // If the contact tag doesn't match the active forum tag, show the no-posts message
     // and exit early.
@@ -240,18 +243,28 @@ class ForumManager {
       filters.push(`{ andWhere: ${dynamicFilter} }`);
     }
     if (this.searchTerm && this.searchTerm.trim() !== "") {
-      filters.push(`{
+      filters.push(`
+      {
         andWhere: {
           Author: [
             { where: { display_name: $searchPatternDisplayName, _OPERATOR_: like } }
           ]
         }
-      }`);
+      }
+      { andWhere: { Related_Course: [{ where: { id: "${courseID}" } }] } }
+      { andWhere: { post_status: "Published - Not flagged" } }
+      { andWhere: { related__course__tag: "${this.activeForumTag}"}}
+      `
+    );
       filters.push(`{
         orWhere: {
           post_copy: $searchPatternPostCopy, _OPERATOR_: like
         }
-      }`);
+      }
+      { andWhere: { Related_Course: [{ where: { id: "${courseID}" } }] } }
+      { andWhere: { post_status: "Published - Not flagged" } }
+      { andWhere: { related__course__tag: "${this.activeForumTag}"}}  
+      `);
     }
     const queryFilters = `[ ${filters.join(", ")} ]`;
     let args = [];
