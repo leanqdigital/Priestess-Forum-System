@@ -135,6 +135,7 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           Mentioned_Users { id }
           post_publish_date 
           post_status 
+          related__course__tag 
         }
       }
       `,
@@ -147,7 +148,8 @@ document.getElementById("submit-post").addEventListener("click", async (e) => {
           file_tpe: uploadedFile ? fileType : null,
           file_content: fileData ? fileData : null,
           post_publish_date: Date.now(),
-          post_status: "Published - Not flagged"
+          post_status: "Published - Not flagged",
+          related__course__tag: CONFIG.api.activeForumTag,
         },
       }
     );

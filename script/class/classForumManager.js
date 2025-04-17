@@ -16,7 +16,7 @@ class ForumManager {
     this.votedPostIds = new Map();
     this.votedCommentIds = new Map();
     this.votedReplyIds = new Map();
-    this.activeFourmTag = CONFIG.api.activeFourmTag;
+    this.activeForumTag = CONFIG.api.activeForumTag;
     this.hasValidTag = false;
     this.init();
   }
@@ -48,7 +48,7 @@ class ForumManager {
                   {
                     where: {
                       Tag: [
-                        { where: { name: "${this.activeFourmTag}" } }
+                        { where: { name: "${this.activeForumTag}" } }
                       ]
                     }
                   }
@@ -70,8 +70,8 @@ class ForumManager {
       .flat();
     tagNames = String(tagNames);
 
-    // Set the hasValidTag flag based on comparison with activeFourmTag.
-    if (tagNames === this.activeFourmTag) {
+    // Set the hasValidTag flag based on comparison with activeForumTag.
+    if (tagNames === this.activeForumTag) {
       this.hasValidTag = true;
     } else {
       this.hasValidTag = false;
@@ -232,7 +232,7 @@ class ForumManager {
       `
       { where: { Related_Course: [{ where: { id: "${courseID}" } }] } }
       { andWhere: { post_status: "Published - Not flagged" } }
-      { andWhere: { related__course__tag: "${this.activeFourmTag}"}}
+      { andWhere: { related__course__tag: "${this.activeForumTag}"}}
        `
     );
 
