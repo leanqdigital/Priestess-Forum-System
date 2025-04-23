@@ -50,7 +50,7 @@ class ContactService {
 
       const variables = { 
         registered_course_id: courseID,
-        name: CONFIG.api.activeFourmTag,
+        name: CONFIG.api.activeForumTag,
       };
 
       const data = await ApiService.query(query, variables);
