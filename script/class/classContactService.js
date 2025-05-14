@@ -3,8 +3,10 @@ class ContactService {
     try {
       const query = `
         query calcRegisteredMembersRegisteredCoursesMany(
-        $registered_course_id: PriestessCourseID
-         $name: TextScalar
+          $registered_course_id: PriestessCourseID
+          $name: TextScalar
+          $limit: IntScalar
+          $offset: IntScalar
         ) {
           calcRegisteredMembersRegisteredCoursesMany(
             query: [
@@ -51,6 +53,8 @@ class ContactService {
       const variables = { 
         registered_course_id: courseID,
         name: CONFIG.api.activeForumTag,
+        limit: 5000,
+        offset: 0
       };
 
       const data = await ApiService.query(query, variables);
