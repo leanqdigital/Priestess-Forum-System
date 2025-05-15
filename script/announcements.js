@@ -280,6 +280,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const notifCourseId = notifCourseIdRaw ? Number(notifCourseIdRaw.trim()) : null;
       const notifCourseName = card.getAttribute("data-course-name");
       const currentCourseId = courseIdToCheck ? Number(courseIdToCheck.trim()) : null;
+      console.log(courseIdToCheck);
+      console.log(currentCourseId);
       if (currentCourseId && notifCourseId !== null && currentCourseId === notifCourseId) {
         const commentId = card.getAttribute("data-comment-id");
         if (commentId) {
