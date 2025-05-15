@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let createdAt = CONFIG.api.dateAdded;
   const LOGGED_IN_CONTACT_ID = CONFIG.api.userId;
   let courseIdToCheck = CONFIG.api.currentCourseId;
+  console.log("CID", courseIdToCheck);
   const aggregatedNotifications = new Map();
 
 
