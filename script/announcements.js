@@ -1,10 +1,9 @@
-
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('DOM fully loaded, notifications script starting.');
-
+document.addEventListener("DOMContentLoaded", function () {
   // Ensure CONFIG is defined
-  if (typeof CONFIG === 'undefined' || !CONFIG.api) {
-    console.error('CONFIG object is missing. Make sure it is defined before this script runs.');
+  if (typeof CONFIG === "undefined" || !CONFIG.api) {
+    console.error(
+      "CONFIG object is missing. Make sure it is defined before this script runs."
+    );
     return;
   }
 
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const LOGGED_IN_CONTACT_ID = CONFIG.api.userId;
   let courseIdToCheck = CONFIG.api.currentCourseId;
   const aggregatedNotifications = new Map();
-
 
   const REGISTERD_COURSES_QUERY = `
     query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
@@ -41,12 +39,13 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then((response) => response.json())
       .then((data) => {
-        const courses = data.data.calcRegisteredMembersRegisteredCoursesMany || [];
-        console.log('Registered courses:', courses);
+        const courses =
+          data.data.calcRegisteredMembersRegisteredCoursesMany || [];
+        console.log("Registered courses:", courses);
         return courses.map((course) => Number(course.Registered_Course_ID));
       })
       .catch((error) => {
-        console.error('Error fetching registered courses:', error);
+        console.error("Error fetching registered courses:", error);
         return [];
       });
   }
@@ -109,18 +108,19 @@ document.addEventListener('DOMContentLoaded', function () {
       Post_ID: field(arg: ["post_id"])
       Post_Related_Course_ID: field(arg: ["Post", "related_course_id"])
       Course_Course_name: field(arg: ["Post", "Related_Course", "course_name"])
+      Course_Course_Forum_Page_Type_URL: field(arg: ["Post", "Related_Course", "course_forum_page_type_url"])
       Contact_Display_Name: field(arg: ["Post", "Author", "display_name"])
       Contact_Contact_ID: field(arg: ["Post", "Mentioned_Users", "id"])
       Comment_ID: field(arg: ["comment_id"])
       Comment_Forum_Post_ID: field(arg: ["Comment", "forum_post_id"])
       ForumPost_Related_Course_ID: field(arg: ["Comment", "Forum_Post", "related_course_id"])
       Course_Course_name1: field(arg: ["Comment", "Forum_Post", "Related_Course", "course_name"])
+      Course_Course_Forum_Page_Type_URL1: field(arg: ["Comment", "Forum_Post", "Related_Course", "course_forum_page_type_url"])
       Contact_Display_Name1: field(arg: ["Comment", "Author", "display_name"])
       Contact_Contact_ID1: field(arg: ["Comment", "Comment_or_Reply_Mentions", "id"])
     }
   }
   `;
-
 
   const READ_QUERY = `
   query calcOReadContactReadAnnouncements {
@@ -140,9 +140,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   `;
 
-  const containerNavbar = document.getElementById("parentNotificationTemplatesInNavbar");
-  const containerBody = document.getElementById("parentNotificationTemplatesInBody");
-  console.log('containerNavbar:', containerNavbar, 'containerBody:', containerBody);
+  const containerNavbar = document.getElementById(
+    "parentNotificationTemplatesInNavbar"
+  );
+  const containerBody = document.getElementById(
+    "parentNotificationTemplatesInBody"
+  );
+  console.log(
+    "containerNavbar:",
+    containerNavbar,
+    "containerBody:",
+    containerBody
+  );
 
   const notificationsContainers = [];
   if (containerNavbar) notificationsContainers.push(containerNavbar);
@@ -158,18 +167,25 @@ document.addEventListener('DOMContentLoaded', function () {
   const pendingAnnouncements = new Set();
 
   function getPostDetails(notification) {
-    let postId = null, courseId = null, courseName = null;
+    let postId = null,
+      courseId = null,
+      courseName = null;
     const announcementType = notification.Announcement_Type;
     if (announcementType === "Post" || announcementType === "Post Mention") {
       postId = notification.Post_ID;
       courseId = notification.Post_Related_Course_ID;
       courseName = notification.Course_Course_name;
-    } else if (announcementType === "Comment" || announcementType === "Comment Mention") {
+      courseUrl = notification.Course_Course_Forum_Page_Type_URL;
+    } else if (
+      announcementType === "Comment" ||
+      announcementType === "Comment Mention"
+    ) {
       postId = notification.Comment_Forum_Post_ID;
       courseId = notification.ForumPost_Related_Course_ID;
       courseName = notification.Course_Course_name1;
+      courseUrl = notification.Course_Course_Forum_Page_Type_URL1;
     }
-    return { postId, courseId, courseName };
+    return { postId, courseId, courseName, courseUrl };
   }
 
   function getCustomTitleAndContent(notification) {
@@ -177,41 +193,46 @@ document.addEventListener('DOMContentLoaded', function () {
     if (announcementType === "Post") {
       return {
         title: `${notification.Course_Course_name} - A new notification has been added`,
-        content: `Important message from ${notification.Contact_Display_Name}`
+        content: `Important message from ${notification.Contact_Display_Name}`,
       };
     } else if (announcementType === "Comment") {
       return {
         title: `${notification.Course_Course_name1} - A new comment has been added`,
-        content: `${notification.Contact_Display_Name1} commented on your post`
+        content: `${notification.Contact_Display_Name1} commented on your post`,
       };
     } else if (announcementType === "Post Mention") {
-      if (Number(notification.Contact_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+      if (
+        Number(notification.Contact_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)
+      ) {
         return {
           title: `${notification.Course_Course_name} - You have been mentioned in a post`,
-          content: `${notification.Contact_Display_Name} mentioned you in a post`
+          content: `${notification.Contact_Display_Name} mentioned you in a post`,
         };
       } else {
         return {
           title: `${notification.Course_Course_name} - A post has been created`,
-          content: `${notification.Contact_Display_Name} has created a post`
+          content: `${notification.Contact_Display_Name} has created a post`,
         };
       }
     } else if (announcementType === "Comment Mention") {
-      if (Number(notification.Contact_Contact_ID1) === Number(LOGGED_IN_CONTACT_ID)) {
+      if (
+        Number(notification.Contact_Contact_ID1) ===
+        Number(LOGGED_IN_CONTACT_ID)
+      ) {
         return {
           title: `${notification.Course_Course_name1} - You have been mentioned in a comment`,
-          content: `${notification.Contact_Display_Name1} mentioned you in a comment`
+          content: `${notification.Contact_Display_Name1} mentioned you in a comment`,
         };
       } else {
         return {
           title: `${notification.Course_Course_name1} - A new comment has been added`,
-          content: `${notification.Contact_Display_Name1} commented on your post`
+          content: `${notification.Contact_Display_Name1} commented on your post`,
         };
       }
     }
     return {
       title: notification.Title || "",
-      content: notification.Content || ""
+      content: notification.Content || "",
     };
   }
 
@@ -239,9 +260,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function createNotificationCard(notification, isRead) {
     const card = document.createElement("div");
-    card.className = "notification flex justify-between gap-2 load-comments-btn";
+    card.className =
+      "notification flex justify-between gap-2 load-comments-btn";
     card.setAttribute("data-id", String(notification.ID));
-    const { postId, courseId, courseName } = getPostDetails(notification);
+    const { postId, courseId, courseName, courseUrl } =
+      getPostDetails(notification);
     if (postId) {
       card.setAttribute("data-post-id", String(postId));
       if (courseId) {
@@ -261,14 +284,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     const { title, content } = getCustomTitleAndContent(notification);
     card.innerHTML = `
-    <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${isRead ? "" : "bg-unread"} hover:bg-secondary-100 hover:text-white">
-      <div class="flex justify-between w-full gap-[4px]">
-        <div class="text-sm font-semibold leading-none titleText">${title}</div>
-        <div class="text-xs leading-3 data-added line-clamp-1 text-nowrap dateText">${timeAgo(notification.Date_Added)}</div>
-      </div>
-      <div class="text-xs leading-none contentText">${content}</div>
-    </div>
-  `;
+        <div class="w-full flex flex-col p-2 gap-[4px] cursor-pointer rounded ${
+          isRead ? "" : "bg-unread"
+        } hover:bg-secondary-100 hover:text-white">
+          <div class="flex justify-between w-full gap-[4px]">
+            <div class="text-sm font-semibold leading-none titleText">${title}</div>
+            <div class="text-xs leading-3 data-added line-clamp-1 text-nowrap dateText">${timeAgo(
+              notification.Date_Added
+            )}</div>
+          </div>
+          <div class="text-xs leading-none contentText">${content}</div>
+        </div>
+     `;
     card.addEventListener("click", function () {
       const id = Number(card.getAttribute("data-id"));
       const postIdAttr = card.getAttribute("data-post-id");
@@ -277,15 +304,25 @@ document.addEventListener('DOMContentLoaded', function () {
         markAsRead(id);
       }
       const notifCourseIdRaw = card.getAttribute("data-course-id");
-      const notifCourseId = notifCourseIdRaw ? Number(notifCourseIdRaw.trim()) : null;
+      const notifCourseId = notifCourseIdRaw
+        ? Number(notifCourseIdRaw.trim())
+        : null;
       const notifCourseName = card.getAttribute("data-course-name");
-      const currentCourseId = courseIdToCheck ? Number(courseIdToCheck.trim()) : null;
-      if (currentCourseId && notifCourseId !== null && currentCourseId === notifCourseId) {
+      const currentCourseId = courseIdToCheck
+        ? Number(courseIdToCheck.trim())
+        : null;
+      if (
+        currentCourseId &&
+        notifCourseId !== null &&
+        currentCourseId === notifCourseId
+      ) {
         const commentId = card.getAttribute("data-comment-id");
         if (commentId) {
           // If you rely on openCommentModal, ensure it is defined in your environment.
           setTimeout(() => {
-            const commentEl = document.querySelector(`[data-comment-id="${commentId}"] .commentCard`);
+            const commentEl = document.querySelector(
+              `[data-comment-id="${commentId}"] .commentCard`
+            );
             if (commentEl) {
               commentEl.scrollIntoView({ behavior: "smooth", block: "center" });
               commentEl.classList.add("highlight");
@@ -298,8 +335,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return;
       } else {
-        const formattedCourseName = notifCourseName ? notifCourseName.replace(/\s+/g, "-").toLowerCase() : "course";
-        let redirectUrl = `https://library.priestesspresence.com/forum/${formattedCourseName}?pid=${postIdAttr}`;
+        const formattedCourseName = notifCourseName
+          ? notifCourseName.replace(/\s+/g, "-").toLowerCase()
+          : "course";
+        let redirectUrl = `${baseUrl}?pid=${postIdAttr}`;
         const commentId = card.getAttribute("data-comment-id");
         if (commentId) {
           redirectUrl += `&cid=${commentId}`;
@@ -325,13 +364,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function updateNoNotificationsMessage() {
-    const notificationContainers = document.querySelectorAll("#parentNotificationTemplatesInNavbar, #parentNotificationTemplatesInBody");
+    const notificationContainers = document.querySelectorAll(
+      "#parentNotificationTemplatesInNavbar, #parentNotificationTemplatesInBody"
+    );
     notificationContainers.forEach((container) => {
       let messageDiv = container.querySelector(".no-notifications-message");
       if (displayedNotifications.size === 0) {
         if (!messageDiv) {
           messageDiv = document.createElement("div");
-          messageDiv.className = "no-notifications-message text-black text-center p-2";
+          messageDiv.className =
+            "no-notifications-message text-black text-center p-2";
           messageDiv.textContent = "No notifications";
           container.appendChild(messageDiv);
         }
@@ -343,14 +385,20 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function processNotification(notification) {
-    console.log('Processing notification:', notification);
+    console.log("Processing notification:", notification);
     const id = Number(notification.ID);
     if (aggregatedNotifications.has(id)) {
       let aggregated = aggregatedNotifications.get(id);
-      if (notification.Announcement_Type === "Post Mention" || notification.Announcement_Type === "Comment Mention") {
-        aggregated.Contact_Contact_ID = notification.Contact_Contact_ID || aggregated.Contact_Contact_ID;
-        aggregated.Contact_Contact_ID1 = notification.Contact_Contact_ID1 || aggregated.Contact_Contact_ID1;
-        aggregated.Announcement_Type = notification.Announcement_Type || aggregated.Announcement_Type;
+      if (
+        notification.Announcement_Type === "Post Mention" ||
+        notification.Announcement_Type === "Comment Mention"
+      ) {
+        aggregated.Contact_Contact_ID =
+          notification.Contact_Contact_ID || aggregated.Contact_Contact_ID;
+        aggregated.Contact_Contact_ID1 =
+          notification.Contact_Contact_ID1 || aggregated.Contact_Contact_ID1;
+        aggregated.Announcement_Type =
+          notification.Announcement_Type || aggregated.Announcement_Type;
         aggregatedNotifications.set(id, aggregated);
         updateNotificationCard(id, aggregated);
       }
@@ -390,7 +438,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function updateRedDot() {
     const redDot = document.querySelector(".red-dot");
     if (!redDot) return;
-    const unreadCount = Array.from(displayedNotifications).filter((id) => !readAnnouncements.has(id)).length;
+    const unreadCount = Array.from(displayedNotifications).filter(
+      (id) => !readAnnouncements.has(id)
+    ).length;
     if (unreadCount > 0) {
       redDot.classList.remove("hidden");
     } else {
@@ -421,7 +471,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function markAsRead(announcementId) {
-    if (pendingAnnouncements.has(announcementId) || readAnnouncements.has(announcementId))
+    if (
+      pendingAnnouncements.has(announcementId) ||
+      readAnnouncements.has(announcementId)
+    )
       return;
     pendingAnnouncements.add(announcementId);
     disableNotificationUI(announcementId);
@@ -460,10 +513,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   async function markAllAsRead() {
-    const unreadAnnouncementIds = [...displayedNotifications].filter((id) => !readAnnouncements.has(id));
+    const unreadAnnouncementIds = [...displayedNotifications].filter(
+      (id) => !readAnnouncements.has(id)
+    );
     if (unreadAnnouncementIds.length === 0) return;
     markAllButtons.forEach((btn) => btn.classList.add("disabled"));
-    const promises = unreadAnnouncementIds.map((announcementId) => markAsRead(announcementId));
+    const promises = unreadAnnouncementIds.map((announcementId) =>
+      markAsRead(announcementId)
+    );
     await Promise.all(promises);
     updateNotificationReadStatus();
     markAllButtons.forEach((btn) => btn.classList.remove("disabled"));
@@ -481,11 +538,15 @@ document.addEventListener('DOMContentLoaded', function () {
       .then((response) => response.json())
       .then((data) => {
         if (data.data && data.data.calcOReadContactReadAnnouncements) {
-          const records = Array.isArray(data.data.calcOReadContactReadAnnouncements)
+          const records = Array.isArray(
+            data.data.calcOReadContactReadAnnouncements
+          )
             ? data.data.calcOReadContactReadAnnouncements
             : [data.data.calcOReadContactReadAnnouncements];
           records.forEach((record) => {
-            if (Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)) {
+            if (
+              Number(record.Read_Contact_ID) === Number(LOGGED_IN_CONTACT_ID)
+            ) {
               readAnnouncements.add(Number(record.Read_Announcement_ID));
             }
           });
@@ -493,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function () {
           updateNoNotificationsMessage();
         }
       })
-      .catch(() => { });
+      .catch(() => {});
   }
 
   function sendKeepAlive() {
@@ -505,25 +566,27 @@ document.addEventListener('DOMContentLoaded', function () {
   function connect() {
     socket = new WebSocket(WS_ENDPOINT, "vitalstats");
     socket.onopen = () => {
-      console.log('WebSocket connected.');
+      console.log("WebSocket connected.");
       socket.send(JSON.stringify({ type: "connection_init" }));
       keepAliveInterval = setInterval(sendKeepAlive, 28000);
       fetchRegisteredCourses().then((registeredCourseIds) => {
         registeredCourseIds.forEach((courseId, index) => {
           const subscriptionId = `sub-${courseId}-${index}`;
-          socket.send(JSON.stringify({
-            id: subscriptionId,
-            type: "GQL_START",
-            payload: {
-              query: SUBSCRIPTION_QUERY,
-              variables: {
-                author_id: LOGGED_IN_CONTACT_ID,
-                id: LOGGED_IN_CONTACT_ID,
-                related_course_id: courseId,
-                created_at: createdAt,
+          socket.send(
+            JSON.stringify({
+              id: subscriptionId,
+              type: "GQL_START",
+              payload: {
+                query: SUBSCRIPTION_QUERY,
+                variables: {
+                  author_id: LOGGED_IN_CONTACT_ID,
+                  id: LOGGED_IN_CONTACT_ID,
+                  related_course_id: courseId,
+                  created_at: createdAt,
+                },
               },
-            }
-          }));
+            })
+          );
         });
       });
       fetchReadData();
@@ -531,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('WebSocket message received:', data);
+      console.log("WebSocket message received:", data);
       if (data.type !== "GQL_DATA") return;
       if (!data.payload || !data.payload.data) return;
       const result = data.payload.data.subscribeToCalcAnnouncements;
@@ -541,12 +604,12 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     socket.onclose = () => {
-      console.log('WebSocket closed.');
+      console.log("WebSocket closed.");
       clearInterval(keepAliveInterval);
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+      console.error("WebSocket error:", error);
     };
   }
 
@@ -556,6 +619,3 @@ document.addEventListener('DOMContentLoaded', function () {
 
   connect();
 });
-
-
-
