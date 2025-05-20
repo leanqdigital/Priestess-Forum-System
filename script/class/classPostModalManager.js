@@ -225,6 +225,15 @@ class PostModalManager {
                                         fill="#C29D68" />
                                 </svg>
                             </button>
+                            <select class="bg-transparent border-none text-[#D4AF7A] cursor-pointer speed-select">
+                              <option value="0.8">0.8x</option>
+                              <option value="1" selected>1x</option>
+                              <option value="1.2">1.2x</option>
+                              <option value="1.5">1.5x</option>
+                              <option value="1.7">1.7x</option>
+                              <option value="2">2x</option>
+                              <option value="2.5">2.5x</option>
+                            </select>
                         </div>
 
                         <!-- Progress and volume -->

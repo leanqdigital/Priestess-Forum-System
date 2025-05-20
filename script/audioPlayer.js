@@ -1,7 +1,6 @@
 function playAudio(id) {
   const player = document.querySelector(`[data-audio-player="${id}"]`);
   if (!player) {
-    console.error(`Audio player with id "${id}" not found.`);
     return;
   }
 
@@ -39,6 +38,11 @@ function playAudio(id) {
     forwardBtn,
     progressBar
   );
+
+  const speedSelect = player.querySelector(".speed-select");
+  speedSelect.addEventListener("change", (e) => {
+    audio.playbackRate = parseFloat(e.target.value);
+  });
 
   // When the audio ends, reset the seeker and update icons to play state
   audio.addEventListener("ended", () => {
