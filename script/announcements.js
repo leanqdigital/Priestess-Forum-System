@@ -290,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
     card.addEventListener("click", function () {
       const id = Number(card.getAttribute("data-id"));
       const postIdAttr = card.getAttribute("data-post-id");
+      let baseUrl = courseUrl;
       if (!postIdAttr) return;
       if (!readAnnouncements.has(id) && !pendingAnnouncements.has(id)) {
         markAsRead(id);
