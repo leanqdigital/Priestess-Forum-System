@@ -1,9 +1,10 @@
-document.addEventListener("DOMContentLoaded", function () {
+
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('DOM fully loaded, notifications script starting.');
+
   // Ensure CONFIG is defined
-  if (typeof CONFIG === "undefined" || !CONFIG.api) {
-    console.error(
-      "CONFIG object is missing. Make sure it is defined before this script runs."
-    );
+  if (typeof CONFIG === 'undefined' || !CONFIG.api) {
+    console.error('CONFIG object is missing. Make sure it is defined before this script runs.');
     return;
   }
 
@@ -39,13 +40,12 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => response.json())
       .then((data) => {
-        const courses =
-          data.data.calcRegisteredMembersRegisteredCoursesMany || [];
-        console.log("Registered courses:", courses);
+        const courses = data.data.calcRegisteredMembersRegisteredCoursesMany || [];
+        console.log('Registered courses:', courses);
         return courses.map((course) => Number(course.Registered_Course_ID));
       })
       .catch((error) => {
-        console.error("Error fetching registered courses:", error);
+        console.error('Error fetching registered courses:', error);
         return [];
       });
   }
@@ -140,18 +140,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   `;
 
-  const containerNavbar = document.getElementById(
-    "parentNotificationTemplatesInNavbar"
-  );
-  const containerBody = document.getElementById(
-    "parentNotificationTemplatesInBody"
-  );
-  console.log(
-    "containerNavbar:",
-    containerNavbar,
-    "containerBody:",
-    containerBody
-  );
+  const containerNavbar = document.getElementById("parentNotificationTemplatesInNavbar");
+  const containerBody = document.getElementById("parentNotificationTemplatesInBody");
+  console.log('containerNavbar:', containerNavbar, 'containerBody:', containerBody);
 
   const notificationsContainers = [];
   if (containerNavbar) notificationsContainers.push(containerNavbar);
@@ -308,14 +299,8 @@ document.addEventListener("DOMContentLoaded", function () {
         ? Number(notifCourseIdRaw.trim())
         : null;
       const notifCourseName = card.getAttribute("data-course-name");
-      const currentCourseId = courseIdToCheck
-        ? Number(courseIdToCheck.trim())
-        : null;
-      if (
-        currentCourseId &&
-        notifCourseId !== null &&
-        currentCourseId === notifCourseId
-      ) {
+      const currentCourseId = courseIdToCheck ? Number(courseIdToCheck.trim()) : null;
+      if (currentCourseId && notifCourseId !== null && currentCourseId === notifCourseId) {
         const commentId = card.getAttribute("data-comment-id");
         if (commentId) {
           // If you rely on openCommentModal, ensure it is defined in your environment.
@@ -385,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function processNotification(notification) {
-    console.log("Processing notification:", notification);
+    console.log('Processing notification:', notification);
     const id = Number(notification.ID);
     if (aggregatedNotifications.has(id)) {
       let aggregated = aggregatedNotifications.get(id);
@@ -566,7 +551,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function connect() {
     socket = new WebSocket(WS_ENDPOINT, "vitalstats");
     socket.onopen = () => {
-      console.log("WebSocket connected.");
+      console.log('WebSocket connected.');
       socket.send(JSON.stringify({ type: "connection_init" }));
       keepAliveInterval = setInterval(sendKeepAlive, 28000);
       fetchRegisteredCourses().then((registeredCourseIds) => {
@@ -594,7 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("WebSocket message received:", data);
+      console.log('WebSocket message received:', data);
       if (data.type !== "GQL_DATA") return;
       if (!data.payload || !data.payload.data) return;
       const result = data.payload.data.subscribeToCalcAnnouncements;
@@ -604,12 +589,12 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     socket.onclose = () => {
-      console.log("WebSocket closed.");
+      console.log('WebSocket closed.');
       clearInterval(keepAliveInterval);
     };
 
     socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
+      console.error('WebSocket error:', error);
     };
   }
 
