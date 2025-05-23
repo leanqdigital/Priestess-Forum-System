@@ -117,7 +117,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const READ_QUERY = `
   query calcOReadContactReadAnnouncements {
-    calcOReadContactReadAnnouncements {
+    calcOReadContactReadAnnouncements (
+      limit: 50000
+      offset: 0
+    ){
       Read_Announcement_ID: field(arg: ["read_announcement_id"])
       Read_Contact_ID: field(arg: ["read_contact_id"])
     }
