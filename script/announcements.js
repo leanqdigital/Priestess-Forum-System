@@ -1,10 +1,5 @@
-
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('DOM fully loaded, notifications script starting.');
-
-  // Ensure CONFIG is defined
-  if (typeof CONFIG === 'undefined' || !CONFIG.api) {
-    console.error('CONFIG object is missing. Make sure it is defined before this script runs.');
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof CONFIG === "undefined" || !CONFIG.api) {
     return;
   }
 
@@ -40,12 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then((response) => response.json())
       .then((data) => {
-        const courses = data.data.calcRegisteredMembersRegisteredCoursesMany || [];
-        console.log('Registered courses:', courses);
+        const courses =
+          data.data.calcRegisteredMembersRegisteredCoursesMany || [];
         return courses.map((course) => Number(course.Registered_Course_ID));
       })
       .catch((error) => {
-        console.error('Error fetching registered courses:', error);
         return [];
       });
   }
@@ -62,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
     subscribeToCalcAnnouncements(
       query: [
         { where: { created_at: $created_at, _OPERATOR_: gt } },
-        ${fetchUserDate}
         {
           andWhereGroup: [
             {
@@ -140,9 +133,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   `;
 
-  const containerNavbar = document.getElementById("parentNotificationTemplatesInNavbar");
-  const containerBody = document.getElementById("parentNotificationTemplatesInBody");
-  console.log('containerNavbar:', containerNavbar, 'containerBody:', containerBody);
+  const containerNavbar = document.getElementById(
+    "parentNotificationTemplatesInNavbar"
+  );
+
+  const containerBody = document.getElementById(
+    "parentNotificationTemplatesInBody"
+  );
 
   const notificationsContainers = [];
   if (containerNavbar) notificationsContainers.push(containerNavbar);
@@ -301,7 +298,11 @@ document.addEventListener('DOMContentLoaded', function () {
         : null;
       const notifCourseName = card.getAttribute("data-course-name");
       const currentCourseId = courseIdToCheck;
-      if (currentCourseId && notifCourseId !== null && currentCourseId === notifCourseId) {
+      if (
+        currentCourseId &&
+        notifCourseId !== null &&
+        currentCourseId === notifCourseId
+      ) {
         const commentId = card.getAttribute("data-comment-id");
         if (commentId) {
           // If you rely on openCommentModal, ensure it is defined in your environment.
@@ -371,7 +372,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function processNotification(notification) {
-    console.log('Processing notification:', notification);
     const id = Number(notification.ID);
     if (aggregatedNotifications.has(id)) {
       let aggregated = aggregatedNotifications.get(id);
@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function fetchReadData() {
-    fetch(HTTP_ENDPOINT, {
+    return fetch(HTTP_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -552,35 +552,36 @@ document.addEventListener('DOMContentLoaded', function () {
   function connect() {
     socket = new WebSocket(WS_ENDPOINT, "vitalstats");
     socket.onopen = () => {
-      console.log('WebSocket connected.');
       socket.send(JSON.stringify({ type: "connection_init" }));
       keepAliveInterval = setInterval(sendKeepAlive, 28000);
-      fetchRegisteredCourses().then((registeredCourseIds) => {
-        registeredCourseIds.forEach((courseId, index) => {
-          const subscriptionId = `sub-${courseId}-${index}`;
-          socket.send(
-            JSON.stringify({
-              id: subscriptionId,
-              type: "GQL_START",
-              payload: {
-                query: SUBSCRIPTION_QUERY,
-                variables: {
-                  author_id: LOGGED_IN_CONTACT_ID,
-                  id: LOGGED_IN_CONTACT_ID,
-                  related_course_id: courseId,
-                  created_at: createdAt,
+
+      // ensure we know which announcements are already read
+      fetchReadData()
+        .then(() => fetchRegisteredCourses())
+        .then((registeredCourseIds) => {
+          registeredCourseIds.forEach((courseId, index) => {
+            const subscriptionId = `sub-${courseId}-${index}`;
+            socket.send(
+              JSON.stringify({
+                id: subscriptionId,
+                type: "GQL_START",
+                payload: {
+                  query: SUBSCRIPTION_QUERY,
+                  variables: {
+                    author_id: LOGGED_IN_CONTACT_ID,
+                    id: LOGGED_IN_CONTACT_ID,
+                    related_course_id: courseId,
+                    created_at: createdAt,
+                  },
                 },
-              },
-            })
-          );
+              })
+            );
+          });
         });
-      });
-      fetchReadData();
     };
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log('WebSocket message received:', data);
       if (data.type !== "GQL_DATA") return;
       if (!data.payload || !data.payload.data) return;
       const result = data.payload.data.subscribeToCalcAnnouncements;
@@ -590,13 +591,10 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     socket.onclose = () => {
-      console.log('WebSocket closed.');
       clearInterval(keepAliveInterval);
     };
 
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+    socket.onerror = (error) => {};
   }
 
   markAllButtons.forEach((btn) => {
