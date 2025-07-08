@@ -612,7 +612,7 @@ function sortAllNotifications() {
       if (!result) return;
       const notifications = Array.isArray(result) ? result : [result];
       notifications.slice().reverse().forEach(processNotification);
-      //sortAllNotifications();
+      sortAllNotifications();
     };
 
     socket.onclose = () => {
