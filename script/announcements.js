@@ -611,8 +611,8 @@ function sortAllNotifications() {
       const result = data.payload.data.subscribeToCalcAnnouncements;
       if (!result) return;
       const notifications = Array.isArray(result) ? result : [result];
-      //notifications.slice().reverse().forEach(processNotification);
-      sortAllNotifications();
+      notifications.slice().reverse().forEach(processNotification);
+      //sortAllNotifications();
     };
 
     socket.onclose = () => {
