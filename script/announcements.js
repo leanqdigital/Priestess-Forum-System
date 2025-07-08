@@ -10,6 +10,24 @@ document.addEventListener("DOMContentLoaded", function () {
   const LOGGED_IN_CONTACT_ID = CONFIG.api.userId;
   let courseIdToCheck = CONFIG.api.currentCourseId;
   const aggregatedNotifications = new Map();
+  
+  function sortNotificationsContainer(container) {
+  const cards = Array.from(
+    container.querySelectorAll(".notification")
+  );
+  cards.sort((a, b) => {
+    return (
+      Number(b.getAttribute("data-timestamp")) -
+      Number(a.getAttribute("data-timestamp"))
+    );
+  });
+  // re-append in sorted order
+  cards.forEach((card) => container.appendChild(card));
+}
+
+function sortAllNotifications() {
+  notificationsContainers.forEach(sortNotificationsContainer);
+}
 
   const REGISTERD_COURSES_QUERY = `
     query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
@@ -408,6 +426,7 @@ document.addEventListener("DOMContentLoaded", function () {
       cards.push(card);
     });
     cardMap.set(id, cards);
+    sortAllNotifications();
     updateNoNotificationsMessage();
     updateRedDot();
   }
