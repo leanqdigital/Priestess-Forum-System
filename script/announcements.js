@@ -63,13 +63,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 { where: { announcement__type: "Post" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
                 { andWhere: { Post: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } },
-                { andWhere: { Post: [ { where: { post_type: "Notification" } } ] } }
+                { andWhere: { Post: [ { where: { post_type: "Notification" } } ] } },
+                { andWhere: { Post: [ { where: { post_status: "Published - Not flagged" } } ] }
+              }
               ]
             },
             {
               orWhereGroup: [
                 { where: { announcement__type: "Comment"} },
-                { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } }, { andWhere: { author_id: $author_id } } ] } } ] } },
+                { andWhere: { Comment: [ { where: { Forum_Post: [ { where: { related_course_id: $related_course_id } }, 
+                { andWhere: { author_id: $author_id } } ] } } ] } },
                 { andWhere: { Comment: [ { where: { author_id: $author_id, _OPERATOR_: neq } } ] } }
               ]
             },
@@ -85,7 +88,9 @@ document.addEventListener("DOMContentLoaded", function () {
               orWhereGroup: [
                 { where: { announcement__type: "Post Mention" } },
                 { andWhere: { Post: [ { where: { related_course_id: $related_course_id } } ] } },
-                { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } }
+                { andWhere: { Post: [ { where: { Mentioned_Users: [ { where: { id: $id } } ] } }, 
+                { andWhere: { author_id: $author_id, _OPERATOR_: neq } } ] } },
+                { andWhere: { Post: [ { where: { post_status: "Published - Not flagged" } } ] } }
               ]
             }
           ]
