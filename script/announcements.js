@@ -275,6 +275,7 @@ function sortAllNotifications() {
     card.className =
       "notification flex justify-between gap-2 load-comments-btn";
     card.setAttribute("data-id", String(notification.ID));
+    card.setAttribute("data-timestamp", String(notification.Date_Added));
     const { postId, courseId, courseName, courseUrl } =
       getPostDetails(notification);
     if (postId) {
