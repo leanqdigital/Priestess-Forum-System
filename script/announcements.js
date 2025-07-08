@@ -11,23 +11,21 @@ document.addEventListener("DOMContentLoaded", function () {
   let courseIdToCheck = CONFIG.api.currentCourseId;
   const aggregatedNotifications = new Map();
   
-  function sortNotificationsContainer(container) {
-  const cards = Array.from(
-    container.querySelectorAll(".notification")
-  );
+function sortNotificationsContainer(container) {
+  const cards = Array.from(container.querySelectorAll(".notification"));
   cards.sort((a, b) => {
     return (
       Number(b.getAttribute("data-timestamp")) -
       Number(a.getAttribute("data-timestamp"))
     );
   });
-  // re-append in sorted order
   cards.forEach((card) => container.appendChild(card));
 }
 
 function sortAllNotifications() {
   notificationsContainers.forEach(sortNotificationsContainer);
 }
+
 
   const REGISTERD_COURSES_QUERY = `
     query calcRegisteredMembersRegisteredCoursesMany($id: PriestessContactID) {
@@ -426,7 +424,6 @@ function sortAllNotifications() {
       cards.push(card);
     });
     cardMap.set(id, cards);
-    sortAllNotifications();
     updateNoNotificationsMessage();
     updateRedDot();
   }
@@ -614,7 +611,8 @@ function sortAllNotifications() {
       const result = data.payload.data.subscribeToCalcAnnouncements;
       if (!result) return;
       const notifications = Array.isArray(result) ? result : [result];
-      notifications.slice().reverse().forEach(processNotification);
+      //notifications.slice().reverse().forEach(processNotification);
+      sortAllNotifications();
     };
 
     socket.onclose = () => {
