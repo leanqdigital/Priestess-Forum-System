@@ -277,7 +277,14 @@ function sortAllNotifications() {
     card.className =
       "notification flex justify-between gap-2 load-comments-btn";
     card.setAttribute("data-id", String(notification.ID));
-    card.setAttribute("data-timestamp", String(notification.Date_Added));
+    // Determine which date to use for display and sorting
+    let displayTimestamp;
+    if (notification.Announcement_Type === "Post" && notification.Post_Post_Publish_Date) {
+      displayTimestamp = notification.Post_Post_Publish_Date;
+    } else {
+      displayTimestamp = notification.Date_Added;
+    }
+    card.setAttribute("data-timestamp", String(displayTimestamp));
     const { postId, courseId, courseName, courseUrl } =
       getPostDetails(notification);
     if (postId) {
@@ -305,7 +312,7 @@ function sortAllNotifications() {
           <div class="flex justify-between w-full gap-[4px]">
             <div class="text-sm font-semibold leading-none titleText">${title}</div>
             <div class="text-xs leading-3 data-added line-clamp-1 text-nowrap dateText">${timeAgo(
-              notification.Date_Added
+              displayTimestamp
             )}</div>
           </div>
           <div class="text-xs leading-none contentText">${content}</div>
