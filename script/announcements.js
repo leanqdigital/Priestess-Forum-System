@@ -132,6 +132,8 @@ function sortAllNotifications() {
       Course_Course_Forum_Page_Type_URL1: field(arg: ["Comment", "Forum_Post", "Related_Course", "course_forum_page_type_url"])
       Contact_Display_Name1: field(arg: ["Comment", "Author", "display_name"])
       Contact_Contact_ID1: field(arg: ["Comment", "Comment_or_Reply_Mentions", "id"])
+      Post_Post_Publish_Date: field(arg: ["Post", "post_publish_date"]
+    )
     }
   }
   `;
