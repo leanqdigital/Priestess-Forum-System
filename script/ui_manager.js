@@ -184,7 +184,7 @@ let formatPreiview = function formatPreiview() {
           } else if (url.includes("vimeo.com")) {
             url = transformVimeoUrl(url);
           }
-          if (!post.querySelector(`[data-preview-url="${url}"]`)) {
+          if (!post.querySelector(`[data-preview-url="${CSS.escape(url)}"]`)) {
             createPreviewContainer(url, post);
           }
         });
@@ -192,7 +192,7 @@ let formatPreiview = function formatPreiview() {
     });
 
     function createPreviewContainer(url, post) {
-      if (post.querySelector(`[data-preview-url="${url}"]`)) {
+      if (post.querySelector(`[data-preview-url="${CSS.escape(url)}"]`)) {
         return;
       }
       const iframe = document.createElement("iframe");
